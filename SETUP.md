@@ -83,10 +83,10 @@
 3. Prepare `src` and `dist` directories
 
   We will create 2 directories `src` and `dist` in our project, with `src` being the TS source code we write,
-  and `dist` being the compiled JS output that we will use to actually run:
+  and `dist` being the compiled JS output that we will run with Node:
 
   ```shell
-  mkdir src dist;
+  mkdir src dist; # This creates 2 new directories "src" and "dist"
   ```
 
   Now, configure `tsc` to read source files from `src` and output JS files to `dist`, by updating `tsconfig.json`.
@@ -116,7 +116,7 @@
 
   - `compilerOptions.sourceMap`: `true`
 
-    This will create an `index.js.map` file in our output directory to help with debugging
+    This will prompt `tsc` to create a mapper file `dist/foo.js.map` file for `src/foo.ts`, for debugging
 
   The code block below is the bare minimum `tsconfig.json` that covers everything from steps 4-5:
 
@@ -126,8 +126,8 @@
       "module": "NodeNext",
       "moduleResolution": "NodeNext",
       "target": "ES2020",
-      "sourceMap": true,
-      "outDir": "dist"
+      "outDir": "dist",
+      "sourceMap": true
     },
     "include": ["src/**/*"]
   }
