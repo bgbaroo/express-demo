@@ -4,7 +4,7 @@ Simple web back-end written in TypeScript.
 
 The demo will include:
 
-1. [Express with TypeScript setup](/SETUP.md)
+1. [Project setup](/SETUP.md)
 
 2. (TODO) Basic webserver with Express
 
