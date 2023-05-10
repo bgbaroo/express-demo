@@ -15,9 +15,7 @@ export interface IGroup {
 export class Group implements IGroup {
   id: string;
   name: string;
-
   private _members: Map<string, IUser>;
-  private findMemberIndex: (this: IGroup, userId: string) => number;
 
   constructor(id: string, name: string, users: IUser[]) {
     this.id = id;
