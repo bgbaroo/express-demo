@@ -9,7 +9,7 @@ export async function listenAndServe(port: number | string) {
   const app: Express = express();
   app.use(express.json());
 
-  app.get("/test", (_req, res) => {
+  app.get("/status", (_req: Request, res: Response) => {
     return Ok("ok", res);
   });
 
