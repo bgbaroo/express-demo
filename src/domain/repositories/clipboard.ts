@@ -39,14 +39,9 @@ class ClipboardRepository implements IClipboardRepository {
     this: ClipboardRepository,
     id: string,
     userId: string
-  ): Promise<IClipboard> {
+  ): Promise<IClipboard | undefined> {
     const key = userId + id;
-    const clipboard = this.storage.get(key);
-    if (clipboard) {
-      return Promise.resolve(clipboard);
-    }
-
-    return Promise.reject(AppErrors.ClipboardNotFound);
+    return Promise.resolve(this.storage.get(key));
   }
 
   async getClipboards(

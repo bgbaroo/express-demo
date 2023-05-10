@@ -20,7 +20,7 @@ class ClipboardUseCase implements IClipboardUseCase {
     this: ClipboardUseCase,
     id: string,
     userId: string
-  ): Promise<IClipboard> {
+  ): Promise<IClipboard | undefined> {
     return repository.getClipboard(id, userId);
   }
 

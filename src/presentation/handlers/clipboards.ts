@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IClipboard } from "../../domain/entities/clipboard";
+import usecase from "../../domain/usecases/clipboard";
 import {
   Ok,
   NotFound,
@@ -7,7 +8,6 @@ import {
   InternalServerError,
   MissingField,
 } from "../response";
-import usecase from "../../domain/usecases/clipboard";
 
 export async function createClipboard(req: Request, res: Response) {
   const { userId, message } = req.body;
@@ -32,7 +32,6 @@ export async function createClipboard(req: Request, res: Response) {
     );
 }
 
-// TODO: 500 returned when not found
 export async function getClipboard(req: Request, res: Response) {
   const { id, userId } = req.body;
   if (!id) {
@@ -45,8 +44,16 @@ export async function getClipboard(req: Request, res: Response) {
 
   return usecase
     .getClipboard(id, userId)
-    .then((clip) => Ok(clip, res))
-    .catch((err) => NotFound(`failed to get clipboard ${id}: ${err}`, res));
+    .then((clip) => {
+      if (clip === undefined) {
+        return NotFound(`clipboard ${id} not found`, res);
+      }
+
+      return Ok(clip, res);
+    })
+    .catch((err) =>
+      InternalServerError(`failed to get clipboard ${id}: ${err}`, res)
+    );
 }
 
 export async function deleteClipboard(
