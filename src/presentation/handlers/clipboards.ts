@@ -9,7 +9,10 @@ import {
   MissingField,
 } from "../response";
 
-export async function createClipboard(req: Request, res: Response) {
+export async function createClipboard(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { userId, message } = req.body;
   if (!userId) {
     return MissingField("userId", res);
@@ -32,7 +35,10 @@ export async function createClipboard(req: Request, res: Response) {
     );
 }
 
-export async function getClipboard(req: Request, res: Response) {
+export async function getClipboard(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { id, userId } = req.body;
   if (!id) {
     return MissingField("id", res);
