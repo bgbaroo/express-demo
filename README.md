@@ -14,12 +14,14 @@ The demo will include:
 
 5. (TODO) Other advanced concepts
 
-## The app
+## Features
 
-This demo app will be a clipboard/text sharing app.
+This demo back-end app will be a clipboard/text sharing service.
 
 It (will) support basic CRUD operations, as well as authorizations and user groups.
 
-Code is organized following the clean architecture mindset.
+I will try to make it use both in-memory cache, Redis store, and a SQL database.
+
+Code is organized following the [clean architecture](https://www.freecodecamp.org/news/a-quick-introduction-to-clean-architecture-990c014448d2/) mindset.
 
 The HTTP APIs are not yet stable, so they are not documented.
