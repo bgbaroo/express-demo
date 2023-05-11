@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, Router } from "express";
+import express, { Request, Response } from "express";
 
 import resp from "./response";
 import { IHandlerClipboards, RouterClipboard } from "./routes/clipboards";
