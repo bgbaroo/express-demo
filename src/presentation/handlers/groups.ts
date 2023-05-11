@@ -12,10 +12,12 @@ export class HandlerGroups implements IHandlerGroups {
   }
 
   async createGroup(_req: Request, res: Response): Promise<Response> {
+    console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "createGroup");
   }
 
   async deleteGroup(_req: Request, res: Response): Promise<Response> {
+    console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "deleteGroup");
   }
 }

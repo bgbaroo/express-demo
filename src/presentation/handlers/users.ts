@@ -12,18 +12,22 @@ export class HandlerUsers implements IHandlerUsers {
   }
 
   async register(_req: Request, res: Response): Promise<Response> {
+    console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "register");
   }
 
   async login(_req: Request, res: Response): Promise<Response> {
+    console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "login");
   }
 
   async changePassword(_req: Request, res: Response): Promise<Response> {
+    console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "changePassword");
   }
 
   async deleteUser(_req: Request, res: Response): Promise<Response> {
+    console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "deleteUser");
   }
 }
