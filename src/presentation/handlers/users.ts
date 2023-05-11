@@ -1,27 +1,29 @@
 import { Request, Response } from "express";
-import { NotImplemented } from "../response";
 
-export async function register(
-  _req: Request,
-  res: Response,
-): Promise<Response> {
-  return NotImplemented(res, "register");
-}
+import resp from "../response";
+import { IHandlerUsers } from "../routes/users";
+import { IUsecaseUser } from "../../domain/interfaces/usecases/user";
 
-export async function login(_req: Request, res: Response): Promise<Response> {
-  return NotImplemented(res, "login");
-}
+export class HandlerUsers implements IHandlerUsers {
+  private usecase: IUsecaseUser;
 
-export async function changePassword(
-  _req: Request,
-  res: Response,
-): Promise<Response> {
-  return NotImplemented(res, "changePassword");
-}
+  constructor(usecase: IUsecaseUser) {
+    this.usecase = usecase;
+  }
 
-export async function deleteUser(
-  _req: Request,
-  res: Response,
-): Promise<Response> {
-  return NotImplemented(res, "deleteUser");
+  async register(_req: Request, res: Response): Promise<Response> {
+    return resp.NotImplemented(res, "register");
+  }
+
+  async login(_req: Request, res: Response): Promise<Response> {
+    return resp.NotImplemented(res, "login");
+  }
+
+  async changePassword(_req: Request, res: Response): Promise<Response> {
+    return resp.NotImplemented(res, "changePassword");
+  }
+
+  async deleteUser(_req: Request, res: Response): Promise<Response> {
+    return resp.NotImplemented(res, "deleteUser");
+  }
 }

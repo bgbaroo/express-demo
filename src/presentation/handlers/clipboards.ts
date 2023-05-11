@@ -1,90 +1,88 @@
 import { Request, Response } from "express";
+
+import resp from "../response";
 import { IClipboard } from "../../domain/entities/clipboard";
-import usecase from "../../domain/usecases/clipboard";
-import {
-  Ok,
-  NotFound,
-  Created,
-  InternalServerError,
-  MissingField,
-} from "../response";
+import { IUsecaseClipboard } from "../../domain/interfaces/usecases/clipboard";
+import { IHandlerClipboards } from "../routes/clipboards";
 
-export async function createClipboard(
-  req: Request,
-  res: Response,
-): Promise<Response> {
-  const { userId, message } = req.body;
-  if (!userId) {
-    return MissingField(res, "userId");
-  }
-  if (!message) {
-    return MissingField(res, "message");
+export class HandlerClipboards implements IHandlerClipboards {
+  private usecase: IUsecaseClipboard;
+
+  constructor(usecase: IUsecaseClipboard) {
+    this.usecase = usecase;
   }
 
-  const clipboard: IClipboard = {
-    id: usecase.newClipboardId(),
-    userId,
-    message,
-  };
+  async createClipboard(req: Request, res: Response): Promise<Response> {
+    const { userId, message } = req.body;
+    if (!userId) {
+      return resp.MissingField(res, "userId");
+    }
+    if (!message) {
+      return resp.MissingField(res, "message");
+    }
 
-  return usecase
-    .createClipboard(clipboard)
-    .then(() => Created(clipboard, res))
-    .catch((err) =>
-      InternalServerError(res, `failed to create clipboard: ${err}`),
-    );
-}
+    const clipboard: IClipboard = {
+      id: this.usecase.newClipboardId(),
+      userId,
+      message,
+    };
 
-export async function getClipboard(
-  req: Request,
-  res: Response,
-): Promise<Response> {
-  const { id, userId } = req.body;
-  if (!id) {
-    return MissingField(res, "id");
+    return this.usecase
+      .createClipboard(clipboard)
+      .then(() => resp.Created(clipboard, res))
+      .catch((err) =>
+        resp.InternalServerError(res, `failed to create clipboard: ${err}`),
+      );
   }
 
-  if (!userId) {
-    return MissingField(res, "userId");
+  async getClipboard(req: Request, res: Response): Promise<Response> {
+    const { id, userId } = req.body;
+    if (!id) {
+      return resp.MissingField(res, "id");
+    }
+
+    if (!userId) {
+      return resp.MissingField(res, "userId");
+    }
+
+    return this.usecase
+      .getClipboard(id, userId)
+      .then((clip) => {
+        if (clip === undefined) {
+          return resp.NotFound(res, `clipboard ${id} not found`);
+        }
+
+        return resp.Ok(clip, res);
+      })
+      .catch((err) =>
+        resp.InternalServerError(res, `failed to get clipboard ${id}: ${err}`),
+      );
   }
 
-  return usecase
-    .getClipboard(id, userId)
-    .then((clip) => {
-      if (clip === undefined) {
-        return NotFound(res, `clipboard ${id} not found`);
-      }
+  async deleteClipboard(req: Request, res: Response): Promise<Response> {
+    const { id, userId } = req.body;
+    if (!id) {
+      return resp.MissingField(res, "id");
+    }
 
-      return Ok(clip, res);
-    })
-    .catch((err) =>
-      InternalServerError(res, `failed to get clipboard ${id}: ${err}`),
-    );
-}
+    if (!userId) {
+      return resp.MissingField(res, "userId");
+    }
 
-export async function deleteClipboard(
-  req: Request,
-  res: Response,
-): Promise<Response> {
-  const { id, userId } = req.body;
-  if (!id) {
-    return MissingField(res, "id");
+    return this.usecase
+      .deleteClipboard(id, userId)
+      .then((deleted) => {
+        if (deleted) {
+          return resp.Ok(`clipboard ${id} deleted`, res);
+        }
+
+        return resp.NotFound(res, `clipboard ${id} was not found`);
+      })
+      .catch((err) =>
+        resp.InternalServerError(
+          res,
+          `failed to delete clipboard ${id}: ${err}`,
+        ),
+      );
   }
-
-  if (!userId) {
-    return MissingField(res, "userId");
-  }
-
-  return usecase
-    .deleteClipboard(id, userId)
-    .then((deleted) => {
-      if (deleted) {
-        return Ok(`clipboard ${id} deleted`, res);
-      }
-
-      return NotFound(res, `clipboard ${id} was not found`);
-    })
-    .catch((err) =>
-      InternalServerError(res, `failed to delete clipboard ${id}: ${err}`),
-    );
 }

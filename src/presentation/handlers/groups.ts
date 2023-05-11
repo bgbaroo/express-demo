@@ -1,16 +1,21 @@
 import { Request, Response } from "express";
-import { NotImplemented } from "../response";
 
-export async function createGroup(
-  _req: Request,
-  res: Response,
-): Promise<Response> {
-  return NotImplemented(res, "createGroup");
-}
+import resp from "../response";
+import { IHandlerGroups } from "../routes/groups";
+import { IUsecaseGroup } from "../../domain/interfaces/usecases/group";
 
-export async function deleteGroup(
-  _req: Request,
-  res: Response,
-): Promise<Response> {
-  return NotImplemented(res, "deleteGroup");
+export class HandlerGroups implements IHandlerGroups {
+  private usecase: IUsecaseGroup;
+
+  constructor(usecase: IUsecaseGroup) {
+    this.usecase = usecase;
+  }
+
+  async createGroup(_req: Request, res: Response): Promise<Response> {
+    return resp.NotImplemented(res, "createGroup");
+  }
+
+  async deleteGroup(_req: Request, res: Response): Promise<Response> {
+    return resp.NotImplemented(res, "deleteGroup");
+  }
 }

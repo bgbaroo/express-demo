@@ -1,12 +1,11 @@
 import { IClipboard } from "../entities/clipboard";
-import { AppErrors } from "../errors";
 import { IClipboardRepository } from "../interfaces/repositories/clipboard";
 
 function dummyId(clipboard: IClipboard): string {
   return clipboard.userId + clipboard.id;
 }
 
-class ClipboardRepository implements IClipboardRepository {
+export class RepositoryClipboards implements IClipboardRepository {
   private storage: Map<string, IClipboard>;
   private counter: number; // For mock IDs
 
@@ -15,18 +14,15 @@ class ClipboardRepository implements IClipboardRepository {
     this.counter = 0;
   }
 
-  debug(this: ClipboardRepository) {
+  debug() {
     console.table(this.storage);
   }
 
-  newClipboardId(this: ClipboardRepository): string {
+  newClipboardId(): string {
     return this.counter.toString();
   }
 
-  async createClipboard(
-    this: ClipboardRepository,
-    clipboard: IClipboard,
-  ): Promise<void> {
+  async createClipboard(clipboard: IClipboard): Promise<void> {
     const key: string = dummyId(clipboard);
 
     this.storage.set(key, clipboard);
@@ -36,7 +32,6 @@ class ClipboardRepository implements IClipboardRepository {
   }
 
   async getClipboard(
-    this: ClipboardRepository,
     id: string,
     userId: string,
   ): Promise<IClipboard | undefined> {
@@ -44,10 +39,7 @@ class ClipboardRepository implements IClipboardRepository {
     return Promise.resolve(this.storage.get(key));
   }
 
-  async getClipboards(
-    this: ClipboardRepository,
-    userId: string,
-  ): Promise<IClipboard[]> {
+  async getClipboards(userId: string): Promise<IClipboard[]> {
     return Promise.resolve(
       Array.from(this.storage.values()).filter(
         (clip: IClipboard, _) => clip.userId === userId,
@@ -62,15 +54,8 @@ class ClipboardRepository implements IClipboardRepository {
     return Promise.resolve();
   }
 
-  async deleteClipboard(
-    this: ClipboardRepository,
-    id: string,
-    userId: string,
-  ): Promise<boolean> {
+  async deleteClipboard(id: string, userId: string): Promise<boolean> {
     const key = userId + id;
     return Promise.resolve(this.storage.delete(key));
   }
 }
-
-const repository: ClipboardRepository = new ClipboardRepository();
-export default repository;

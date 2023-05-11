@@ -1,13 +1,19 @@
-import express, { Router } from "express";
-import { register, login, changePassword, deleteUser } from "../handlers/users";
+import { Router } from "./router";
+import { HandlerFunc } from "../app";
 
-export function routes(): Router {
-  const router: Router = express.Router();
+export interface IHandlerUsers {
+  register: HandlerFunc;
+  login: HandlerFunc;
+  changePassword: HandlerFunc;
+  deleteUser: HandlerFunc;
+}
 
-  router.post("/register", register);
-  router.post("/login", login);
-  router.post("/pw", changePassword);
-  router.delete("/", deleteUser);
-
-  return router;
+export class RouterUsers extends Router {
+  constructor(handler: IHandlerUsers) {
+    super();
+    this.router().post("/register", handler.register.bind(handler));
+    this.router().post("/login", handler.login.bind(handler));
+    this.router().post("/pw", handler.changePassword.bind(handler));
+    this.router().delete("/", handler.deleteUser.bind(handler));
+  }
 }

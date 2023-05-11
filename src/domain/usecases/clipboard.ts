@@ -1,37 +1,31 @@
-import { IClipboardUseCase } from "../interfaces/usecases/clipboard";
+import { IUsecaseClipboard } from "../interfaces/usecases/clipboard";
+import { IClipboardRepository } from "../interfaces/repositories/clipboard";
 import { IClipboard } from "../entities/clipboard";
 
-import repository from "../repositories/clipboard";
-
 // Current usecase is just repository wrapper.
-class ClipboardUseCase implements IClipboardUseCase {
-  newClipboardId(this: ClipboardUseCase): string {
-    return repository.newClipboardId();
+export class UsecaseClipboard implements IUsecaseClipboard {
+  private repository: IClipboardRepository;
+
+  constructor(repo: IClipboardRepository) {
+    this.repository = repo;
   }
 
-  async createClipboard(
-    this: ClipboardUseCase,
-    clipboard: IClipboard,
-  ): Promise<void> {
-    return repository.createClipboard(clipboard);
+  newClipboardId(this: UsecaseClipboard): string {
+    return this.repository.newClipboardId();
+  }
+
+  async createClipboard(clipboard: IClipboard): Promise<void> {
+    return this.repository.createClipboard(clipboard);
   }
 
   async getClipboard(
-    this: ClipboardUseCase,
     id: string,
     userId: string,
   ): Promise<IClipboard | undefined> {
-    return repository.getClipboard(id, userId);
+    return this.repository.getClipboard(id, userId);
   }
 
-  async deleteClipboard(
-    this: ClipboardUseCase,
-    id: string,
-    userId: string,
-  ): Promise<boolean> {
-    return repository.deleteClipboard(id, userId);
+  async deleteClipboard(id: string, userId: string): Promise<boolean> {
+    return this.repository.deleteClipboard(id, userId);
   }
 }
-
-const usecase: ClipboardUseCase = new ClipboardUseCase();
-export default usecase;

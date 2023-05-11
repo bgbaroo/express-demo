@@ -1,25 +1,37 @@
-import express, { Express, Request, Response } from "express";
-import { routes as clipboardRoutes } from "./routes/clipboard";
-import { routes as userRoutes } from "./routes/users";
-import { routes as groupRoutes } from "./routes/groups";
-import { Ok } from "./response";
+import express, { Express, Request, Response, Router } from "express";
 
-export async function listenAndServe(port: number | string) {
-  // Setup our Express app
-  const app: Express = express();
-  app.use(express.json());
+import resp from "./response";
+import { IHandlerClipboards, RouterClipboard } from "./routes/clipboards";
+import { IHandlerUsers, RouterUsers } from "./routes/users";
+import { IHandlerGroups, RouterGroups } from "./routes/groups";
 
-  app.get("/status", (_req: Request, res: Response) => {
-    return Ok("ok", res);
-  });
+export type HandlerFunc = (Request, Response) => Promise<Response>;
 
-  // Register routes
-  app.use("/clipboards", clipboardRoutes());
-  app.use("/users", userRoutes());
-  app.use("/groups", groupRoutes());
+export class App {
+  private app: express.Express;
 
-  // Listen and serve
-  app.listen(port, () => {
-    console.log(`Express server is listening on ${port}`);
-  });
+  constructor(arg: {
+    clipboard: IHandlerClipboards;
+    user: IHandlerUsers;
+    group: IHandlerGroups;
+  }) {
+    // Setup our Express app
+    this.app = express();
+    this.app.use(express.json());
+
+    this.app.get("/status", (_req: Request, res: Response) => {
+      return resp.Ok("ok", res);
+    });
+
+    // Register routers
+    this.app.use("/clipboards", new RouterClipboard(arg.clipboard).router());
+    this.app.use("/users", new RouterUsers(arg.user).router());
+    this.app.use("/groups", new RouterGroups(arg.group).router());
+  }
+
+  async listenAndServe(port: number | string) {
+    this.app.listen(port, () => {
+      console.log(`Express server is listening on ${port}`);
+    });
+  }
 }

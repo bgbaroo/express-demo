@@ -54,7 +54,7 @@ class JsonResp {
   }
 }
 
-export async function NotImplemented(
+async function NotImplemented(
   res: Response,
   usecase: string,
 ): Promise<Response> {
@@ -64,29 +64,35 @@ export async function NotImplemented(
   ).marshal(res, "error");
 }
 
-export async function MissingField(
-  res: Response,
-  field: string,
-): Promise<Response> {
+async function MissingField(res: Response, field: string): Promise<Response> {
   const body = Bodies.MissingField + ` '${field}'`;
   return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
 }
 
-export async function Ok(body: any, res: Response): Promise<Response> {
+async function Ok(body: any, res: Response): Promise<Response> {
   return new JsonResp(Codes.Ok, body).marshal(res, "data");
 }
 
-export async function Created(body: any, res: Response): Promise<Response> {
+async function Created(body: any, res: Response): Promise<Response> {
   return new JsonResp(Codes.Created, body).marshal(res, "resource");
 }
 
-export async function NotFound(res: Response, body: any): Promise<Response> {
+async function NotFound(res: Response, body: any): Promise<Response> {
   return new JsonResp(Codes.NotFound, body).marshal(res, "message");
 }
 
-export async function InternalServerError(
+async function InternalServerError(
   res: Response,
   body: any,
 ): Promise<Response> {
   return new JsonResp(Codes.InternalServerError, body).marshal(res, "message");
 }
+
+export default {
+  NotImplemented,
+  MissingField,
+  Ok,
+  Created,
+  NotFound,
+  InternalServerError,
+};

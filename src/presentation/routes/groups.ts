@@ -1,11 +1,15 @@
-import express, { Router } from "express";
-import { createGroup, deleteGroup } from "../handlers/groups";
+import { HandlerFunc } from "../app";
+import { Router } from "./router";
 
-export function routes(): Router {
-  const router: Router = express.Router();
+export interface IHandlerGroups {
+  createGroup: HandlerFunc;
+  deleteGroup: HandlerFunc;
+}
 
-  router.post("/", createGroup);
-  router.delete("/", deleteGroup);
-
-  return router;
+export class RouterGroups extends Router {
+  constructor(handler: IHandlerGroups) {
+    super();
+    this.router().post("/", handler.createGroup.bind(handler));
+    this.router().delete("/", handler.deleteGroup.bind(handler));
+  }
 }
