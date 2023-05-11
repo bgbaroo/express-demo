@@ -6,7 +6,7 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "noImplicitReturns": true,
-    "outDir": "dist",
+    "outDir": "dist"
   },
   "include": ["src/**/*"]
 }
