@@ -1,6 +1,9 @@
-import { IUsecaseClipboard } from "../interfaces/usecases/clipboard";
 import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 import { IClipboard } from "../entities/clipboard";
+import {
+  IPreClipboard,
+  IUsecaseClipboard,
+} from "../interfaces/usecases/clipboard";
 
 // Current usecase is just repository wrapper.
 export class UsecaseClipboard implements IUsecaseClipboard {
@@ -10,11 +13,12 @@ export class UsecaseClipboard implements IUsecaseClipboard {
     this.repository = repo;
   }
 
-  newClipboardId(this: UsecaseClipboard): string {
-    return this.repository.newClipboardId();
-  }
+  async createClipboard(preClipboard: IPreClipboard): Promise<void> {
+    const clipboard: IClipboard = {
+      id: this.repository.newClipboardId(),
+      ...preClipboard,
+    };
 
-  async createClipboard(clipboard: IClipboard): Promise<void> {
     return this.repository.createClipboard(clipboard);
   }
 

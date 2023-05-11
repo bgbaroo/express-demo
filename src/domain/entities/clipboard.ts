@@ -1,6 +1,7 @@
 export interface IClipboard {
   id: string;
-  message: string;
+  title?: string;
+  content: string;
   userId: string;
   expiration?: Date;
 }

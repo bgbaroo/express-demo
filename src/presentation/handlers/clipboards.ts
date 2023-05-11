@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 
 import resp from "../response";
-import { IClipboard } from "../../domain/entities/clipboard";
-import { IUsecaseClipboard } from "../../domain/interfaces/usecases/clipboard";
 import { IHandlerClipboards } from "../routes/clipboards";
+import {
+  IPreClipboard,
+  IUsecaseClipboard,
+} from "../../domain/interfaces/usecases/clipboard";
 
 export class HandlerClipboards implements IHandlerClipboards {
   private usecase: IUsecaseClipboard;
@@ -13,18 +15,19 @@ export class HandlerClipboards implements IHandlerClipboards {
   }
 
   async createClipboard(req: Request, res: Response): Promise<Response> {
-    const { userId, message } = req.body;
+    const { userId, content, title } = req.body;
     if (!userId) {
       return resp.MissingField(res, "userId");
     }
-    if (!message) {
-      return resp.MissingField(res, "message");
+    if (!content) {
+      return resp.MissingField(res, "content");
     }
 
-    const clipboard: IClipboard = {
-      id: this.usecase.newClipboardId(),
+    // PreClipboard is clipboard without field id (not known yet)
+    const clipboard: IPreClipboard = {
       userId,
-      message,
+      title,
+      content,
     };
 
     return this.usecase
