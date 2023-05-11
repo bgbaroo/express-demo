@@ -25,7 +25,7 @@ class ClipboardRepository implements IClipboardRepository {
 
   async createClipboard(
     this: ClipboardRepository,
-    clipboard: IClipboard
+    clipboard: IClipboard,
   ): Promise<void> {
     const key: string = dummyId(clipboard);
 
@@ -38,7 +38,7 @@ class ClipboardRepository implements IClipboardRepository {
   async getClipboard(
     this: ClipboardRepository,
     id: string,
-    userId: string
+    userId: string,
   ): Promise<IClipboard | undefined> {
     const key = userId + id;
     return Promise.resolve(this.storage.get(key));
@@ -46,12 +46,12 @@ class ClipboardRepository implements IClipboardRepository {
 
   async getClipboards(
     this: ClipboardRepository,
-    userId: string
+    userId: string,
   ): Promise<IClipboard[]> {
     return Promise.resolve(
       Array.from(this.storage.values()).filter(
-        (clip: IClipboard, _) => clip.userId === userId
-      )
+        (clip: IClipboard, _) => clip.userId === userId,
+      ),
     );
   }
 
@@ -65,7 +65,7 @@ class ClipboardRepository implements IClipboardRepository {
   async deleteClipboard(
     this: ClipboardRepository,
     id: string,
-    userId: string
+    userId: string,
   ): Promise<boolean> {
     const key = userId + id;
     return Promise.resolve(this.storage.delete(key));

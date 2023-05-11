@@ -39,7 +39,7 @@ class JsonResp {
   async marshal(
     this: JsonResp,
     res: Response,
-    fieldName: string
+    fieldName: string,
   ): Promise<Response> {
     return res
       .status(this.code)
@@ -47,11 +47,29 @@ class JsonResp {
         Object.fromEntries(
           new Map<string, any>()
             .set("status", this.status)
-            .set(fieldName, this.body)
-        )
+            .set(fieldName, this.body),
+        ),
       )
       .end();
   }
+}
+
+export async function NotImplemented(
+  res: Response,
+  usecase: string,
+): Promise<Response> {
+  return new JsonResp(
+    Codes.InternalServerError,
+    Bodies.NotImplemented.toString() + `: ${usecase}`,
+  ).marshal(res, "error");
+}
+
+export async function MissingField(
+  res: Response,
+  field: string,
+): Promise<Response> {
+  const body = Bodies.MissingField + ` '${field}'`;
+  return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
 }
 
 export async function Ok(body: any, res: Response): Promise<Response> {
@@ -62,31 +80,13 @@ export async function Created(body: any, res: Response): Promise<Response> {
   return new JsonResp(Codes.Created, body).marshal(res, "resource");
 }
 
-export async function NotImplemented(
-  res: Response,
-  usecase: string
-): Promise<Response> {
-  return new JsonResp(
-    Codes.InternalServerError,
-    Bodies.NotImplemented.toString() + `: ${usecase}`
-  ).marshal(res, "error");
-}
-
-export async function MissingField(
-  res: Response,
-  field: string
-): Promise<Response> {
-  const body = Bodies.MissingField + ` '${field}'`;
-  return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
-}
-
 export async function NotFound(res: Response, body: any): Promise<Response> {
   return new JsonResp(Codes.NotFound, body).marshal(res, "message");
 }
 
 export async function InternalServerError(
   res: Response,
-  body: any
+  body: any,
 ): Promise<Response> {
   return new JsonResp(Codes.InternalServerError, body).marshal(res, "message");
 }

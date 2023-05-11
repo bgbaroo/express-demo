@@ -11,7 +11,7 @@ import {
 
 export async function createClipboard(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> {
   const { userId, message } = req.body;
   if (!userId) {
@@ -31,13 +31,13 @@ export async function createClipboard(
     .createClipboard(clipboard)
     .then(() => Created(clipboard, res))
     .catch((err) =>
-      InternalServerError(res, `failed to create clipboard: ${err}`)
+      InternalServerError(res, `failed to create clipboard: ${err}`),
     );
 }
 
 export async function getClipboard(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> {
   const { id, userId } = req.body;
   if (!id) {
@@ -58,13 +58,13 @@ export async function getClipboard(
       return Ok(clip, res);
     })
     .catch((err) =>
-      InternalServerError(res, `failed to get clipboard ${id}: ${err}`)
+      InternalServerError(res, `failed to get clipboard ${id}: ${err}`),
     );
 }
 
 export async function deleteClipboard(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> {
   const { id, userId } = req.body;
   if (!id) {
@@ -85,6 +85,6 @@ export async function deleteClipboard(
       return NotFound(res, `clipboard ${id} was not found`);
     })
     .catch((err) =>
-      InternalServerError(res, `failed to delete clipboard ${id}: ${err}`)
+      InternalServerError(res, `failed to delete clipboard ${id}: ${err}`),
     );
 }

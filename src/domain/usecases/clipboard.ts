@@ -11,7 +11,7 @@ class ClipboardUseCase implements IClipboardUseCase {
 
   async createClipboard(
     this: ClipboardUseCase,
-    clipboard: IClipboard
+    clipboard: IClipboard,
   ): Promise<void> {
     return repository.createClipboard(clipboard);
   }
@@ -19,7 +19,7 @@ class ClipboardUseCase implements IClipboardUseCase {
   async getClipboard(
     this: ClipboardUseCase,
     id: string,
-    userId: string
+    userId: string,
   ): Promise<IClipboard | undefined> {
     return repository.getClipboard(id, userId);
   }
@@ -27,7 +27,7 @@ class ClipboardUseCase implements IClipboardUseCase {
   async deleteClipboard(
     this: ClipboardUseCase,
     id: string,
-    userId: string
+    userId: string,
   ): Promise<boolean> {
     return repository.deleteClipboard(id, userId);
   }
