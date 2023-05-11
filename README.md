@@ -6,9 +6,9 @@ The demo will include:
 
 1. [Project setup](/SETUP.md)
 
-2. Basic webserver with Express, with Clean Architecture structure
+2. Basic webserver with Express, with [Clean Architecture structure](./src/)
 
-3. (TODO) Connecting to databases with ORM
+3. [Connecting to databases with ORM](./ORM.md)
 
 4. (TODO) Authorizations
 

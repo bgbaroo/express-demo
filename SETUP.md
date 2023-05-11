@@ -2,16 +2,25 @@
 
 ## Initialize a Node project
 
-1. Create a Node module, either with `npm` or `pnpm` (this note will assume `npm`):
+We will assume that the project will be kept in `~/git/academy/my_project`.
+
+1. Create and go to your project directory
+
+```shell
+mkdir -p ~/git/academy/my_project; # Create my_project in git/academy
+cd ~/git/academy/my_project; # Change directory to the said directory
+```
+
+2. Create a Node module, either with `npm` or `pnpm` (this note will assume `npm`):
 
 ```shell
 # With npm:
 npm init;
 ```
 
-This will give us a new, default `package.json` file
+This will give us a new, default `package.json` file in `~/git/academy/my_project`.
 
-2. Change project type to ES Module
+3. Change project type to ES Module
 
 > This is done so that we can use `import foo from 'bar'` syntax (from ES Modules)
 > instead of `const foo = require(bar)` (CommonJS):
