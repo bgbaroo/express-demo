@@ -19,11 +19,10 @@ enum Bodies {
   MissingField = "missing field",
 }
 
-// TODO: Review
 class JsonResp {
   private code: Codes;
-  status: Status;
-  body: any;
+  private status: Status;
+  private body: any;
 
   constructor(code: Codes, body: any) {
     this.code = code;
@@ -39,8 +38,8 @@ class JsonResp {
 
   async marshal(
     this: JsonResp,
-    fieldName: string,
-    res: Response
+    res: Response,
+    fieldName: string
   ): Promise<Response> {
     return res
       .status(this.code)
@@ -56,35 +55,38 @@ class JsonResp {
 }
 
 export async function Ok(body: any, res: Response): Promise<Response> {
-  return new JsonResp(Codes.Ok, body).marshal("data", res);
+  return new JsonResp(Codes.Ok, body).marshal(res, "data");
 }
 
 export async function Created(body: any, res: Response): Promise<Response> {
-  return new JsonResp(Codes.Created, body).marshal("resource", res);
+  return new JsonResp(Codes.Created, body).marshal(res, "resource");
 }
 
-export async function NotImplemented(res: Response): Promise<Response> {
-  return new JsonResp(Codes.InternalServerError, Bodies.NotImplemented).marshal(
-    "error",
-    res
-  );
+export async function NotImplemented(
+  res: Response,
+  usecase: string
+): Promise<Response> {
+  return new JsonResp(
+    Codes.InternalServerError,
+    Bodies.NotImplemented.toString() + `: ${usecase}`
+  ).marshal(res, "error");
 }
 
 export async function MissingField(
-  field: string,
-  res: Response
+  res: Response,
+  field: string
 ): Promise<Response> {
   const body = Bodies.MissingField + ` '${field}'`;
-  return new JsonResp(Codes.BadRequest, body).marshal("error", res);
+  return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
 }
 
-export async function NotFound(body: any, res: Response): Promise<Response> {
-  return new JsonResp(Codes.NotFound, body).marshal("message", res);
+export async function NotFound(res: Response, body: any): Promise<Response> {
+  return new JsonResp(Codes.NotFound, body).marshal(res, "message");
 }
 
 export async function InternalServerError(
-  body: any,
-  res: Response
+  res: Response,
+  body: any
 ): Promise<Response> {
-  return new JsonResp(Codes.InternalServerError, body).marshal("message", res);
+  return new JsonResp(Codes.InternalServerError, body).marshal(res, "message");
 }

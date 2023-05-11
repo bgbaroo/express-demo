@@ -15,10 +15,10 @@ export async function createClipboard(
 ): Promise<Response> {
   const { userId, message } = req.body;
   if (!userId) {
-    return MissingField("userId", res);
+    return MissingField(res, "userId");
   }
   if (!message) {
-    return MissingField("message", res);
+    return MissingField(res, "message");
   }
 
   const clipboard: IClipboard = {
@@ -31,7 +31,7 @@ export async function createClipboard(
     .createClipboard(clipboard)
     .then(() => Created(clipboard, res))
     .catch((err) =>
-      InternalServerError(`failed to create clipboard: ${err}`, res)
+      InternalServerError(res, `failed to create clipboard: ${err}`)
     );
 }
 
@@ -41,24 +41,24 @@ export async function getClipboard(
 ): Promise<Response> {
   const { id, userId } = req.body;
   if (!id) {
-    return MissingField("id", res);
+    return MissingField(res, "id");
   }
 
   if (!userId) {
-    return MissingField("userId", res);
+    return MissingField(res, "userId");
   }
 
   return usecase
     .getClipboard(id, userId)
     .then((clip) => {
       if (clip === undefined) {
-        return NotFound(`clipboard ${id} not found`, res);
+        return NotFound(res, `clipboard ${id} not found`);
       }
 
       return Ok(clip, res);
     })
     .catch((err) =>
-      InternalServerError(`failed to get clipboard ${id}: ${err}`, res)
+      InternalServerError(res, `failed to get clipboard ${id}: ${err}`)
     );
 }
 
@@ -68,11 +68,11 @@ export async function deleteClipboard(
 ): Promise<Response> {
   const { id, userId } = req.body;
   if (!id) {
-    return MissingField("id", res);
+    return MissingField(res, "id");
   }
 
   if (!userId) {
-    return MissingField("userId", res);
+    return MissingField(res, "userId");
   }
 
   return usecase
@@ -82,9 +82,9 @@ export async function deleteClipboard(
         return Ok(`clipboard ${id} deleted`, res);
       }
 
-      return NotFound(`clipboard ${id} was not found`, res);
+      return NotFound(res, `clipboard ${id} was not found`);
     })
     .catch((err) =>
-      InternalServerError(`failed to delete clipboard ${id}: ${err}`, res)
+      InternalServerError(res, `failed to delete clipboard ${id}: ${err}`)
     );
 }

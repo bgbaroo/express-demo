@@ -5,12 +5,12 @@ export async function createGroup(
   _req: Request,
   res: Response
 ): Promise<Response> {
-  return NotImplemented(res);
+  return NotImplemented(res, "createGroup");
 }
 
 export async function deleteGroup(
   _req: Request,
   res: Response
 ): Promise<Response> {
-  return NotImplemented(res);
+  return NotImplemented(res, "deleteGroup");
 }
