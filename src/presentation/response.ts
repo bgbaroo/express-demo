@@ -37,31 +37,34 @@ class JsonResp {
     this.status = Status.Err;
   }
 
-  async compile(
+  async marshal(
     this: JsonResp,
     fieldName: string,
     res: Response
   ): Promise<Response> {
     return res
       .status(this.code)
-      .json({
-        status: this.status,
-        fieldName: this.body,
-      })
+      .json(
+        Object.fromEntries(
+          new Map<string, any>()
+            .set("status", this.status)
+            .set(fieldName, this.body)
+        )
+      )
       .end();
   }
 }
 
 export async function Ok(body: any, res: Response): Promise<Response> {
-  return new JsonResp(Codes.Ok, body).compile("data", res);
+  return new JsonResp(Codes.Ok, body).marshal("data", res);
 }
 
 export async function Created(body: any, res: Response): Promise<Response> {
-  return new JsonResp(Codes.Created, body).compile("resource", res);
+  return new JsonResp(Codes.Created, body).marshal("resource", res);
 }
 
 export async function NotImplemented(res: Response): Promise<Response> {
-  return new JsonResp(Codes.InternalServerError, Bodies.NotImplemented).compile(
+  return new JsonResp(Codes.InternalServerError, Bodies.NotImplemented).marshal(
     "error",
     res
   );
@@ -72,16 +75,16 @@ export async function MissingField(
   res: Response
 ): Promise<Response> {
   const body = Bodies.MissingField + ` '${field}'`;
-  return new JsonResp(Codes.BadRequest, body).compile("error", res);
+  return new JsonResp(Codes.BadRequest, body).marshal("error", res);
 }
 
 export async function NotFound(body: any, res: Response): Promise<Response> {
-  return new JsonResp(Codes.NotFound, body).compile("message", res);
+  return new JsonResp(Codes.NotFound, body).marshal("message", res);
 }
 
 export async function InternalServerError(
   body: any,
   res: Response
 ): Promise<Response> {
-  return new JsonResp(Codes.InternalServerError, body).compile("message", res);
+  return new JsonResp(Codes.InternalServerError, body).marshal("message", res);
 }
