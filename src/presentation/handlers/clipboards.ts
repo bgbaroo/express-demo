@@ -29,7 +29,7 @@ export class HandlerClipboards implements IHandlerClipboards {
 
     return this.usecase
       .createClipboard(clipboard)
-      .then(() => resp.Created(clipboard, res))
+      .then(() => resp.Created(res, clipboard))
       .catch((err) =>
         resp.InternalServerError(res, `failed to create clipboard: ${err}`),
       );
@@ -52,7 +52,7 @@ export class HandlerClipboards implements IHandlerClipboards {
           return resp.NotFound(res, `clipboard ${id} not found`);
         }
 
-        return resp.Ok(clip, res);
+        return resp.Ok(res, clip);
       })
       .catch((err) =>
         resp.InternalServerError(res, `failed to get clipboard ${id}: ${err}`),
@@ -73,7 +73,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       .deleteClipboard(id, userId)
       .then((deleted) => {
         if (deleted) {
-          return resp.Ok(`clipboard ${id} deleted`, res);
+          return resp.Ok(res, `clipboard ${id} deleted`);
         }
 
         return resp.NotFound(res, `clipboard ${id} was not found`);

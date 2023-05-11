@@ -1,6 +1,6 @@
 import { IGroup } from "../../entities/group";
 
-export interface IGroupRepository {
+export interface IRepositoryGroup {
   createGroup(group: IGroup): Promise<void>;
   getGroup(id: string): Promise<IGroup>;
   getGroups(): Promise<IGroup[]>;

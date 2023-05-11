@@ -69,11 +69,11 @@ async function MissingField(res: Response, field: string): Promise<Response> {
   return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
 }
 
-async function Ok(body: any, res: Response): Promise<Response> {
+async function Ok(res: Response, body: any): Promise<Response> {
   return new JsonResp(Codes.Ok, body).marshal(res, "data");
 }
 
-async function Created(body: any, res: Response): Promise<Response> {
+async function Created(res: Response, body: any): Promise<Response> {
   return new JsonResp(Codes.Created, body).marshal(res, "resource");
 }
 
@@ -95,4 +95,5 @@ export default {
   Created,
   NotFound,
   InternalServerError,
+  Status,
 };

@@ -20,7 +20,7 @@ export class App {
     this.app.use(express.json());
 
     this.app.get("/status", (_req: Request, res: Response) => {
-      return resp.Ok("ok", res);
+      return resp.Ok(res, "ok");
     });
 
     // Register routers

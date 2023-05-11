@@ -1,6 +1,6 @@
 import { IUser } from "../../entities/user";
 
-export interface IUserRepository {
+export interface IRepositoryUser {
   createUser(user: IUser): Promise<void>;
   getUser(): Promise<IUser>;
   getUsers(): Promise<IUser[]>;

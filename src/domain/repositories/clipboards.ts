@@ -1,11 +1,11 @@
 import { IClipboard } from "../entities/clipboard";
-import { IClipboardRepository } from "../interfaces/repositories/clipboard";
+import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 
 function dummyId(clipboard: IClipboard): string {
   return clipboard.userId + clipboard.id;
 }
 
-export class RepositoryClipboards implements IClipboardRepository {
+export class RepositoryClipboards implements IRepositoryClipboard {
   private storage: Map<string, IClipboard>;
   private counter: number; // For mock IDs
 

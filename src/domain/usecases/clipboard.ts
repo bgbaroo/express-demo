@@ -1,12 +1,12 @@
 import { IUsecaseClipboard } from "../interfaces/usecases/clipboard";
-import { IClipboardRepository } from "../interfaces/repositories/clipboard";
+import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 import { IClipboard } from "../entities/clipboard";
 
 // Current usecase is just repository wrapper.
 export class UsecaseClipboard implements IUsecaseClipboard {
-  private repository: IClipboardRepository;
+  private repository: IRepositoryClipboard;
 
-  constructor(repo: IClipboardRepository) {
+  constructor(repo: IRepositoryClipboard) {
     this.repository = repo;
   }
 
