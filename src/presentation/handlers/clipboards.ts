@@ -4,14 +4,31 @@ import resp from "../response";
 import { IHandlerClipboards } from "../routes/clipboards";
 import {
   IPreClipboard,
-  IUsecaseClipboard,
+  IUseCaseCreateClipboard,
+  IUseCaseDeleteUserClipboard,
+  IUseCaseDeleteUserClipboards,
+  IUseCaseGetUserClipboard,
+  IUseCaseGetUserClipboards,
 } from "../../domain/interfaces/usecases/clipboard";
 
 export class HandlerClipboards implements IHandlerClipboards {
-  private usecase: IUsecaseClipboard;
+  private usecaseCreateClipboard: IUseCaseCreateClipboard;
+  private usecaseGetUserClipboard: IUseCaseGetUserClipboard;
+  private usecaseGetUserClipboards: IUseCaseGetUserClipboards;
+  private usecaseDeleteUserClipboard: IUseCaseDeleteUserClipboard;
+  private usecaseDeleteUserClipboards: IUseCaseDeleteUserClipboards;
 
-  constructor(usecase: IUsecaseClipboard) {
-    this.usecase = usecase;
+  constructor(arg: {
+    createClipboard: IUseCaseCreateClipboard;
+    getClipboard: IUseCaseGetUserClipboard;
+    getClipboards: IUseCaseGetUserClipboards;
+    deleteClipboard: IUseCaseDeleteUserClipboard;
+    deleteClipboards: IUseCaseDeleteUserClipboards;
+  }) {
+    this.usecaseCreateClipboard = arg.createClipboard;
+    this.usecaseGetUserClipboard = arg.getClipboard;
+    this.usecaseDeleteUserClipboard = arg.deleteClipboard;
+    this.usecaseDeleteUserClipboards = arg.deleteClipboards;
   }
 
   async createClipboard(req: Request, res: Response): Promise<Response> {
@@ -30,8 +47,8 @@ export class HandlerClipboards implements IHandlerClipboards {
       content,
     };
 
-    return this.usecase
-      .createClipboard(clipboard)
+    return this.usecaseCreateClipboard
+      .execute(clipboard)
       .then(() => resp.Created(res, clipboard))
       .catch((err) =>
         resp.InternalServerError(res, `failed to create clipboard: ${err}`),
@@ -48,8 +65,8 @@ export class HandlerClipboards implements IHandlerClipboards {
       return resp.MissingField(res, "userId");
     }
 
-    return this.usecase
-      .getUserClipboard(userId, id)
+    return this.usecaseGetUserClipboard
+      .execute(userId, id)
       .then((clip) => {
         if (clip === undefined) {
           return resp.NotFound(res, `clipboard ${id} not found`);
@@ -59,6 +76,33 @@ export class HandlerClipboards implements IHandlerClipboards {
       })
       .catch((err) =>
         resp.InternalServerError(res, `failed to get clipboard ${id}: ${err}`),
+      );
+  }
+
+  async getClipboards(req: Request, res: Response): Promise<Response> {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return resp.MissingField(res, "userId");
+    }
+
+    return this.usecaseGetUserClipboards
+      .execute(userId)
+      .then((clipboards) => {
+        if (clipboards) {
+          return resp.Ok(res, clipboards);
+        }
+
+        return resp.NotFound(
+          res,
+          `clipboards for user ${userId} was not found`,
+        );
+      })
+      .catch((err) =>
+        resp.InternalServerError(
+          res,
+          `failed to get clipboards for user ${userId}: ${err}`,
+        ),
       );
   }
 
@@ -72,8 +116,8 @@ export class HandlerClipboards implements IHandlerClipboards {
       return resp.MissingField(res, "userId");
     }
 
-    return this.usecase
-      .deleteUserClipboard(userId, id)
+    return this.usecaseDeleteUserClipboard
+      .execute(userId, id)
       .then((deleted) => {
         if (deleted) {
           return resp.Ok(res, `clipboard ${id} deleted`);
@@ -85,6 +129,36 @@ export class HandlerClipboards implements IHandlerClipboards {
         resp.InternalServerError(
           res,
           `failed to delete clipboard ${id}: ${err}`,
+        ),
+      );
+  }
+
+  async deleteClipboards(req: Request, res: Response): Promise<Response> {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return resp.MissingField(res, "userId");
+    }
+
+    return this.usecaseDeleteUserClipboards
+      .execute(userId)
+      .then((deleteds) => {
+        if (deleteds) {
+          return resp.Ok(
+            res,
+            `${deleteds} clipboards from user ${userId} deleted`,
+          );
+        }
+
+        return resp.NotFound(
+          res,
+          `clipboards for user ${userId} was not found`,
+        );
+      })
+      .catch((err) =>
+        resp.InternalServerError(
+          res,
+          `failed to delete user clipboards ${userId}: ${err}`,
         ),
       );
   }

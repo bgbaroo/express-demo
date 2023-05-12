@@ -1,17 +1,28 @@
 import { RepositoryClipboards } from "./domain/repositories/clipboards";
-import { UsecaseClipboard } from "./domain/usecases/clipboard";
 import { UsecaseGroup } from "./domain/usecases/group";
 import { UsecaseUser } from "./domain/usecases/user";
+import {
+  UseCaseCreateClipboard,
+  UseCaseDeleteUserClipboard,
+  UseCaseDeleteUserClipboards,
+  UseCaseGetUserClipboard,
+  UseCaseGetUserClipboards,
+} from "./domain/usecases/clipboard";
 
+import { App } from "./presentation/app";
 import { HandlerClipboards } from "./presentation/handlers/clipboards";
 import { HandlerGroups } from "./presentation/handlers/groups";
 import { HandlerUsers } from "./presentation/handlers/users";
-import { App } from "./presentation/app";
 
 async function main(): Promise<void> {
   const repoClipboards = new RepositoryClipboards();
-  const usecaseClipboard = new UsecaseClipboard(repoClipboards);
-  const handlerClipboards = new HandlerClipboards(usecaseClipboard);
+  const handlerClipboards = new HandlerClipboards({
+    createClipboard: new UseCaseCreateClipboard(repoClipboards),
+    getClipboard: new UseCaseGetUserClipboard(repoClipboards),
+    getClipboards: new UseCaseGetUserClipboards(repoClipboards),
+    deleteClipboard: new UseCaseDeleteUserClipboard(repoClipboards),
+    deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboards),
+  });
 
   // Dummy
   const usecaseUser = new UsecaseUser();

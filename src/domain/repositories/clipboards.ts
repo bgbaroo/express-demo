@@ -32,8 +32,8 @@ export class RepositoryClipboards implements IRepositoryClipboard {
   }
 
   async getUserClipboard(
-    id: string,
     userId: string,
+    id: string,
   ): Promise<IClipboard | undefined> {
     const key = userId + id;
     return Promise.resolve(this.storage.get(key));
@@ -54,8 +54,12 @@ export class RepositoryClipboards implements IRepositoryClipboard {
     return Promise.resolve();
   }
 
-  async deleteUserClipboard(id: string, userId: string): Promise<boolean> {
+  async deleteUserClipboard(userId: string, id: string): Promise<boolean> {
     const key = userId + id;
     return Promise.resolve(this.storage.delete(key));
+  }
+
+  async deleteUserClipboards(userId: string): Promise<number> {
+    return Promise.reject("not implemented");
   }
 }

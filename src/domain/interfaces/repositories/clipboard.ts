@@ -7,4 +7,5 @@ export interface IRepositoryClipboard {
   getUserClipboards(userId: string): Promise<IClipboard[]>;
   updateClipboard(clipboard: IClipboard);
   deleteUserClipboard(userId: string, id: string): Promise<boolean>;
+  deleteUserClipboards(userId: string): Promise<number>;
 }
