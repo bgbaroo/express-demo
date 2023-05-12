@@ -1,5 +1,5 @@
-import { Group } from "./group";
-import { IUser } from "./user";
+import { Group } from "../src/domain/entities/group";
+import { IUser } from "../src/domain/entities/user";
 
 describe("empty if 0 user were given to constructor", () => {
   const group = new Group("gid", "gname", []);

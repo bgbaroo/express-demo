@@ -115,6 +115,10 @@ For now, we'll leave the file untouched.
 Now, let's write unit tests for our functions. Start by creating a new file,
 e.g. `bank_return.test.ts` (Jest TypeScript test files have `.test.ts` extensions):
 
+> Test files are usually placed in separate top-level directory `test`.
+> You can still place them inside `src`, but don't forget to exclude the
+> test files from `tsc` compilation sources by excluding the wildcard `*.test.ts`.
+
 ```typescript
 import { mul, periodReturn, fromPercent, compound } from "./bank_return";
 
