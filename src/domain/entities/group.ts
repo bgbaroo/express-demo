@@ -9,7 +9,7 @@ export interface IGroup {
   size(): number;
   isEmpty(): boolean;
   isMember(email: string): boolean;
-  getMember(email: string): IUser | undefined; // maybe undefined if not found
+  getMember(email: string): IUser | undefined;
   delMember(email: string): boolean;
 }
 

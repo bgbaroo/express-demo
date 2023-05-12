@@ -45,6 +45,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       userId,
       title,
       content,
+      expiration: undefined,
     };
 
     return this.usecaseCreateClipboard

@@ -1,7 +1,8 @@
 export interface IClipboard {
   id: string;
-  title?: string;
   content: string;
   userId: string;
-  expiration?: Date;
+  // Optional
+  title: string | undefined;
+  expiration: Date | undefined;
 }
