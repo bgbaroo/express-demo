@@ -240,14 +240,16 @@ from an env with key `DATABASE_URL`, which is what we just put in [`./.env`](./.
 ## SQL migration
 
 After we defined our data models and database connection, we still can't just jump right back
-to coding. We still need to prepare the database, i.e. defining SQL tables with exactly
+to coding.
+
+We still need to prepare the database, i.e. defining SQL tables with exactly
 the same fields and relations as with our Prisma Schema data models.
 
 But this is difficult - you might define invalid tables, with broken relations, etc.
 The best way to do this is to let Prisma do it for you.
 
-With Prisma, `npx prisma migrate` performs database operations that match with our
-Prisma data models.
+With Prisma, `npx prisma migrate` performs database operations that reshape the database
+to match with our Prisma data models.
 
 There're 2 flavors for Prisma migration - (1) development and (2) production.
 
@@ -349,7 +351,8 @@ async function ormDemo() {
   console.table(sameNewUser);
 
   // All users in table `users` with 0 conditions
-  const users = await prisma.user.findMany();
+  const allUsers = await prisma.user.findMany();
+  console.table(allUsers);
 }
 
 ormDemo();

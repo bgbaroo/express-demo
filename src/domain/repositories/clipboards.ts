@@ -31,7 +31,7 @@ export class RepositoryClipboards implements IRepositoryClipboard {
     return Promise.resolve();
   }
 
-  async getClipboard(
+  async getUserClipboard(
     id: string,
     userId: string,
   ): Promise<IClipboard | undefined> {
@@ -39,7 +39,7 @@ export class RepositoryClipboards implements IRepositoryClipboard {
     return Promise.resolve(this.storage.get(key));
   }
 
-  async getClipboards(userId: string): Promise<IClipboard[]> {
+  async getUserClipboards(userId: string): Promise<IClipboard[]> {
     return Promise.resolve(
       Array.from(this.storage.values()).filter(
         (clip: IClipboard, _) => clip.userId === userId,
@@ -54,7 +54,7 @@ export class RepositoryClipboards implements IRepositoryClipboard {
     return Promise.resolve();
   }
 
-  async deleteClipboard(id: string, userId: string): Promise<boolean> {
+  async deleteUserClipboard(id: string, userId: string): Promise<boolean> {
     const key = userId + id;
     return Promise.resolve(this.storage.delete(key));
   }

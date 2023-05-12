@@ -5,6 +5,6 @@ export interface IPreClipboard extends Omit<IClipboard, "id"> {}
 
 export interface IUsecaseClipboard {
   createClipboard(clipboard: IPreClipboard): Promise<void>;
-  getClipboard(id: string, userId: string): Promise<IClipboard | undefined>;
-  deleteClipboard(id: string, userId: string): Promise<boolean>;
+  getUserClipboard(userId: string, id: string): Promise<IClipboard | undefined>;
+  deleteUserClipboard(userId: string, id: string): Promise<boolean>;
 }

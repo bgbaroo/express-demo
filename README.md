@@ -14,6 +14,8 @@ The demo will include:
 
 5. (TODO) Other advanced concepts
 
+6. [Testing](./TEST.md)
+
 ## Features
 
 This demo back-end app will be a clipboard/text sharing service.

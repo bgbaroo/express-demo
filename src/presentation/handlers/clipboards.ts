@@ -15,7 +15,6 @@ export class HandlerClipboards implements IHandlerClipboards {
   }
 
   async createClipboard(req: Request, res: Response): Promise<Response> {
-    throw "foo";
     const { userId, content, title } = req.body;
     if (!userId) {
       return resp.MissingField(res, "userId");
@@ -50,7 +49,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     }
 
     return this.usecase
-      .getClipboard(id, userId)
+      .getUserClipboard(userId, id)
       .then((clip) => {
         if (clip === undefined) {
           return resp.NotFound(res, `clipboard ${id} not found`);
@@ -74,7 +73,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     }
 
     return this.usecase
-      .deleteClipboard(id, userId)
+      .deleteUserClipboard(userId, id)
       .then((deleted) => {
         if (deleted) {
           return resp.Ok(res, `clipboard ${id} deleted`);

@@ -4,12 +4,13 @@ export interface IGroup {
   id: string;
   name: string;
 
-  members(): IUser[];
-  isEmpty(): boolean;
-  isMember(userId: string): boolean;
-  getMember(userId: string): IUser | undefined; // maybe undefined if not found
   addMember(user: IUser): boolean;
-  delMember(userId: string): boolean;
+  members(): IUser[];
+  size(): number;
+  isEmpty(): boolean;
+  isMember(email: string): boolean;
+  getMember(email: string): IUser | undefined; // maybe undefined if not found
+  delMember(email: string): boolean;
 }
 
 export class Group implements IGroup {
@@ -20,10 +21,25 @@ export class Group implements IGroup {
   constructor(id: string, name: string, users: IUser[]) {
     this.id = id;
     this.name = name;
+    this._members = new Map();
 
     users.forEach((user) => {
-      this._members.set(user.id, user);
+      this.addMember(user);
     });
+  }
+
+  // Do not add new user with duplicate emails
+  addMember(this: Group, user: IUser): boolean {
+    if (this.isMember(user.email)) {
+      return false;
+    }
+
+    this._members.set(user.email, user);
+    return true;
+  }
+
+  size(this: Group): number {
+    return this._members.size;
   }
 
   members(this: Group): IUser[] {
@@ -34,24 +50,15 @@ export class Group implements IGroup {
     return this._members.size === 0;
   }
 
-  isMember(this: Group, userId: string): boolean {
-    return this._members.get(userId) != undefined;
+  isMember(this: Group, email: string): boolean {
+    return this._members.get(email) != undefined;
   }
 
-  getMember(this: Group, userId: string): IUser | undefined {
-    return this._members.get(userId);
+  getMember(this: Group, email: string): IUser | undefined {
+    return this._members.get(email);
   }
 
-  addMember(this: Group, user: IUser): boolean {
-    if (this.isMember(user.id)) {
-      return false;
-    }
-
-    this._members.set(user.id, user);
-    return true;
-  }
-
-  delMember(this: Group, userId: string): boolean {
-    return this._members.delete(userId);
+  delMember(this: Group, email: string): boolean {
+    return this._members.delete(email);
   }
 }

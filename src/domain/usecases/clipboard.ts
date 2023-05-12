@@ -22,14 +22,14 @@ export class UsecaseClipboard implements IUsecaseClipboard {
     return this.repository.createClipboard(clipboard);
   }
 
-  async getClipboard(
-    id: string,
+  async getUserClipboard(
     userId: string,
+    id: string,
   ): Promise<IClipboard | undefined> {
-    return this.repository.getClipboard(id, userId);
+    return this.repository.getUserClipboard(userId, id);
   }
 
-  async deleteClipboard(id: string, userId: string): Promise<boolean> {
-    return this.repository.deleteClipboard(id, userId);
+  async deleteUserClipboard(userId: string, id: string): Promise<boolean> {
+    return this.repository.deleteUserClipboard(userId, id);
   }
 }
