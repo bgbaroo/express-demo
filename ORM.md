@@ -49,7 +49,7 @@ To initialize the template with PostgreSQL as datasource, use the Prisma `npx` s
 npx prisma init --datasource-provider=postgresql
 ```
 
-This creates a new top-level directory `prisma`, and generates a new Prisma Schema at `./prisma/schema.prisma`.
+This creates a new top-level directory `prisma`, and generates a new Prisma Schema at [`./prisma/schema.prisma`](./prisma/schema.prisma).
 
 ## [Define data model in the Schema](https://www.prisma.io/docs/concepts/components/prisma-schema/data-model)
 
@@ -90,6 +90,12 @@ model Clipboard {
   updatedAt DateTime @updatedAt
   title     String
   content   String?
+
+  // Since a User can have many Clipboards,
+  // but a Clipboard can only have 1 User,
+  // Clipboard relates to model User,
+  // with Clipboard.userId being User.id
+
   user      User     @relation(fields: [userId], references: [id])
   userId    String
 }
@@ -100,13 +106,20 @@ model User {
   updatedAt  DateTime @updatedAt
   email      String   @unique
   clipboards Clipboard[]
+
+  // A User can have >1 Group(s)
   groups     UserOnGroup[]
 }
 
+// Relation table required for M-N relationship between User and Group
 model UserOnGroup {
   id      String @id @default(uuid())
+
+  // This model refers to User.id via UserOnGroup.userId
   user    User   @relation(fields: [userId], references: [id])
   userId  String
+
+  // This model refers to Group.id via UserOnGroup.groupId
   group   Group  @relation(fields: [groupId], references: [id])
   groupId String
 }
@@ -116,6 +129,8 @@ model Group {
   createdAt DateTime @updatedAt
   updatedAt DateTime @default(now())
   name      String   @unique
+
+  // A Group can have >1 User(s)
   users     UserOnGroup[]
 }
 ```
@@ -151,7 +166,121 @@ npm install @prisma/client;
 
 After your Client is successfully generated, we are ready to use the Client in our app code.
 
+### Placing `prisma` directory in different place
+
+By default, the `npx prisma init` commands creates `prisma` directory at the project root.
+This can interfere with our project code organization, especially when we employ clean
+architecture in our code.
+
+You can, in fact, put your `prisma` directory anywhere under the project root. But you will
+need to instruct `npx` script `prisma generate` to find your `prisma` from a non-default
+location. Do this with `--schema` flag.
+
+For example, if you moved your `prisma` directory from `./prisma` to `./data/sources/prisma`,
+and your schema filename is `schema.prisma`, then you'll need to supply
+`--schema ./src/data/sources/postgres/prisma/schema.prisma` in your client generation command:
+
+```shell
+npx prisma generate --schema ./src/data/sources/postgres/prisma/schema.prisma;
+```
+
+> Note: You can put the above command in an `npm run` script by modifying your `package.json`.
+
+## PostgreSQL connection
+
+Before we update our code to use Prisma, let's first connect to the database. The connection
+to the database, like our data models, was defined in [Prisma Schema](./prisma/schema.prisma).
+The connection to the DB was specified with a URL, whose scheme varies amoung database vendors.
+
+Since the URL may contain sensitive information such as database passwords or other secrets,
+it is advised to always use some kind of secret management for the URLs, both in development
+and production.
+
+One of the simplest way to manage secrets in development without exposing them is via the
+_environment variables (also called **env**)_, which is a key-value dictionary.
+In this tutorial, we will be using env to manage connection URL, leveraging Prisma's
+built-in mechanisms to obtain env declared in [`/.env`](./.env) file.
+
+When we install `@prisma/client`, the install script also created the file [`.env`](./.env) for us
+in the project root, initialized with a nice template for us:
+
+```shell
+# File /.env
+DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+```
+
+Now we can just substitute `johndoe` with our Postgres username, `randompassword` with Postgres
+username's password, `mydb` with our Postgres DB name, and `public` with our Postgres schema.
+The `localhost:5432` means that PostgreSQL is listening on `localhost` port 54332.
+
+For example, my PostgreSQL user is `postgres`, whose password is `postgres`, and PostgreSQL
+is listening at `localhost@5432`. My database name is `express-demo`, and the PostgreSQL schema
+(not to be confused with Prisma Schema) is `public`, then my URL would look like so:
+
+```shell
+# File /.env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/express-demo?schema=public"
+```
+
+> For other envs, we can use `dotenv` package to manage envs, e.g. for Redis connection,
+> but this is beyond the scope of this tutorial.
+
+Now, update your Prisma Schema to use envs with the `datasource` key:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
+
+This will instruct the generator to create a Prisma Client which takes its connection URL
+from an env with key `DATABASE_URL`, which is what we just put in [`./.env`](./.env).
+
+## SQL migration
+
+After we defined our data models and database connection, we still can't just jump right back
+to coding. We still need to prepare the database, i.e. defining SQL tables with exactly
+the same fields and relations as with our Prisma Schema data models.
+
+But this is difficult - you might define invalid tables, with broken relations, etc.
+The best way to do this is to let Prisma do it for you.
+
+With Prisma, `npx prisma migrate` performs database operations that match with our
+Prisma data models.
+
+There're 2 flavors for Prisma migration - (1) development and (2) production.
+
+We will mostly be running development migrations, as development period is where most of
+table alterations happen. The development migrations are toggled with `--dev` flag.
+
+We run production migrations when the production database needs to be altered to match
+with the new code we're deploying.
+
+`prisma migrate` takes the same `--schema` flag as with `prisma generate`, so if you are
+migrating your databases from schema `./src/data/sources/postgres/prisma/schema.prisma`,
+you will need to run:
+
+```shell
+npx prisma migrate --dev --schema ./src/data/sources/postgres/prisma/schema.prisma;
+```
+
+> Note: You can put the above command in an `npm run` script by modifying your `package.json`.
+
+This will prompt Prisma to read the Schema file, parses the data models, and alters any
+out-of-sync tables to match the data models declared in the Schema.
+
+You can verify that the correct tables were created during migration manually, or just
+try to write some code - if any mistakes were made, Prisma will complain in our application
+code that the tables are some how incorrect.
+
 ## Using Prisma Client in our code
+
+After your Schema data models compiles, and migrations ran successfully, we can now
+start to add Prisma to our application code.
+
+Connecting to the databases is as simple as importing `PrismaClient` object from
+`@prisma/client`.
 
 The following code imports `PrismaClient` generated from the step above and initializes
 a TypeScript Prisma Client:
@@ -163,38 +292,67 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 ```
 
+The object was generated with our Prisma Schema, so it had all the
+neccessary information to connect to the databases and map the tables back
+to TypeScript types and symbols.
+
 All models are available as top-level object fields of variable `prisma`,
-for example, the `users` table (`User` model) is represented in `prisma` as `prisma.user`.
+for example, the `users` table (`User` model) is represented in `prisma`
+as `prisma.user`.
 
-### `create`
+### Basic SQL operations
 
-We can try inserting a new entry for model `User` with `prisma.user.create`:
-
-```typescript
-const newUser = await prisma.user.create({
-  data: {
-    email: "foo@bar.com",
-    posts: [],
-  },
-});
-```
-
-The arguments to Prisma methods are usually objects, and for DB operation methods,
-they usually have top-level key `data` for our entry data.
+The arguments to `prisma` object methods are usually objects.
+And for DB operations, they usually have top-level key `data` for our entry data.
 
 Other top-level keys are still related to the DB operations, but not our data.
 For example, they might be used to fine-tune database performance metrics or behaviors.
 
-### `findMany` and `findFirst`
+### `create`, `findFirst`, and `findMany`
 
-To get all entries from a model, use `findMany` method:
+We can try inserting a new entry for model `User` with `prisma.user.create`,
+and then immediately query for that new user with `prisma.user.findFirst`.
+
+`create` method creates a single entry, and `findFirst` returns the first entry
+Prisma found that matches some conditions given. In this example, the `findFirst`
+condition is that the entry's `email` matches with `newUser`'s.
+
+> Note: we use `await` to make 2 database operations synchronous - we first
+> insert and wait until that insertion is finished, before we progress to read
+> it back to compare it.
 
 ```typescript
-// All users in table `users`
-const users = await prisma.user.findMany();
+import { PrismaClient } from "@prisma/client";
 
-// First user the database found in the table, with 0 condition
-const someUser = await prisma.user.findOne();
+async function ormDemo() {
+  const prisma = new PrismaClient();
+
+  // Insert
+  const newUser = await prisma.user.create({
+    data: {
+      email: "newUser@foo.bar",
+    },
+  });
+
+  // Get a User from the database whose email matches newUser.email
+  const sameNewUser = await prisma.user.findFirst({
+    where: {
+      email: {
+        equals: newUser.email,
+      },
+    },
+  });
+
+  console.log("user inserted");
+  console.table(newUser);
+  console.log("user queried");
+  console.table(sameNewUser);
+
+  // All users in table `users` with 0 conditions
+  const users = await prisma.user.findMany();
+}
+
+ormDemo();
 ```
 
 ### [Filter and conditions](https://www.prisma.io/docs/concepts/components/prisma-client/filtering-and-sorting)
@@ -247,3 +405,7 @@ const users = await prisma.user.findMany({
   include: { clipboards: true }, // The key `clipboards` is from the Schema model User
 });
 ```
+
+Now that we have ORM in our code, we can progress and write code that utilize SQL databases
+without having to write a single SQL query. For more examples, refer to
+[Prisma docs](https://www.prisma.io/docs)

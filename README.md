@@ -4,11 +4,11 @@ Simple web back-end written in TypeScript.
 
 The demo will include:
 
-1. [Project setup](/SETUP.md)
+1. [Setting up](/SETUP.md) the project
 
-2. Basic webserver with Express, with [Clean Architecture structure](./src/)
+2. Basic webserver with Express, with [Clean Architecture](./src/) structure
 
-3. [Connecting to databases with ORM](./ORM.md)
+3. Connecting to databases with [ORM](./ORM.md)
 
 4. (TODO) Authorizations
 

@@ -15,6 +15,7 @@ export class HandlerClipboards implements IHandlerClipboards {
   }
 
   async createClipboard(req: Request, res: Response): Promise<Response> {
+    throw "foo";
     const { userId, content, title } = req.body;
     if (!userId) {
       return resp.MissingField(res, "userId");

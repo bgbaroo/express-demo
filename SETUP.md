@@ -75,8 +75,8 @@ npm install -save-dev @types/node;
 
 2. Initialize `tsconfig.json`
 
-> Just like how `package.json` is a manifest for our project, `tsconfig.json` is a manifest
-> specifically for TypeScript in our project.
+> Just like how `package.json` is a manifest for our project,
+> `tsconfig.json` is a manifest specifically for TypeScript in our project.
 >
 > `tsconfig.json` includes configuration like the source directories, the output JavaScript editions,
 > and other compiler options.
@@ -91,29 +91,34 @@ Now we should have a `tsconfig.json` at our package root.
 
 3. Prepare `src` and `dist` directories
 
-We will create 2 directories `src` and `dist` in our project, with `src` being the TS source code we write,
-and `dist` being the compiled JS output that we will run with Node:
+We will create 2 directories `src` and `dist` in our project, with `src`
+being the TS source code we write, and `dist` being the compiled JS output
+that we will run with Node:
 
 ```shell
 mkdir src dist; # This creates 2 new directories "src" and "dist"
 ```
 
-Now, configure `tsc` to read source files from `src` and output JS files to `dist`, by updating `tsconfig.json`.
+Now, configure `tsc` to read source files from `src` and output JS files to
+`dist`, by updating `tsconfig.json`.
 
 - We will configure `dist` first - go to `compilerOptions.outDir` and change the value to `"dist"`
 
-- Then, go to top-level key `include`, and update it with value `["src/**/*"]` - this means that `tsc` will include
-  all files with `.ts` extensions under `src` for compilation
+- Then, go to top-level key `include`, and update it with value `["src/**/*"]` -
+  this means that `tsc` will include all files with `.ts` extensions under `src`
+  for compilation
 
 4. Configure `tsconfig.json`
 
-Other keys in `tsconfig.json` is also worth customizing. For our basic project, let's just mess with `compilerOptions` key.
+Other keys in `tsconfig.json` is also worth customizing. For our basic project,
+let's just mess with `compilerOptions` key.
 
 We will use the following values for `compilerOptions`:
 
 - `compilerOptions.module`: `"NodeNext"`
 
-  This specifies module system of our TS program (not to be confused with `package.json`'s `"type"` key')
+  This specifies module system of our TS program (not to be confused with
+  `package.json`'s `"type"` key')
 
 - `compilerOptions.moduleResolution`: `"NodeNext"`
 
@@ -144,7 +149,8 @@ The code block below is the bare minimum `tsconfig.json` that covers everything 
 
 5. Add npm scripts (optional)
 
-npm scripts are like aliases to long commands. They are configured in `package.json` under the key `"scripts"`.
+npm scripts are like aliases to long commands. They are configured in `package.json`
+under the key `"scripts"`.
 
 - `npm run start`
 
@@ -183,16 +189,22 @@ npm scripts are like aliases to long commands. They are configured in `package.j
 ### Install Express, as well as its type decoration package:
 
 ```shell
-npm install express @types/express;
+npm install express;
+npm install --save-dev  @types/express;
 ```
 
-This installs 2 packages - (1) `express` Express library, and (2) `@types/express` Express type decorations
-The type decoration package is required in order for TypeScript to understand Express code, since the Express
-library itself is written in plain JavaScript.
+This installs 2 packages - (1) `express` Express library, and (2) `@types/express`
+Express type decorations. The type decoration package is required during development
+in order for TypeScript to understand Express code, since the Express library
+itself is written in plain JavaScript.
+
+We don't need `@types/express` because we don't need type decorations in our production
+environment, and the production will use only JavaScript any way.
 
 ## Verifying Express + TypeScript, and our npm scripts
 
-Try writing a simple webserver using Express in TypeScript, and see if our setup steps done above work perfectly.
+Try writing a simple webserver using Express in TypeScript, and see if our setup
+steps done above work perfectly.
 
 We will first begin with our entrypoint file, or `src/index.ts`:
 

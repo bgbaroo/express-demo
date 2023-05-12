@@ -1,3 +1,4 @@
+import http from "http";
 import express, { Request, Response } from "express";
 
 import resp from "./response";
@@ -29,9 +30,24 @@ export class App {
     this.app.use("/groups", new RouterGroups(arg.group).router());
   }
 
-  async listenAndServe(port: number | string) {
-    this.app.listen(port, () => {
+  async listenAndServe(port: number | string): Promise<void> {
+    const server = this.app.listen(port, () => {
       console.log(`Express server is listening on ${port}`);
     });
+
+    shutdown(server, "SIGINT");
+    shutdown(server, "SIGTERM");
   }
+}
+
+async function shutdown(server: http.Server, signal: string) {
+  // Graceful shutdown for HTTP server
+  process.on(signal, () => {
+    console.log(`${signal} signal received: closing Express server`);
+
+    server.close(() => {
+      console.log(`Express server closed due to ${signal}`);
+      return Promise.resolve();
+    });
+  });
 }

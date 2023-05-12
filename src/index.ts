@@ -8,7 +8,7 @@ import { HandlerGroups } from "./presentation/handlers/groups";
 import { HandlerUsers } from "./presentation/handlers/users";
 import { App } from "./presentation/app";
 
-async function main() {
+async function main(): Promise<void> {
   const repoClipboards = new RepositoryClipboards();
   const usecaseClipboard = new UsecaseClipboard(repoClipboards);
   const handlerClipboards = new HandlerClipboards(usecaseClipboard);
@@ -27,7 +27,8 @@ async function main() {
     group: handlerGroups,
   });
 
-  app.listenAndServe(8000);
+  // Graceful shutdowns are implemented in listenAndServe
+  return app.listenAndServe(8000);
 }
 
 main();
