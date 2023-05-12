@@ -1,11 +1,10 @@
-import { Handler } from "express";
 import { HandlerFunc } from "../app";
 import { Router } from "./router";
 
 export interface IHandlerClipboards {
   createClipboard: HandlerFunc;
   getClipboard: HandlerFunc;
-  getClipboards: Handler;
+  getClipboards: HandlerFunc;
   deleteClipboard: HandlerFunc;
   deleteClipboards: HandlerFunc;
 }
