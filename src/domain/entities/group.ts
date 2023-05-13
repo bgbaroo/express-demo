@@ -34,6 +34,7 @@ export class Group implements IGroup {
       return false;
     }
 
+    user.groupId = this.id;
     this._members.set(user.email, user);
     return true;
   }

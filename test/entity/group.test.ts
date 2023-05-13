@@ -1,5 +1,5 @@
-import { Group } from "../src/domain/entities/group";
-import { IUser } from "../src/domain/entities/user";
+import { Group } from "../../src/domain/entities/group";
+import { IUser } from "../../src/domain/entities/user";
 
 describe("empty if 0 user were given to constructor", () => {
   const group = new Group("gid", "gname", []);
@@ -19,18 +19,22 @@ describe("no duplicate emails", () => {
     {
       id: id,
       email: fooAtBar,
+      groupId: "someOtherGID",
     },
     {
       id: "2345",
       email: "bar@baz.com",
+      groupId: undefined,
     },
     {
       id: "3456",
       email: "baz@foo.com",
+      groupId: undefined,
     },
     {
       id: "4567",
       email: fooAtBar,
+      groupId: undefined,
     },
   ];
 
@@ -50,5 +54,10 @@ describe("no duplicate emails", () => {
     if (idFromGroup) {
       expect(idFromGroup).toBe(id);
     }
+  });
+
+  it("User.groupId unexpected", () => {
+    expect(firstFooAtBar?.groupId).toBeDefined();
+    expect(firstFooAtBar?.groupId).toBe(group.id);
   });
 });

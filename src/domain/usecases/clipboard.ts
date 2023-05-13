@@ -1,5 +1,5 @@
-import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 import { IClipboard } from "../entities/clipboard";
+import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 import {
   IPreClipboard,
   IUseCaseCreateClipboard,
