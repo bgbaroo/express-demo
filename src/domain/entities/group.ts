@@ -1,3 +1,4 @@
+import { v4 as uuid } from "uuid";
 import { IUser } from "./user";
 import { IGroupOwner } from "./group_owner";
 
@@ -26,15 +27,20 @@ export class Group implements IGroup {
   private _members: Map<string, IUser>;
 
   // For when constructing from database values, with known ID
-  constructor(id: string, name: string, owner: IGroupOwner, users?: IUser[]) {
-    this.id = id;
-    this.name = name;
-    this.ownerId = owner.id;
+  constructor(args: {
+    id?: string;
+    name: string;
+    owner: IGroupOwner;
+    users?: IUser[];
+  }) {
+    this.id = args.id || uuid();
+    this.name = args.name;
+    this.ownerId = args.owner.id;
     this._members = new Map();
-    this.setOwner(owner);
+    this.setOwner(args.owner);
 
-    if (users !== undefined) {
-      this.addMembers(owner, users);
+    if (args.users !== undefined) {
+      this.addMembers(args.owner, args.users);
     }
   }
 
@@ -43,10 +49,13 @@ export class Group implements IGroup {
   }
 
   // Standard way to add key to map
-  private _addMember(owner: IGroupOwner, user: IUser) {
+  private _addMember(owner: IGroupOwner, user: IUser): boolean {
     if (this.isOwner(owner)) {
       this._members.set(user.id, user);
+      return true;
     }
+
+    return false;
   }
 
   // setOwner will call owner.
@@ -67,7 +76,7 @@ export class Group implements IGroup {
   // Wrapper for _addMember and isMember
   // that won't add new user with duplicate keys
   addMember(owner: IGroupOwner, user: IUser): boolean {
-    if (this.isOwner(owner)) {
+    if (!this.isOwner(owner)) {
       return false;
     }
 
@@ -75,8 +84,7 @@ export class Group implements IGroup {
       return false;
     }
 
-    this._addMember(owner, user);
-    return true;
+    return this._addMember(owner, user);
   }
 
   addMembers(owner: IGroupOwner, users: IUser[]): number {

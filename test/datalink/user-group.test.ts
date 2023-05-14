@@ -19,23 +19,24 @@ async function testUserAndGroup() {
     const groupDb = new DataLinkGroup(pg);
 
     // The IDs will be discarded
-    const user0 = new User("user0Id", "user0");
-    const user1 = new User("user1_id", "user1");
-    const user2 = new User("user2_id", "user2");
+    const user0 = new User("user0");
+    const user1 = new User("user1");
+    const user2 = new User("user2");
 
     // Insert owner
     const user0Saved = await userDb.createUser(user0, "pass0");
-    const user0Owner = new GroupOwner(user0Saved.id, user0Saved.email);
+    const user0Owner = new GroupOwner(user0Saved.email, user0Saved.id);
 
     // Insert other users
     const user1Saved = await userDb.createUser(user1, "pass1");
     const user2Saved = await userDb.createUser(user2, "pass2");
 
     // Create groups, with correct user IDs (from databases)
-    const group = new Group("groupId", "groupName", user0Owner, [
-      user1Saved,
-      user2Saved,
-    ]);
+    const group = new Group({
+      name: "groupName",
+      owner: user0Owner,
+      users: [user1Saved, user2Saved],
+    });
 
     const groupSaved = await groupDb.createGroup(group);
     expect(groupSaved).toBeTruthy();
@@ -53,6 +54,16 @@ async function testUserAndGroup() {
     [user0Owner, user1Saved, user2Saved].forEach((member) => {
       expect(groupSaved.isMember(member.id)).toBe(true);
       expect(groupQueried.isMember(member.id)).toBe(true);
+    });
+
+    const user3 = new User("user3");
+    const user3Saved = await userDb.createUser(user3, "pass3");
+    expect(groupQueried.addMember(user0Owner, user3Saved)).toBe(true);
+
+    const groupUpdated = await groupDb.updateGroup(groupQueried);
+    console.table(groupUpdated);
+    [user0Owner, user1Saved, user2Saved, user3Saved].forEach((member) => {
+      expect(groupUpdated.isMember(member.id)).toBe(true);
     });
   } catch (err) {
     console.error(err);

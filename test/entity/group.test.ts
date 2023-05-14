@@ -2,8 +2,8 @@ import { Group } from "../../src/domain/entities/group";
 import { IGroupOwner, GroupOwner } from "../../src/domain/entities/group_owner";
 import { IUser, User } from "../../src/domain/entities/user";
 
-function mockOwner(id?: string, email?: string): IGroupOwner {
-  return new GroupOwner(id || "ownerId", email || "ownerEmail");
+function mockOwner(email?: string, id?: string): IGroupOwner {
+  return new GroupOwner(email || "ownerEmail", id || "ownerId");
 }
 
 function ownerForgot(owner: IGroupOwner, gids: string[]): string | undefined {
@@ -23,7 +23,7 @@ function testGroupOwner(owner: IGroupOwner, _gids: Set<string>) {
   describe(`owner creates new ${gids.length} groups`, () => {
     for (let i = 0; i < gids.length; i++) {
       const gid = gids[i];
-      const group = new Group(gid, `$group_${gid}`, owner);
+      const group = new Group({ id: gid, name: `group_${gid}`, owner });
 
       it("empty group.size() != 1", () => {
         // Owner is also a member,
@@ -54,19 +54,19 @@ describe("Creating owner and groups", () => {
 describe("no duplicate emails", () => {
   const fooAtBar = "foo@bar.com";
   const id = "1234";
-  const myUser: IUser = new User(id, fooAtBar);
+  const myUser: IUser = new User(fooAtBar, id);
 
   const users: IUser[] = [
     {
       ...myUser,
     },
-    new User("2345", "bar@baz.com"),
-    new User("3456", "baz@foo.com"),
-    new User(id, fooAtBar),
+    new User("bar@baz.com"),
+    new User("baz@foo.com"),
+    new User(fooAtBar, id), // Group should not add this user, as ID is a duplicate
   ];
 
   const owner = mockOwner();
-  const group = new Group("gid", "gname", owner, users);
+  const group = new Group({ id: "gid", name: "gname", owner, users });
   const target = group.getMember(id);
 
   it("unexpected Group.ownerId()", () => {
@@ -95,5 +95,13 @@ describe("no duplicate emails", () => {
 
   it("User.email unexpected", () => {
     expect(target?.email).toBe(myUser.email);
+  });
+
+  it("duplicate User.id was added", () => {
+    expect(group.addMember(owner, new User(fooAtBar, id))).toBe(false);
+  });
+
+  it("new User was not added", () => {
+    expect(group.addMember(owner, new User("new email", "new id"))).toBe(true);
   });
 });

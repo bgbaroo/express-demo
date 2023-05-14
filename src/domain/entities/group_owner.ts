@@ -9,8 +9,8 @@ export interface IGroupOwner extends IUser {
 export class GroupOwner extends User implements IGroupOwner {
   private ownGroups: Set<string>;
 
-  constructor(id: string, email: string) {
-    super(id, email);
+  constructor(email: string, id?: string) {
+    super(email, id);
     this.ownGroups = new Set();
   }
 

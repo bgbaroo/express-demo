@@ -3,7 +3,7 @@ import { User } from "../../../../../domain/entities/user";
 import { IUser } from "../../../../../domain/entities/user";
 
 function dataModelUserToIUser(user: DataModelUser): IUser {
-  return new User(user.id, user.email);
+  return new User(user.email, user.id);
 }
 
 function dataModelUsersToIUsers(users: DataModelUser[]): IUser[] {
@@ -42,6 +42,7 @@ function formCreateUserToDataModelUser(
   password: string,
 ): IDataModelUserWithOwnGroups {
   return {
+    id: user.id,
     email: user.email,
     password,
     ownGroups: {

@@ -44,12 +44,12 @@ function groupToDataModelGroupWithMembers(
 function dataModelGroupWithMembersToGroup(
   group: DataModelGroupWithMembers,
 ): IGroup {
-  return new Group(
-    group.id,
-    group.name,
-    new GroupOwner(group.owner.id, group.owner.email),
-    dataModelGroupMembersToUsers(group.users),
-  );
+  return new Group({
+    id: group.id,
+    name: group.name,
+    owner: new GroupOwner(group.owner.email, group.owner.id),
+    users: dataModelGroupMembersToUsers(group.users),
+  });
 }
 
 export default {

@@ -1,8 +1,5 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
-import {
-  connectUsersToGroupMembers,
-  dataModelGroupMembers,
-} from "./adapters/group-members";
+import { connectUsersToGroupMembers } from "./adapters/group-members";
 import groupAdapter from "./adapters/group";
 
 import { IGroup } from "../../../../domain/entities/group";
@@ -41,6 +38,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .create({
         include: alwaysIncludeOwnerAndUsers(),
         data: {
+          id: group.id,
           name: group.name,
           users: {
             create: connectUsersToGroupMembers(group.getMembers()),
@@ -106,9 +104,9 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           owner: undefined,
 
           name: group.name,
-          // Update UserOnGroups
+          // Re-create relations: will fail
           users: {
-            create: dataModelGroupMembers(group),
+            create: connectUsersToGroupMembers(group.getMembers()),
           },
         },
       })
