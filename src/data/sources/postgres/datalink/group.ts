@@ -1,10 +1,11 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
-import userAdapter from "./adapters/user";
-import { dataModelGroupMembers } from "./adapters/group-members";
+import {
+  connectUsersToGroupMembers,
+  dataModelGroupMembers,
+} from "./adapters/group-members";
 import groupAdapter from "./adapters/group";
-import { IUser } from "../../../../domain/entities/user";
-import { Group, IGroup } from "../../../../domain/entities/group";
-import { GroupOwner } from "../../../../domain/entities/group_owner";
+
+import { IGroup } from "../../../../domain/entities/group";
 
 class IncludeOwnerAndUsers {
   users: {
@@ -42,10 +43,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
         data: {
           name: group.name,
           users: {
-            createMany: {
-              data: dataModelGroupMembers(group),
-              skipDuplicates: true,
-            },
+            create: connectUsersToGroupMembers(group.getMembers()),
           },
           owner: {
             connect: {
@@ -54,13 +52,9 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           },
         },
       })
-      .then(({ id, name, owner, users: usersOnGroups }) => {
-        const users: IUser[] = usersOnGroups.map((uog) =>
-          userAdapter.dataModelUserToIUser(uog.user),
-        );
-
+      .then((result) => {
         return Promise.resolve(
-          new Group(id, name, new GroupOwner(owner.id, owner.email), users),
+          groupAdapter.dataModelGroupWithMembersToGroup(result),
         );
       })
       .catch((err) => Promise.reject(`failed to create group: ${err}`));

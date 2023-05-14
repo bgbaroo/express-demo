@@ -16,9 +16,33 @@ interface IDataModelGroupMember {
   userId: string;
 }
 
+// Supplied to PrismaClient().group.create when the new group already
+// has existing users as members
+interface GroupMemberConnectUser {
+  user: {
+    connect: {
+      id: string;
+    };
+  };
+}
+
 function dataModelGroupMembers(group: IGroup): IDataModelGroupMember[] {
   return group.getMembers().map((user): IDataModelGroupMember => {
     return { userId: user.id };
+  });
+}
+
+function connectUsersToGroupMembers(
+  members: IUser[],
+): GroupMemberConnectUser[] {
+  return members.map((member): GroupMemberConnectUser => {
+    return {
+      user: {
+        connect: {
+          id: member.id,
+        },
+      },
+    };
   });
 }
 
@@ -48,4 +72,5 @@ export {
   dataModelGroupMembersToUsers,
   userToGroupMember,
   usersToGroupMembers,
+  connectUsersToGroupMembers,
 };
