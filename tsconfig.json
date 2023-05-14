@@ -9,5 +9,5 @@
     "noUnusedLocals": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "test/entity/datalink/user-group.test.ts"]
 }

@@ -1,65 +1,123 @@
 import { IUser } from "./user";
+import { IGroupOwner } from "./group_owner";
 
 export interface IGroup {
   id: string;
   name: string;
 
-  addMember(user: IUser): boolean;
-  members(): IUser[];
+  // These methods require the owner
+  addMember(owner: IGroupOwner, user: IUser): boolean;
+  addMembers(owner: IGroupOwner, users: IUser[]): number;
+  delMember(owner: IGroupOwner, email: string): boolean;
+
+  // These methods can be called without the owner
   size(): number;
-  isEmpty(): boolean;
   isMember(email: string): boolean;
+  getOwnerId(): string;
+  getMembers(): IUser[];
   getMember(email: string): IUser | undefined;
-  delMember(email: string): boolean;
 }
 
 export class Group implements IGroup {
   id: string;
   name: string;
+  ownerId: string;
+
   private _members: Map<string, IUser>;
 
-  constructor(id: string, name: string, users: IUser[]) {
+  // For when constructing from database values, with known ID
+  constructor(id: string, name: string, owner: IGroupOwner, users?: IUser[]) {
     this.id = id;
     this.name = name;
+    this.ownerId = owner.id;
     this._members = new Map();
+    this.setOwner(owner);
 
-    users.forEach((user) => {
-      this.addMember(user);
-    });
+    if (users !== undefined) {
+      this.addMembers(owner, users);
+    }
   }
 
-  // Do not add new user with duplicate emails
-  addMember(this: Group, user: IUser): boolean {
-    if (this.isMember(user.email)) {
+  private isOwner(owner: IGroupOwner): boolean {
+    return owner.id === this.ownerId && owner.ownsGroup(this.id);
+  }
+
+  // Standard way to add key to map
+  private _addMember(owner: IGroupOwner, user: IUser) {
+    if (this.isOwner(owner)) {
+      this._members.set(user.id, user);
+    }
+  }
+
+  // setOwner will call owner.
+  private setOwner(owner: IGroupOwner) {
+    if (!this.ownerId) {
+      return;
+    }
+
+    owner.ownNewGroup(this.id);
+    this.ownerId = owner.id;
+    this._addMember(owner, owner);
+  }
+
+  getOwnerId(): string {
+    return this.ownerId;
+  }
+
+  // Wrapper for _addMember and isMember
+  // that won't add new user with duplicate keys
+  addMember(owner: IGroupOwner, user: IUser): boolean {
+    if (this.isOwner(owner)) {
       return false;
     }
 
-    user.groupId = this.id;
-    this._members.set(user.email, user);
+    if (this.isMember(user.id)) {
+      return false;
+    }
+
+    this._addMember(owner, user);
     return true;
+  }
+
+  addMembers(owner: IGroupOwner, users: IUser[]): number {
+    let count = 0;
+    if (!this.isOwner(owner)) {
+      return count;
+    }
+
+    users.forEach((user) => {
+      if (this.isMember(user.id)) {
+        return;
+      }
+
+      this._addMember(owner, user);
+      count++;
+    });
+
+    return count;
+  }
+
+  delMember(owner: IGroupOwner, userId: string): boolean {
+    if (!this.isOwner(owner)) {
+      return false;
+    }
+
+    return this._members.delete(userId);
   }
 
   size(this: Group): number {
     return this._members.size;
   }
 
-  members(this: Group): IUser[] {
+  getMembers(this: Group): IUser[] {
     return Array.from(this._members.values());
   }
 
-  isEmpty(this: Group): boolean {
-    return this._members.size === 0;
+  isMember(this: Group, userId: string): boolean {
+    return this._members.get(userId) != undefined;
   }
 
-  isMember(this: Group, email: string): boolean {
-    return this._members.get(email) != undefined;
-  }
-
-  getMember(this: Group, email: string): IUser | undefined {
-    return this._members.get(email);
-  }
-
-  delMember(this: Group, email: string): boolean {
-    return this._members.delete(email);
+  getMember(this: Group, userId: string): IUser | undefined {
+    return this._members.get(userId);
   }
 }

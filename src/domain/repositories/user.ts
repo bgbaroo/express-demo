@@ -1,20 +1,31 @@
+import { DataLinkUser } from "../../data/sources/postgres/datalink/user";
 import { IUser } from "../entities/user";
 import { IRepositoryUser } from "../interfaces/repositories/user";
 
 export class RepositoryUser implements IRepositoryUser {
-  createUser(_user: IUser): Promise<void> {
-    return Promise.reject("not implemented");
+  private link: DataLinkUser;
+
+  constructor(link: DataLinkUser) {
+    this.link = link;
   }
-  getUser(): Promise<IUser> {
-    return Promise.reject("not implemented");
+
+  async createUser(user: IUser, password: string): Promise<IUser> {
+    return await this.link.createUser(user, password);
   }
-  getUsers(): Promise<IUser[]> {
-    return Promise.reject("not implemented");
+
+  async getUser(id: string): Promise<IUser | null> {
+    return await this.link.getUser(id);
   }
-  updateUser(_user: IUser): Promise<void> {
-    return Promise.reject("not implemented");
+
+  async getUsers(): Promise<IUser[] | null> {
+    return await this.link.getUsers();
   }
-  deleteUser(_id: string): Promise<void> {
-    return Promise.reject("not implemented");
+
+  async updateUser(user: IUser): Promise<IUser | null> {
+    return await this.updateUser(user);
+  }
+
+  async deleteUser(id: string): Promise<IUser | null> {
+    return await this.deleteUser(id);
   }
 }
