@@ -1,4 +1,4 @@
-import { DbOnly, DataModelUser } from "./datamodel";
+import { DbOnly, DataModelUser } from "./model";
 
 import { IUser, User } from "../../../../domain/entities/user";
 

@@ -1,6 +1,6 @@
-import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
-import modelGroup from "../datamodels/group";
-import modelUser from "../datamodels/user";
+import { BasePrismaSchemaDataLink, DbDriver } from "./link";
+import modelGroup from "../data-models/group";
+import modelUser from "../data-models/user";
 
 import { IGroup } from "../../../../domain/entities/group";
 

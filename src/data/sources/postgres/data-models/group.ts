@@ -1,4 +1,4 @@
-import { DataModelUser, DataModelGroup, DbOnly } from "./datamodel";
+import { DataModelUser, DataModelGroup, DbOnly } from "./model";
 import userModel from "./user";
 
 import { IGroup, Group } from "../../../../domain/entities/group";

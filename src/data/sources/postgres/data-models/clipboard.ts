@@ -1,4 +1,4 @@
-import { DataModelUser, DataModelClipboard, DbOnly } from "./datamodel";
+import { DataModelUser, DataModelClipboard, DbOnly } from "./model";
 import userModel from "./user";
 
 import { IClipboard, Clipboard } from "../../../../domain/entities/clipboard";

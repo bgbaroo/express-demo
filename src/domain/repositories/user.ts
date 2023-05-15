@@ -1,4 +1,4 @@
-import { DataLinkUser } from "../../data/sources/postgres/datalink/user";
+import { DataLinkUser } from "../../data/sources/postgres/data-links/user";
 import { IUser } from "../entities/user";
 import { IRepositoryUser } from "../interfaces/repositories/user";
 

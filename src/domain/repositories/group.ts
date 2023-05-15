@@ -1,6 +1,6 @@
 import { IRepositoryGroup } from "../interfaces/repositories/group";
 import { IGroup } from "../entities/group";
-import { DataLinkGroup } from "../../data/sources/postgres/datalink/group";
+import { DataLinkGroup } from "../../data/sources/postgres/data-links/group";
 
 export class RepositoryGroup implements IRepositoryGroup {
   private link: DataLinkGroup;
