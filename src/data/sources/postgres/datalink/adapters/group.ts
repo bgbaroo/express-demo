@@ -11,31 +11,17 @@ interface DataModelGroupWithMembers extends DataModelGroup {
   users: DataModelUser[];
 }
 
-interface IDataModelGroup {
-  name: string;
-  ownerId: string;
-}
-
 interface IncludeOwnerAndUsers {
   users: boolean;
   owner: boolean;
 }
 
-// Supplied to PrismaClient().group.create when the new group already
-// has existing users as members
 interface GroupMembers {
   connect?: { id: string }[];
 }
 
 function alwaysIncludeOwnerAndUsers(): IncludeOwnerAndUsers {
   return { owner: true, users: true };
-}
-
-function groupToDataModelGroup(group: IGroup): IDataModelGroup {
-  return {
-    ...group,
-    ownerId: group.getOwnerId(),
-  };
 }
 
 function dataModelGroupWithMembersToGroup(
@@ -58,7 +44,6 @@ function connectUsersToGroupMembers(members: IUser[]): GroupMembers {
 }
 
 export default {
-  groupToDataModelGroup,
   dataModelGroupWithMembersToGroup,
   alwaysIncludeOwnerAndUsers,
   connectUsersToGroupMembers,

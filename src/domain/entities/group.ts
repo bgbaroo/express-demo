@@ -9,14 +9,15 @@ export interface IGroup {
   // These methods require the owner
   addMember(owner: IGroupOwner, user: IUser): boolean;
   addMembers(owner: IGroupOwner, users: IUser[]): number;
-  delMember(owner: IGroupOwner, email: string): boolean;
+  delMember(owner: IGroupOwner, userId: string): boolean;
+  delMembers(owner: IGroupOwner, userIds: string[]): number;
 
   // These methods can be called without the owner
   size(): number;
-  isMember(email: string): boolean;
+  isMember(userId: string): boolean;
   getOwnerId(): string;
   getMembers(): IUser[];
-  getMember(email: string): IUser | undefined;
+  getMember(userId: string): IUser | undefined;
 }
 
 export class Group implements IGroup {
@@ -109,8 +110,22 @@ export class Group implements IGroup {
     if (!this.isOwner(owner)) {
       return false;
     }
+    if (userId == this.getOwnerId()) {
+      return false;
+    }
 
     return this._members.delete(userId);
+  }
+
+  delMembers(owner: IGroupOwner, userIds: string[]): number {
+    let counter = 0;
+    userIds.forEach((userId) => {
+      if (this.delMember(owner, userId)) {
+        counter++;
+      }
+    });
+
+    return counter;
   }
 
   size(this: Group): number {

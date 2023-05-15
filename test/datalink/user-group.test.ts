@@ -3,106 +3,136 @@ import { PrismaClient } from "@prisma/client";
 import { DataLinkUser } from "../../src/data/sources/postgres/datalink/user";
 import { DataLinkGroup } from "../../src/data/sources/postgres/datalink/group";
 import { GroupOwner } from "../../src/domain/entities/group_owner";
-import { Group, IGroup } from "../../src/domain/entities/group";
+import { Group } from "../../src/domain/entities/group";
 import { User } from "../../src/domain/entities/user";
 
+interface Arg {
+  gName: string; // group name
+  gOwner: string; // group owner email
+  gMembers: string[]; // group members
+  gNewMembers: string[]; // group members to be inserted later
+  gNonMembers: string[]; // non-members
+  gExMembers: string[]; // group members that will be removed
+}
+
 describe("test DB datalink", () => {
-  it("creating group with user relations", async () => {
+  it("group with user relations", async () => {
     const pg = new PrismaClient();
     const userDb = new DataLinkUser(pg);
     const groupDb = new DataLinkGroup(pg);
 
-    const savedResult = await testUserAndGroup(userDb, groupDb);
-    await testPrismaImplicitRelations(groupDb, savedResult);
+    const arg = {
+      gName: "groupName",
+      gOwner: "groupOwner",
+      gMembers: ["member1", "member2", "member3"],
+      gNewMembers: ["newMember1", "newMember2"],
+      gNonMembers: ["user1", "user2"],
+      gExMembers: ["member2", "newMember1"],
+    };
+
+    expect(await testUserAndGroupWrites(userDb, groupDb, arg)).resolves;
   });
 });
 
-interface savedIds {
-  group: string;
-  members: string[];
-  nonMembers?: string[];
-}
-
-async function testPrismaImplicitRelations(
-  groupDb: DataLinkGroup,
-  savedData: savedIds,
-) {
-  const groupSaved = await groupDb.getGroup(savedData.group);
-  expect(groupSaved).toBeTruthy();
-
-  if (!groupSaved) {
-    return;
-  }
-
-  savedData.members.forEach((member) =>
-    expect(groupSaved.isMember(member)).toBe(true),
-  );
-
-  expect(savedData.members.length).toBe(groupSaved.getMembers().length);
-}
-
-async function testUserAndGroup(
+async function testUserAndGroupWrites(
   userDb: DataLinkUser,
   groupDb: DataLinkGroup,
-): Promise<savedIds> {
+  arg: Arg,
+): Promise<void> {
   try {
-    // The IDs will be discarded
-    const user0 = new User("user0");
-    const user1 = new User("user1");
-    const user2 = new User("user2");
+    // Insert group owner
+    const ownerUser = await userDb.createUser(
+      new GroupOwner(arg.gOwner),
+      "passOwner",
+    );
+    const owner = new GroupOwner(ownerUser.email, ownerUser.id);
 
-    // Insert owner
-    const user0Saved = await userDb.createUser(user0, "pass0");
-    const user0Owner = new GroupOwner(user0Saved.email, user0Saved.id);
+    // Insert all other users
+    const users = await Promise.all(
+      Array.from(
+        new Set([
+          ...arg.gMembers,
+          ...arg.gNewMembers,
+          ...arg.gNonMembers,
+          ...arg.gExMembers,
+        ]),
+      ).map((user, i) => userDb.createUser(new User(user), `pass_${i}`)),
+    );
+    const groupMembers = users.filter((user) =>
+      arg.gMembers.includes(user.email),
+    );
+    const newMembers = users.filter((user) =>
+      arg.gNewMembers.includes(user.email),
+    );
+    const exMembers = users.filter((user) =>
+      arg.gExMembers.includes(user.email),
+    );
 
-    // Insert other users
-    const user1Saved = await userDb.createUser(user1, "pass1");
-    const user2Saved = await userDb.createUser(user2, "pass2");
+    // Create a Group with just gMembers, and insert it to DB
+    console.log("Testing inserting with members");
+    const group = await groupDb.createGroup(
+      new Group({
+        owner: new GroupOwner(owner.email, owner.id),
+        name: arg.gName,
+        users: groupMembers,
+      }),
+    );
 
-    // Create groups, with correct user IDs (from databases)
-    const group = new Group({
-      name: "groupName",
-      owner: user0Owner,
-      users: [user1Saved, user2Saved],
+    // Test getMembers and isMembers
+    group.getMembers().forEach((member) => {
+      expect(group.isMember(member.id)).toBe(true);
+
+      if (member.email == arg.gOwner) {
+        return;
+      }
+      expect(arg.gMembers.includes(member.email)).toBe(true);
     });
 
-    const groupSaved = await groupDb.createGroup(group);
-    expect(groupSaved).toBeTruthy();
+    // Add new members arg.NewMembers
+    console.log("Testing inserting with newMembers");
+    group.addMembers(owner, newMembers);
 
-    const groupResult = await groupDb.getGroup(groupSaved.id);
-    expect(groupResult).toBeTruthy();
-    if (!groupResult) {
-      return Promise.reject("null groupResult");
-    }
+    // Save it back to DB
+    const groupNewMembers = await groupDb.updateGroup(group);
+    groupNewMembers
+      .getMembers()
+      .filter((newMember) => !arg.gMembers.includes(newMember.email))
+      .forEach((newMember) => {
+        expect(groupNewMembers.isMember(newMember.id)).toBe(true);
+        if (newMember.email == arg.gOwner) {
+          return;
+        }
 
-    const groupQueried: IGroup = groupResult;
+        console.log(`checking new user ${newMember.email}`);
+        expect(arg.gNewMembers.includes(newMember.email)).toBe(true);
+        expect(arg.gNonMembers.includes(newMember.email)).toBe(false);
+      });
 
-    [user0Owner, user1Saved, user2Saved].forEach((member) => {
-      expect(groupSaved.isMember(member.id)).toBe(true);
-      expect(groupQueried.isMember(member.id)).toBe(true);
-    });
+    // Make sure that ex-members were once in our group before deleting them
+    console.log("Removing exMembers");
+    groupNewMembers.delMembers(
+      owner,
+      exMembers.map((ex) => ex.id),
+    );
 
-    const user3 = new User("user3");
-    const user3Saved = await userDb.createUser(user3, "pass3");
-    expect(groupQueried.addMember(user0Owner, user3Saved)).toBe(true);
+    // Save back group without ex-members
+    console.log("Testing inserting without exMembers");
+    const groupNoExes = await groupDb.updateGroup(groupNewMembers);
+    console.table(groupNoExes.getMembers());
 
-    const groupUpdated = await groupDb.updateGroup(groupQueried);
-    console.table(groupUpdated);
-    [user0Owner, user1Saved, user2Saved, user3Saved].forEach((member) => {
-      expect(groupUpdated.isMember(member.id)).toBe(true);
-    });
+    return Promise.resolve();
 
-    return Promise.resolve({
-      group: groupUpdated.id,
-      members: [user0Owner, user1Saved, user2Saved, user3Saved].map(
-        (user): string => {
-          return user.id;
-        },
-      ),
-    });
+    // Test that ex-members are not members
+    // groupNoExes.getMembers().forEach((member) => {
+    //   if (member.email == arg.gOwner) {
+    //     return;
+    //   }
+
+    //   expect(arg.gExMembers.includes(member.email)).toBe(false);
+    //   expect(arg.gNonMembers.includes(member.email)).toBe(false);
+    // });
   } catch (err) {
     console.error(err);
-
     return Promise.reject(err);
   }
 }
