@@ -2,6 +2,21 @@ import { DbOnly, DataModelUser } from "./db-only";
 import { User } from "../../../../../domain/entities/user";
 import { IUser } from "../../../../../domain/entities/user";
 
+interface UserCreateGroup {
+  name: string;
+}
+interface IUserId {
+  id: string;
+}
+
+function usersToUserIds(users: IUser[]): IUserId[] {
+  return users.map((user): IUserId => {
+    return {
+      id: user.id,
+    };
+  });
+}
+
 function dataModelUserToIUser(user: DataModelUser): IUser {
   return new User(user.email, user.id);
 }
@@ -12,9 +27,6 @@ function dataModelUsersToIUsers(users: DataModelUser[]): IUser[] {
 
 // Allows create empty group with name and owner as member,
 // but will not create new group members (models UserOnGroup and User)
-interface UserCreateGroup {
-  name: string;
-}
 
 type IDataModelUser = Omit<DataModelUser, DbOnly>;
 
@@ -51,7 +63,10 @@ function formCreateUserToDataModelUser(
   };
 }
 
+export { IUserId };
+
 export default {
+  usersToUserIds,
   dataModelUserToIUser,
   dataModelUsersToIUsers,
   formCreateUserToDataModelUser,

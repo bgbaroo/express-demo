@@ -24,10 +24,10 @@ describe("test DB datalink", () => {
     const arg = {
       gName: "groupName",
       gOwner: "groupOwner",
-      gMembers: ["member1", "member2", "member3"],
+      gMembers: ["member1", "member2", "member3", "member4"],
       gNewMembers: ["newMember1", "newMember2"],
       gNonMembers: ["user1", "user2"],
-      gExMembers: ["member2", "newMember1"],
+      gExMembers: ["member2", "member4", "newMember1"],
     };
 
     expect(await testUserAndGroupWrites(userDb, groupDb, arg)).resolves;
@@ -69,14 +69,19 @@ async function testUserAndGroupWrites(
     );
 
     // Create a Group with just gMembers, and insert it to DB
-    console.log("Testing inserting with members");
+    console.log("Testing inserting with members", groupMembers);
     const group = await groupDb.createGroup(
       new Group({
-        owner: new GroupOwner(owner.email, owner.id),
+        owner,
         name: arg.gName,
         users: groupMembers,
       }),
     );
+
+    console.table({
+      debug: "group members",
+      members: group.getMembers().map((member) => member.email),
+    });
 
     // Test getMembers and isMembers
     group.getMembers().forEach((member) => {
@@ -89,7 +94,7 @@ async function testUserAndGroupWrites(
     });
 
     // Add new members arg.NewMembers
-    console.log("Testing inserting with newMembers");
+    console.log("Testing updating with newMembers", newMembers);
     group.addMembers(owner, newMembers);
 
     // Save it back to DB
@@ -108,29 +113,35 @@ async function testUserAndGroupWrites(
         expect(arg.gNonMembers.includes(newMember.email)).toBe(false);
       });
 
+    console.table({
+      debug: "groupNewMembers members",
+      members: groupNewMembers.getMembers().map((member) => member.email),
+    });
+
     // Make sure that ex-members were once in our group before deleting them
-    console.log("Removing exMembers");
+    console.log("Removing exMembers", exMembers);
     groupNewMembers.delMembers(
       owner,
       exMembers.map((ex) => ex.id),
     );
 
     // Save back group without ex-members
-    console.log("Testing inserting without exMembers");
+    console.log("Testing updating without exMembers");
     const groupNoExes = await groupDb.updateGroup(groupNewMembers);
-    console.table(groupNoExes.getMembers());
-
-    return Promise.resolve();
+    console.table({
+      debug: "groupNoExes members",
+      members: groupNoExes.getMembers().map((member) => member.email),
+    });
 
     // Test that ex-members are not members
-    // groupNoExes.getMembers().forEach((member) => {
-    //   if (member.email == arg.gOwner) {
-    //     return;
-    //   }
+    groupNoExes.getMembers().forEach((member) => {
+      if (member.email == arg.gOwner) {
+        return;
+      }
 
-    //   expect(arg.gExMembers.includes(member.email)).toBe(false);
-    //   expect(arg.gNonMembers.includes(member.email)).toBe(false);
-    // });
+      expect(arg.gExMembers.includes(member.email)).toBe(false);
+      expect(arg.gNonMembers.includes(member.email)).toBe(false);
+    });
   } catch (err) {
     console.error(err);
     return Promise.reject(err);

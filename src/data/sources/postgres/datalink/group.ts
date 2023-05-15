@@ -1,5 +1,6 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
 import adapter from "./adapters/group";
+import adapterUser from "./adapters/user";
 
 import { IGroup } from "../../../../domain/entities/group";
 
@@ -15,7 +16,9 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
         data: {
           id: group.id,
           name: group.name,
-          users: adapter.connectUsersToGroupMembers(group.getMembers()),
+          users: {
+            connect: adapterUser.usersToUserIds(group.getMembers()),
+          },
           owner: {
             connect: {
               id: group.getOwnerId(),
@@ -71,13 +74,16 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           id: group.id,
         },
         data: {
+          name: group.name,
+          // Overwrite with set (with current users)
+          users: {
+            set: adapterUser.usersToUserIds(group.getMembers()),
+          },
+
           // Do not allow these fields to change
           id: undefined,
           ownerId: undefined,
           owner: undefined,
-
-          name: group.name,
-          users: adapter.connectUsersToGroupMembers(group.getMembers()),
         },
       })
       .then((result) =>

@@ -1,23 +1,21 @@
 import { Group as DataModelGroup, User as DataModelUser } from "@prisma/client";
+import { DbOnly } from "./db-only";
 import userAdapter from "./user";
 
 import { Group } from "../../../../../domain/entities/group";
 import { GroupOwner } from "../../../../../domain/entities/group_owner";
 import { IGroup } from "../../../../../domain/entities/group";
-import { IUser } from "../../../../../domain/entities/user";
 
 interface DataModelGroupWithMembers extends DataModelGroup {
   owner: DataModelUser;
   users: DataModelUser[];
 }
 
+type AppDataModelGroupWithMembers = Omit<DataModelGroupWithMembers, DbOnly>;
+
 interface IncludeOwnerAndUsers {
   users: boolean;
   owner: boolean;
-}
-
-interface GroupMembers {
-  connect?: { id: string }[];
 }
 
 function alwaysIncludeOwnerAndUsers(): IncludeOwnerAndUsers {
@@ -25,7 +23,7 @@ function alwaysIncludeOwnerAndUsers(): IncludeOwnerAndUsers {
 }
 
 function dataModelGroupWithMembersToGroup(
-  group: DataModelGroupWithMembers,
+  group: AppDataModelGroupWithMembers,
 ): IGroup {
   return new Group({
     id: group.id,
@@ -35,16 +33,7 @@ function dataModelGroupWithMembersToGroup(
   });
 }
 
-function connectUsersToGroupMembers(members: IUser[]): GroupMembers {
-  return {
-    connect: members.map((member): { id: string } => {
-      return { id: member.id };
-    }),
-  };
-}
-
 export default {
   dataModelGroupWithMembersToGroup,
   alwaysIncludeOwnerAndUsers,
-  connectUsersToGroupMembers,
 };
