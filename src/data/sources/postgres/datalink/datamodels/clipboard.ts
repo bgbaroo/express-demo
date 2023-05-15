@@ -1,4 +1,4 @@
-import { DataModelUser, DataModelClipboard, DbOnly } from "./db-only";
+import { DataModelUser, DataModelClipboard, DbOnly } from "./datamodel";
 import adapterUser from "./user";
 
 import {
@@ -12,25 +12,21 @@ interface IDataModelClipboardWithUser extends IDataModelClipboard {
   user: DataModelUser;
 }
 
-function dataModelClipboardToClipboard(
-  data: IDataModelClipboardWithUser,
-): IClipboard {
+function toClipboard(data: IDataModelClipboardWithUser): IClipboard {
   return new Clipboard({
     id: data.id,
     title: data.title || undefined,
     content: data.content,
     expiration: data.expiration || undefined,
-    user: adapterUser.dataModelUserToIUser(data.user),
+    user: adapterUser.toUser(data.user),
   });
 }
 
-function dataModelClipboardsToClipboards(
-  data: IDataModelClipboardWithUser[],
-): IClipboard[] {
-  return data.map((dat) => dataModelClipboardToClipboard(dat));
+function toClipboards(data: IDataModelClipboardWithUser[]): IClipboard[] {
+  return data.map((dat) => toClipboard(dat));
 }
 
 export default {
-  dataModelClipboardToClipboard,
-  dataModelClipboardsToClipboards,
+  toClipboard,
+  toClipboards,
 };

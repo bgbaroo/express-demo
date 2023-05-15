@@ -1,6 +1,6 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
-import adapter from "./adapters/group";
-import adapterUser from "./adapters/user";
+import modelGroup from "./datamodels/group";
+import modelUser from "./datamodels/user";
 
 import { IGroup } from "../../../../domain/entities/group";
 
@@ -12,12 +12,12 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async createGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .create({
-        include: adapter.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.alwaysIncludeOwnerAndUsers(),
         data: {
           id: group.id,
           name: group.name,
           users: {
-            connect: adapterUser.usersToUserIds(group.getMembers()),
+            connect: modelUser.usersToUserIds(group.getMembers()),
           },
           owner: {
             connect: {
@@ -27,9 +27,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
         },
       })
       .then((result) => {
-        return Promise.resolve(
-          adapter.dataModelGroupWithMembersToGroup(result),
-        );
+        return Promise.resolve(modelGroup.toGroupWithMembers(result));
       })
       .catch((err) => Promise.reject(`failed to create group: ${err}`));
   }
@@ -37,7 +35,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroup(id: string): Promise<IGroup | null> {
     return this.db.group
       .findUnique({
-        include: adapter.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.alwaysIncludeOwnerAndUsers(),
         where: { id },
       })
       .then((result) => {
@@ -45,9 +43,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           return Promise.resolve(null);
         }
 
-        return Promise.resolve(
-          adapter.dataModelGroupWithMembersToGroup(result),
-        );
+        return Promise.resolve(modelGroup.toGroupWithMembers(result));
       })
       .catch((err) => Promise.reject(`failed to get group: ${err}`));
   }
@@ -55,11 +51,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroups(): Promise<IGroup[]> {
     return this.db.group
       .findMany({
-        include: adapter.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.alwaysIncludeOwnerAndUsers(),
       })
       .then((groups) =>
         groups.map((group) => {
-          return adapter.dataModelGroupWithMembersToGroup(group);
+          return modelGroup.toGroupWithMembers(group);
         }),
       )
       .catch((err) => Promise.reject(`failed to getGroups: ${err}`));
@@ -69,7 +65,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async updateGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .update({
-        include: adapter.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.alwaysIncludeOwnerAndUsers(),
         where: {
           id: group.id,
         },
@@ -77,7 +73,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           name: group.name,
           // Overwrite with set (with current users)
           users: {
-            set: adapterUser.usersToUserIds(group.getMembers()),
+            set: modelUser.usersToUserIds(group.getMembers()),
           },
 
           // Do not allow these fields to change
@@ -86,23 +82,19 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           owner: undefined,
         },
       })
-      .then((result) =>
-        Promise.resolve(adapter.dataModelGroupWithMembersToGroup(result)),
-      )
+      .then((result) => Promise.resolve(modelGroup.toGroupWithMembers(result)))
       .catch((err) => Promise.reject(`failed to update group: ${err}`));
   }
 
   async deleteGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .delete({
-        include: adapter.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.alwaysIncludeOwnerAndUsers(),
         where: {
           id: group.id,
         },
       })
-      .then((result) =>
-        Promise.resolve(adapter.dataModelGroupWithMembersToGroup(result)),
-      )
+      .then((result) => Promise.resolve(modelGroup.toGroupWithMembers(result)))
       .catch((err) => Promise.reject(`not implemented ${err}`));
   }
 }

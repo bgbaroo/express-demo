@@ -1,6 +1,7 @@
-import { IClipboard } from "../../../../domain/entities/clipboard";
 import { DbDriver, BasePrismaSchemaDataLink } from "./prisma-postgres";
-import adapter from "./adapters/clipboard";
+import model from "./datamodels/clipboard";
+
+import { IClipboard } from "../../../../domain/entities/clipboard";
 
 export class DataLinkClipboard extends BasePrismaSchemaDataLink {
   constructor(db: DbDriver) {
@@ -22,9 +23,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
           },
         },
       })
-      .then((result) =>
-        Promise.resolve(adapter.dataModelClipboardToClipboard(result)),
-      )
+      .then((result) => Promise.resolve(model.toClipboard(result)))
       .catch((err) => Promise.reject(`failed to create clipboard: ${err}`));
   }
 
@@ -47,7 +46,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
           return Promise.resolve(null);
         }
 
-        return Promise.resolve(adapter.dataModelClipboardToClipboard(result));
+        return Promise.resolve(model.toClipboard(result));
       })
       .catch((err) => Promise.reject(`failed to get user clipboard ${err}`));
   }
@@ -67,7 +66,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
           return Promise.resolve(null);
         }
 
-        return Promise.resolve(adapter.dataModelClipboardsToClipboards(result));
+        return Promise.resolve(model.toClipboards(result));
       })
       .catch((err) => Promise.reject(`failed to get user clipboards: ${err}`));
   }
@@ -99,7 +98,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
           return Promise.resolve(null);
         }
 
-        return Promise.resolve(adapter.dataModelClipboardToClipboard(result));
+        return Promise.resolve(model.toClipboard(result));
       })
       .catch((err) =>
         Promise.reject(`failed to get user's group clipboard: ${err}`),
@@ -127,7 +126,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
           return Promise.resolve(null);
         }
 
-        return Promise.resolve(adapter.dataModelClipboardsToClipboards(result));
+        return Promise.resolve(model.toClipboards(result));
       })
       .catch((err) => Promise.reject(`failed to get group clipboards: ${err}`));
   }

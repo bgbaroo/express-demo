@@ -3,13 +3,14 @@ import { Request, Response } from "express";
 import resp from "../response";
 import { IHandlerClipboards } from "../routes/clipboards";
 import {
-  IPreClipboard,
   IUseCaseCreateClipboard,
   IUseCaseDeleteUserClipboard,
   IUseCaseDeleteUserClipboards,
   IUseCaseGetUserClipboard,
   IUseCaseGetUserClipboards,
 } from "../../domain/interfaces/usecases/clipboard";
+import { IClipboard, Clipboard } from "../../domain/entities/clipboard";
+import { User } from "../../domain/entities/user";
 
 export class HandlerClipboards implements IHandlerClipboards {
   private usecaseCreateClipboard: IUseCaseCreateClipboard;
@@ -41,12 +42,11 @@ export class HandlerClipboards implements IHandlerClipboards {
     }
 
     // PreClipboard is clipboard without field id (not known yet)
-    const clipboard: IPreClipboard = {
-      userId,
-      title,
-      content,
-      expiration: undefined,
-    };
+    const clipboard: IClipboard = new Clipboard({
+      user: new User("foo"),
+      title: title,
+      content: "bar",
+    });
 
     return this.usecaseCreateClipboard
       .execute(clipboard)

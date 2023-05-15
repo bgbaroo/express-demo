@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { IUser } from "./user";
-import { IGroupOwner } from "./group_owner";
+import { IGroupOwner } from "./group-owner";
 
 export interface IGroup {
   id: string;

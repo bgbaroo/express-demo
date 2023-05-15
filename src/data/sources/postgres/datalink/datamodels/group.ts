@@ -1,9 +1,8 @@
-import { Group as DataModelGroup, User as DataModelUser } from "@prisma/client";
-import { DbOnly } from "./db-only";
+import { DataModelUser, DataModelGroup, DbOnly } from "./datamodel";
 import userAdapter from "./user";
 
 import { Group } from "../../../../../domain/entities/group";
-import { GroupOwner } from "../../../../../domain/entities/group_owner";
+import { GroupOwner } from "../../../../../domain/entities/group-owner";
 import { IGroup } from "../../../../../domain/entities/group";
 
 interface DataModelGroupWithMembers extends DataModelGroup {
@@ -22,18 +21,16 @@ function alwaysIncludeOwnerAndUsers(): IncludeOwnerAndUsers {
   return { owner: true, users: true };
 }
 
-function dataModelGroupWithMembersToGroup(
-  group: AppDataModelGroupWithMembers,
-): IGroup {
+function toGroupWithMembers(group: AppDataModelGroupWithMembers): IGroup {
   return new Group({
     id: group.id,
     name: group.name,
     owner: new GroupOwner(group.owner.email, group.owner.id),
-    users: userAdapter.dataModelUsersToIUsers(group.users),
+    users: userAdapter.toUsers(group.users),
   });
 }
 
 export default {
-  dataModelGroupWithMembersToGroup,
+  toGroupWithMembers,
   alwaysIncludeOwnerAndUsers,
 };

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 import { DataLinkUser } from "../../src/data/sources/postgres/datalink/user";
 import { DataLinkGroup } from "../../src/data/sources/postgres/datalink/group";
-import { GroupOwner } from "../../src/domain/entities/group_owner";
+import { GroupOwner } from "../../src/domain/entities/group-owner";
 import { Group } from "../../src/domain/entities/group";
 import { User } from "../../src/domain/entities/user";
 

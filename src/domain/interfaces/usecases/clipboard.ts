@@ -1,8 +1,7 @@
 import { IClipboard } from "../../entities/clipboard";
-import { IFormCreateClipboard } from "../../adapters/create_forms";
 
 export interface IUseCaseCreateClipboard {
-  execute(clipboard: IFormCreateClipboard): Promise<void>;
+  execute(clipboard: IClipboard): Promise<void>;
 }
 
 export interface IUseCaseGetUserClipboard {
