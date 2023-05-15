@@ -25,27 +25,18 @@ model User {
   email      String   @unique
   password   String
   clipboards Clipboard[]
-  ownGroups  Group[]
-  groups     UserOnGroup[]
+  groups     Group[] @relation("Memberships")
+  ownGroups  Group[] @relation("Ownerships")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-}
-
-model UserOnGroup {
-  user    User   @relation(fields: [userId], references: [id])
-  userId  String
-  group   Group  @relation(fields: [groupId], references: [id])
-  groupId String
-
-  @@id([groupId, userId])
 }
 
 model Group {
   id        String   @id @default(uuid())
   name      String   @unique
-  owner     User     @relation(fields: [ownerId], references: [id])
+  users     User[]   @relation("Memberships")
+  owner     User     @relation("Ownerships", fields: [ownerId], references: [id])
   ownerId   String
-  users     UserOnGroup[]
   createdAt DateTime @updatedAt
   updatedAt DateTime @default(now())
 }

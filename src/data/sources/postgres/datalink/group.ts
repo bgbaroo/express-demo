@@ -1,32 +1,7 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
-import { connectUsersToGroupMembers } from "./adapters/group-members";
-import groupAdapter from "./adapters/group";
+import adapter from "./adapters/group";
 
 import { IGroup } from "../../../../domain/entities/group";
-
-class IncludeOwnerAndUsers {
-  users: {
-    include: {
-      user: boolean;
-    };
-  };
-  owner: boolean;
-
-  constructor(arg: { includeOwner: boolean; includeUsers: boolean }) {
-    return {
-      owner: arg.includeOwner,
-      users: {
-        include: {
-          user: arg.includeUsers,
-        },
-      },
-    };
-  }
-}
-
-function alwaysIncludeOwnerAndUsers(): IncludeOwnerAndUsers {
-  return new IncludeOwnerAndUsers({ includeOwner: true, includeUsers: true });
-}
 
 export class DataLinkGroup extends BasePrismaSchemaDataLink {
   constructor(db: DbDriver) {
@@ -36,13 +11,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async createGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .create({
-        include: alwaysIncludeOwnerAndUsers(),
+        include: adapter.alwaysIncludeOwnerAndUsers(),
         data: {
           id: group.id,
           name: group.name,
-          users: {
-            create: connectUsersToGroupMembers(group.getMembers()),
-          },
+          users: adapter.connectUsersToGroupMembers(group.getMembers()),
           owner: {
             connect: {
               id: group.getOwnerId(),
@@ -52,7 +25,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       })
       .then((result) => {
         return Promise.resolve(
-          groupAdapter.dataModelGroupWithMembersToGroup(result),
+          adapter.dataModelGroupWithMembersToGroup(result),
         );
       })
       .catch((err) => Promise.reject(`failed to create group: ${err}`));
@@ -61,8 +34,8 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroup(id: string): Promise<IGroup | null> {
     return this.db.group
       .findUnique({
+        include: adapter.alwaysIncludeOwnerAndUsers(),
         where: { id },
-        include: alwaysIncludeOwnerAndUsers(),
       })
       .then((result) => {
         if (!result) {
@@ -70,7 +43,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
         }
 
         return Promise.resolve(
-          groupAdapter.dataModelGroupWithMembersToGroup(result),
+          adapter.dataModelGroupWithMembersToGroup(result),
         );
       })
       .catch((err) => Promise.reject(`failed to get group: ${err}`));
@@ -79,11 +52,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroups(): Promise<IGroup[]> {
     return this.db.group
       .findMany({
-        include: alwaysIncludeOwnerAndUsers(),
+        include: adapter.alwaysIncludeOwnerAndUsers(),
       })
       .then((groups) =>
         groups.map((group) => {
-          return groupAdapter.dataModelGroupWithMembersToGroup(group);
+          return adapter.dataModelGroupWithMembersToGroup(group);
         }),
       )
       .catch((err) => Promise.reject(`failed to getGroups: ${err}`));
@@ -93,10 +66,10 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async updateGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .update({
+        include: adapter.alwaysIncludeOwnerAndUsers(),
         where: {
           id: group.id,
         },
-        include: alwaysIncludeOwnerAndUsers(),
         data: {
           // Do not allow these fields to change
           id: undefined,
@@ -104,14 +77,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
           owner: undefined,
 
           name: group.name,
-          // Re-create relations: will fail
-          users: {
-            create: connectUsersToGroupMembers(group.getMembers()),
-          },
+          users: adapter.connectUsersToGroupMembers(group.getMembers()),
         },
       })
       .then((result) =>
-        Promise.resolve(groupAdapter.dataModelGroupWithMembersToGroup(result)),
+        Promise.resolve(adapter.dataModelGroupWithMembersToGroup(result)),
       )
       .catch((err) => Promise.reject(`failed to update group: ${err}`));
   }
@@ -119,13 +89,13 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async deleteGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .delete({
+        include: adapter.alwaysIncludeOwnerAndUsers(),
         where: {
           id: group.id,
         },
-        include: alwaysIncludeOwnerAndUsers(),
       })
       .then((result) =>
-        Promise.resolve(groupAdapter.dataModelGroupWithMembersToGroup(result)),
+        Promise.resolve(adapter.dataModelGroupWithMembersToGroup(result)),
       )
       .catch((err) => Promise.reject(`not implemented ${err}`));
   }

@@ -144,6 +144,13 @@ model Group {
 In addition to `model Clipboard`, `model User`, and `model Group`, we also have
 a relation table to map M-N relationship `model UserOnGroup`.
 
+> The way we relate models User to Group is called _explicit M-N relations_
+> by Prisma. There's another way to do this, called _implicit M-N relations_,
+> which do not _explicitly_ requires relations table. A new, Prisma-managed
+> relations table will be created for implicit M-N relations.
+>
+> [Read more about Prisma many-to-many relations here](https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations)
+
 Now our data models are ready, but we still don't have the Prisma Client.
 
 ## Generate the Prisma Client
