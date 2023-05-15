@@ -1,5 +1,9 @@
-import { User as DataModelUser, Group as DataModelGroup } from "@prisma/client";
+import {
+  User as DataModelUser,
+  Group as DataModelGroup,
+  Clipboard as DataModelClipboard,
+} from "@prisma/client";
 
 type DbOnly = "createdAt" | "updatedAt";
 
-export { DataModelUser, DataModelGroup, DbOnly };
+export { DataModelUser, DataModelGroup, DataModelClipboard, DbOnly };

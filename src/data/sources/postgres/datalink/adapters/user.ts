@@ -1,6 +1,6 @@
 import { DbOnly, DataModelUser } from "./db-only";
-import { User } from "../../../../../domain/entities/user";
-import { IUser } from "../../../../../domain/entities/user";
+
+import { IUser, User } from "../../../../../domain/entities/user";
 
 interface UserCreateGroup {
   name: string;
@@ -17,12 +17,12 @@ function usersToUserIds(users: IUser[]): IUserId[] {
   });
 }
 
-function dataModelUserToIUser(user: DataModelUser): IUser {
-  return new User(user.email, user.id);
+function dataModelUserToIUser(data: DataModelUser): IUser {
+  return new User(data.email, data.id);
 }
 
-function dataModelUsersToIUsers(users: DataModelUser[]): IUser[] {
-  return users.map((user) => dataModelUserToIUser(user));
+function dataModelUsersToIUsers(data: DataModelUser[]): IUser[] {
+  return data.map((user) => dataModelUserToIUser(user));
 }
 
 // Allows create empty group with name and owner as member,

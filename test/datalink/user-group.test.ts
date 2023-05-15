@@ -15,7 +15,7 @@ interface Arg {
   gExMembers: string[]; // group members that will be removed
 }
 
-describe("test DB datalink", () => {
+describe("users and groups datalink", () => {
   it("group with user relations", async () => {
     const pg = new PrismaClient();
     const userDb = new DataLinkUser(pg);

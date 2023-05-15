@@ -2,7 +2,7 @@ import { IClipboard } from "../entities/clipboard";
 import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 
 function dummyId(clipboard: IClipboard): string {
-  return clipboard.userId + clipboard.id;
+  return clipboard.getUserId() + clipboard.id;
 }
 
 export class RepositoryClipboards implements IRepositoryClipboard {
@@ -42,7 +42,7 @@ export class RepositoryClipboards implements IRepositoryClipboard {
   async getUserClipboards(userId: string): Promise<IClipboard[]> {
     return Promise.resolve(
       Array.from(this.storage.values()).filter(
-        (clip: IClipboard, _) => clip.userId === userId,
+        (clip: IClipboard, _) => clip.getUserId() === userId,
       ),
     );
   }
