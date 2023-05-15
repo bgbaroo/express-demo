@@ -1,6 +1,6 @@
 import { IUser } from "../../../../domain/entities/user";
 import { BasePrismaSchemaDataLink, DbDriver } from "./prisma-postgres";
-import modelUser from "./datamodels/user";
+import modelUser from "../datamodels/user";
 
 export class DataLinkUser extends BasePrismaSchemaDataLink {
   constructor(db: DbDriver) {

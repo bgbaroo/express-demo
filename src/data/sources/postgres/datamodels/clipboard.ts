@@ -1,10 +1,7 @@
 import { DataModelUser, DataModelClipboard, DbOnly } from "./datamodel";
-import adapterUser from "./user";
+import userModel from "./user";
 
-import {
-  IClipboard,
-  Clipboard,
-} from "../../../../../domain/entities/clipboard";
+import { IClipboard, Clipboard } from "../../../../domain/entities/clipboard";
 
 type IDataModelClipboard = Omit<DataModelClipboard, DbOnly>;
 
@@ -18,7 +15,7 @@ function toClipboard(data: IDataModelClipboardWithUser): IClipboard {
     title: data.title || undefined,
     content: data.content,
     expiration: data.expiration || undefined,
-    user: adapterUser.toUser(data.user),
+    user: userModel.toUser(data.user),
   });
 }
 

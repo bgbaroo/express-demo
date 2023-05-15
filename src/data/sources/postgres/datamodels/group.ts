@@ -1,9 +1,8 @@
 import { DataModelUser, DataModelGroup, DbOnly } from "./datamodel";
-import userAdapter from "./user";
+import userModel from "./user";
 
-import { Group } from "../../../../../domain/entities/group";
-import { GroupOwner } from "../../../../../domain/entities/group-owner";
-import { IGroup } from "../../../../../domain/entities/group";
+import { IGroup, Group } from "../../../../domain/entities/group";
+import { GroupOwner } from "../../../../domain/entities/group-owner";
 
 interface DataModelGroupWithMembers extends DataModelGroup {
   owner: DataModelUser;
@@ -26,7 +25,7 @@ function toGroupWithMembers(group: AppDataModelGroupWithMembers): IGroup {
     id: group.id,
     name: group.name,
     owner: new GroupOwner(group.owner.email, group.owner.id),
-    users: userAdapter.toUsers(group.users),
+    users: userModel.toUsers(group.users),
   });
 }
 

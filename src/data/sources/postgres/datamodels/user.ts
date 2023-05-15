@@ -1,6 +1,6 @@
 import { DbOnly, DataModelUser } from "./datamodel";
 
-import { IUser, User } from "../../../../../domain/entities/user";
+import { IUser, User } from "../../../../domain/entities/user";
 
 interface UserCreateGroup {
   name: string;

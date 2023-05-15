@@ -1,5 +1,5 @@
 import { DbDriver, BasePrismaSchemaDataLink } from "./prisma-postgres";
-import model from "./datamodels/clipboard";
+import model from "../datamodels/clipboard";
 
 import { IClipboard } from "../../../../domain/entities/clipboard";
 
