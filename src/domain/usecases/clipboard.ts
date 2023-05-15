@@ -1,7 +1,6 @@
 import { IClipboard } from "../entities/clipboard";
 import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 import {
-  IPreClipboard,
   IUseCaseCreateClipboard,
   IUseCaseDeleteUserClipboard,
   IUseCaseDeleteUserClipboards,
@@ -26,12 +25,7 @@ export class UseCaseCreateClipboard
     super(repo);
   }
 
-  async execute(preClipboard: IPreClipboard): Promise<void> {
-    const clipboard: IClipboard = {
-      id: this.repository.newClipboardId(),
-      ...preClipboard,
-    };
-
+  async execute(clipboard: IClipboard): Promise<void> {
     return this.repository.createClipboard(clipboard);
   }
 }
