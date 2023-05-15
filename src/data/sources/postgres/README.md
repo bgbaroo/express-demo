@@ -52,7 +52,7 @@ npx prisma init --datasource-provider=postgresql
 ```
 
 This creates a new top-level directory `prisma`, and generates a new Prisma Schema
-at [`./prisma/schema.prisma`](./prisma/schema.prisma).
+at `./prisma/schema.prisma`.
 
 ## [Define data model in the Schema](https://www.prisma.io/docs/concepts/components/prisma-schema/data-model)
 
@@ -189,7 +189,7 @@ You can, in fact, put your `prisma` directory anywhere under the project root. B
 need to instruct `npx` script `prisma generate` to find your `prisma` from a non-default
 location. Do this with `--schema` flag.
 
-For example, if you moved your `prisma` directory from `./prisma` to `./data/sources/prisma`,
+For example, if you moved your `prisma` directory from `./prisma` to `./data/sources/postgres/prisma`,
 and your schema filename is `schema.prisma`, then you'll need to supply
 `--schema ./src/data/sources/postgres/prisma/schema.prisma` in your client generation command:
 
@@ -257,7 +257,7 @@ datasource db {
 ```
 
 This will instruct the generator to create a Prisma Client which takes its connection URL
-from an env with key `DATABASE_URL`, which is what we just put in [`./.env`](./.env).
+from an env with key `DATABASE_URL`, which is what we just put in [`./.env`](/.env).
 
 ## SQL migration
 

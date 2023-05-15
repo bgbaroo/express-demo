@@ -8,13 +8,13 @@ The demo will include:
 
 2. Basic webserver with Express, with [Clean Architecture](./src/) structure
 
-3. Connecting to databases with [ORM](./ORM.md)
+3. Connecting to databases with [ORM](./data/sources/postgres/)
 
 4. (TODO) Authorizations
 
 5. (TODO) Other advanced concepts
 
-6. [Testing](./TEST.md)
+6. [Testing](./test/)
 
 ## Features
 
