@@ -49,7 +49,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
 
         return Promise.resolve(adapter.dataModelClipboardToClipboard(result));
       })
-      .then((err) => Promise.reject(err));
+      .catch((err) => Promise.reject(`failed to get user clipboard ${err}`));
   }
 
   async getUserClipboards(userId: string): Promise<IClipboard[] | null> {
@@ -69,7 +69,7 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
 
         return Promise.resolve(adapter.dataModelClipboardsToClipboards(result));
       })
-      .then((err) => Promise.reject(err));
+      .catch((err) => Promise.reject(`failed to get user clipboards: ${err}`));
   }
 
   async getUserGroupClipboard(
@@ -101,7 +101,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
 
         return Promise.resolve(adapter.dataModelClipboardToClipboard(result));
       })
-      .then((err) => Promise.reject(err));
+      .catch((err) =>
+        Promise.reject(`failed to get user's group clipboard: ${err}`),
+      );
   }
 
   async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
@@ -127,6 +129,6 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
 
         return Promise.resolve(adapter.dataModelClipboardsToClipboards(result));
       })
-      .then((err) => Promise.reject(err));
+      .catch((err) => Promise.reject(`failed to get group clipboards: ${err}`));
   }
 }
