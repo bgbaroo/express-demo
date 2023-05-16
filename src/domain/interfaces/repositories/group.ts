@@ -1,9 +1,17 @@
 import { IGroup } from "../../entities/group";
 
+export interface WhereGroup {
+  id?: string;
+  ownerId?: string;
+  user?: {
+    id: string;
+  };
+}
+
 export interface IRepositoryGroup {
   createGroup(group: IGroup): Promise<IGroup>;
-  getGroup(id: string): Promise<IGroup | null>;
-  getGroups(): Promise<IGroup[]>;
+  getGroup(where: WhereGroup): Promise<IGroup | null>;
+  getGroups(where: WhereGroup): Promise<IGroup[]>;
   updateGroup(group: IGroup): Promise<IGroup>;
   deleteGroup(group: IGroup): Promise<IGroup>;
 }

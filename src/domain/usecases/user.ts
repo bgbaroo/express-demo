@@ -2,6 +2,7 @@ import { IRepositoryUser } from "../interfaces/repositories/user";
 import {
   IUseCaseUserChangePassword,
   IUseCaseUserDeleteUser,
+  IUseCaseUserGetUser,
   IUseCaseUserRegister,
 } from "../interfaces/usecases/user";
 import { IUser } from "../entities/user";
@@ -90,5 +91,18 @@ export class UseCaseUserDeleteUser
     }
 
     return await this.repo.deleteUser(_user.id);
+  }
+}
+
+export class UseCaseUserGetUser
+  extends BaseUseCaseUser
+  implements IUseCaseUserGetUser
+{
+  constructor(repo: IRepositoryUser) {
+    super(repo);
+  }
+
+  async execute(userId: string): Promise<IUser> {
+    return await this.repo.getUser({ id: userId });
   }
 }

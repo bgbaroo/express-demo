@@ -19,3 +19,7 @@ export interface IUseCaseUserChangePassword {
 export interface IUseCaseUserDeleteUser {
   execute(user: IUser, password: string): Promise<IUser>;
 }
+
+export interface IUseCaseUserGetUser {
+  execute(userId: string): Promise<IUser>;
+}

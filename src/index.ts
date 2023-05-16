@@ -3,12 +3,13 @@ import postgres from "./data/sources/postgres";
 
 import { DataLinkUser } from "./data/sources/postgres/data-links/user";
 import { RepositoryClipboard } from "./domain/repositories/clipboard";
-import { UsecaseGroup } from "./domain/usecases/group";
+import { UseCaseGroupCreateGroup } from "./domain/usecases/group";
 import {
   UseCaseUserRegister,
   UseCaseUserLogin,
   UseCaseUserChangePassword,
   UseCaseUserDeleteUser,
+  UseCaseUserGetUser,
 } from "./domain/usecases/user";
 import {
   UseCaseCreateClipboard,
@@ -24,18 +25,20 @@ import { HandlerGroups } from "./api/handlers/groups";
 import { HandlerUsers } from "./api/handlers/users";
 import { RepositoryUser } from "./domain/repositories/user";
 import { DataLinkClipboard } from "./data/sources/postgres/data-links/clipboard";
+import { DataLinkGroup } from "./data/sources/postgres/data-links/group";
+import { RepositoryGroup } from "./domain/repositories/group";
 
 async function main(): Promise<void> {
   dotenv.config();
   const dataLink = postgres;
 
   const dataLinkUser = new DataLinkUser(dataLink);
-  const userRepo = new RepositoryUser(dataLinkUser);
+  const repoUser = new RepositoryUser(dataLinkUser);
   const handlerUsers = new HandlerUsers({
-    register: new UseCaseUserRegister(userRepo),
-    login: new UseCaseUserLogin(userRepo),
-    changePassword: new UseCaseUserChangePassword(userRepo),
-    deleteUser: new UseCaseUserDeleteUser(userRepo),
+    register: new UseCaseUserRegister(repoUser),
+    login: new UseCaseUserLogin(repoUser),
+    changePassword: new UseCaseUserChangePassword(repoUser),
+    deleteUser: new UseCaseUserDeleteUser(repoUser),
   });
 
   const dataLinkClipboard = new DataLinkClipboard(dataLink);
@@ -48,9 +51,12 @@ async function main(): Promise<void> {
     deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboard),
   });
 
-  // Dummy
-  const usecaseGroup = new UsecaseGroup();
-  const handlerGroups = new HandlerGroups(usecaseGroup);
+  const dataLinkGroup = new DataLinkGroup(dataLink);
+  const repoGroup = new RepositoryGroup(dataLinkGroup);
+  const handlerGroups = new HandlerGroups({
+    createGroup: new UseCaseGroupCreateGroup(repoGroup),
+    getUser: new UseCaseUserGetUser(repoUser),
+  });
 
   const app = new App({
     clipboard: handlerClipboards,

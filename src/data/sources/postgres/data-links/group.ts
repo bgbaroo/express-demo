@@ -3,6 +3,7 @@ import modelGroup from "../data-models/group";
 import modelUser from "../data-models/user";
 
 import { IGroup } from "../../../../domain/entities/group";
+import { WhereGroup } from "../../../../domain/interfaces/repositories/group";
 
 export class DataLinkGroup extends BasePrismaSchemaDataLink {
   constructor(db: DbDriver) {
@@ -32,11 +33,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to create group: ${err}`));
   }
 
-  async getGroup(id: string): Promise<IGroup | null> {
+  async getGroup(where: WhereGroup): Promise<IGroup | null> {
     return this.db.group
       .findUnique({
         include: modelGroup.includeOwnerAndUsers(),
-        where: { id },
+        where: where,
       })
       .then((result) => {
         if (!result) {
@@ -48,10 +49,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to get group: ${err}`));
   }
 
-  async getGroups(): Promise<IGroup[]> {
+  async getGroups(where: WhereGroup): Promise<IGroup[]> {
     return this.db.group
       .findMany({
         include: modelGroup.includeOwnerAndUsers(),
+        where: where,
       })
       .then((groups) =>
         groups.map((group) => {
