@@ -1,6 +1,6 @@
 import { DbOnly, DataModelUser, DataModelGroup } from "./models";
 
-import { IUser, User } from "../../../../domain/entities/user";
+import { IUser, IUserArg, User } from "../../../../domain/entities/user";
 
 // Extends DataModelUser with shallow group information.
 // DataModelUserWithGroups.groups only contains what's available
@@ -32,6 +32,18 @@ interface IUserId {
   id: string;
 }
 
+interface IUserData extends IUser {
+  password: string;
+}
+
+class UserData extends User implements IUserData {
+  password: string;
+  constructor(arg: IUserArg & { password: string }) {
+    super(arg);
+    this.password = arg.password;
+  }
+}
+
 function usersToUserIds(users: IUser[]): IUserId[] {
   return users.map((user): IUserId => {
     return {
@@ -40,11 +52,11 @@ function usersToUserIds(users: IUser[]): IUserId[] {
   });
 }
 
-function toUser(data: AppDataModelUserWithGroups): IUser {
-  return new User({ ...data, groups: [] });
+function toUser(data: AppDataModelUserWithGroups): IUserData {
+  return new UserData({ ...data, groups: [] });
 }
 
-function toUsers(data: AppDataModelUserWithGroups[]): IUser[] {
+function toUsers(data: AppDataModelUserWithGroups[]): IUserData[] {
   return data.map((user) => toUser(user));
 }
 
@@ -81,7 +93,7 @@ function includeGroupsAndOwnGroups(): IIncludeGroups {
   };
 }
 
-export { AppDataModelUserWithGroups, IIncludeGroups };
+export { AppDataModelUserWithGroups, IIncludeGroups, IUserData };
 
 export default {
   usersToUserIds,

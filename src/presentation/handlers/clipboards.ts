@@ -13,11 +13,11 @@ import { IClipboard, Clipboard } from "../../domain/entities/clipboard";
 import { User } from "../../domain/entities/user";
 
 export class HandlerClipboards implements IHandlerClipboards {
-  private usecaseCreateClipboard: IUseCaseCreateClipboard;
-  private usecaseGetUserClipboard: IUseCaseGetUserClipboard;
-  private usecaseGetUserClipboards: IUseCaseGetUserClipboards;
-  private usecaseDeleteUserClipboard: IUseCaseDeleteUserClipboard;
-  private usecaseDeleteUserClipboards: IUseCaseDeleteUserClipboards;
+  private readonly usecaseCreateClipboard: IUseCaseCreateClipboard;
+  private readonly usecaseGetUserClipboard: IUseCaseGetUserClipboard;
+  private readonly usecaseGetUserClipboards: IUseCaseGetUserClipboards;
+  private readonly usecaseDeleteUserClipboard: IUseCaseDeleteUserClipboard;
+  private readonly usecaseDeleteUserClipboards: IUseCaseDeleteUserClipboards;
 
   constructor(arg: {
     createClipboard: IUseCaseCreateClipboard;
@@ -43,7 +43,7 @@ export class HandlerClipboards implements IHandlerClipboards {
 
     // PreClipboard is clipboard without field id (not known yet)
     const clipboard: IClipboard = new Clipboard({
-      user: new User("foo"),
+      user: new User({ email: "foo" }),
       title: title,
       content: "bar",
     });
