@@ -1,5 +1,6 @@
 import { DbDriver, BasePrismaSchemaDataLink } from "./link";
 import model from "../data-models/clipboard";
+import userModel from "../data-models/user";
 
 import { IClipboard } from "../../../../domain/entities/clipboard";
 
@@ -12,7 +13,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
     return this.db.clipboard
       .create({
         include: {
-          user: true,
+          user: {
+            include: userModel.includeGroupsAndOwnGroups(),
+          },
         },
         data: {
           id: clipboard.id,
@@ -34,7 +37,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
     return this.db.clipboard
       .findFirst({
         include: {
-          user: true,
+          user: {
+            include: userModel.includeGroupsAndOwnGroups(),
+          },
         },
         where: {
           id,
@@ -55,7 +60,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
     return this.db.clipboard
       .findMany({
         include: {
-          user: true,
+          user: {
+            include: userModel.includeGroupsAndOwnGroups(),
+          },
         },
         where: {
           userId,
@@ -79,7 +86,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
     return this.db.clipboard
       .findFirst({
         include: {
-          user: true,
+          user: {
+            include: userModel.includeGroupsAndOwnGroups(),
+          },
         },
         where: {
           id,
@@ -109,7 +118,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
     return this.db.clipboard
       .findMany({
         include: {
-          user: true,
+          user: {
+            include: userModel.includeGroupsAndOwnGroups(),
+          },
         },
         where: {
           user: {

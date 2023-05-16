@@ -1,12 +1,12 @@
-import { DataModelUser, DataModelClipboard, DbOnly } from "./model";
-import userModel from "./user";
+import { DataModelClipboard, DbOnly } from "./models";
+import userModel, { AppDataModelUserWithGroups } from "./user";
 
 import { IClipboard, Clipboard } from "../../../../domain/entities/clipboard";
 
 type IDataModelClipboard = Omit<DataModelClipboard, DbOnly>;
 
 interface IDataModelClipboardWithUser extends IDataModelClipboard {
-  user: DataModelUser;
+  user: AppDataModelUserWithGroups;
 }
 
 function toClipboard(data: IDataModelClipboardWithUser): IClipboard {

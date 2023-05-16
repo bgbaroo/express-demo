@@ -12,7 +12,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async createGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .create({
-        include: modelGroup.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.includeOwnerAndUsers(),
         data: {
           id: group.id,
           name: group.name,
@@ -35,7 +35,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroup(id: string): Promise<IGroup | null> {
     return this.db.group
       .findUnique({
-        include: modelGroup.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.includeOwnerAndUsers(),
         where: { id },
       })
       .then((result) => {
@@ -51,7 +51,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroups(): Promise<IGroup[]> {
     return this.db.group
       .findMany({
-        include: modelGroup.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.includeOwnerAndUsers(),
       })
       .then((groups) =>
         groups.map((group) => {
@@ -61,11 +61,10 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to getGroups: ${err}`));
   }
 
-  // TODO: check if members was removed, will this remove UserOnGroup too?
   async updateGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .update({
-        include: modelGroup.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.includeOwnerAndUsers(),
         where: {
           id: group.id,
         },
@@ -89,7 +88,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async deleteGroup(group: IGroup): Promise<IGroup> {
     return this.db.group
       .delete({
-        include: modelGroup.alwaysIncludeOwnerAndUsers(),
+        include: modelGroup.includeOwnerAndUsers(),
         where: {
           id: group.id,
         },

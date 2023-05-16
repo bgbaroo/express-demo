@@ -1,6 +1,26 @@
-import { DbOnly, DataModelUser } from "./model";
+import { DbOnly, DataModelUser, DataModelGroup } from "./models";
 
 import { IUser, User } from "../../../../domain/entities/user";
+
+interface DataModelUserWithGroups extends DataModelUser {
+  groups: DataModelGroup[];
+  ownGroups: DataModelGroup[];
+}
+
+type AppDataModelUser = Omit<DataModelUser, DbOnly>;
+type AppDataModelUserWithGroups = Omit<DataModelUserWithGroups, DbOnly>;
+
+interface IIncludeGroups {
+  groups: boolean;
+  ownGroups: boolean;
+}
+
+interface ICreateGroupOwner extends AppDataModelUser {
+  password: string;
+  ownGroups: {
+    create: UserCreateGroup[] | undefined;
+  };
+}
 
 interface UserCreateGroup {
   name: string;
@@ -17,24 +37,12 @@ function usersToUserIds(users: IUser[]): IUserId[] {
   });
 }
 
-function toUser(data: DataModelUser): IUser {
+function toUser(data: AppDataModelUserWithGroups): IUser {
   return new User(data.email, data.id);
 }
 
-function toUsers(data: DataModelUser[]): IUser[] {
+function toUsers(data: AppDataModelUserWithGroups[]): IUser[] {
   return data.map((user) => toUser(user));
-}
-
-// Allows create empty group with name and owner as member,
-// but will not create new group members (models UserOnGroup and User)
-
-type IDataModelUser = Omit<DataModelUser, DbOnly>;
-
-interface IDataModelUserWithOwnGroups extends IDataModelUser {
-  password: string;
-  ownGroups: {
-    create: UserCreateGroup[] | undefined;
-  };
 }
 
 function mapUserCreateGroups(
@@ -52,7 +60,7 @@ function mapUserCreateGroups(
 function formCreateUserToDataModelUser(
   user: IUser,
   password: string,
-): IDataModelUserWithOwnGroups {
+): ICreateGroupOwner {
   return {
     id: user.id,
     email: user.email,
@@ -63,11 +71,19 @@ function formCreateUserToDataModelUser(
   };
 }
 
-export { IUserId };
+function includeGroupsAndOwnGroups(): IIncludeGroups {
+  return {
+    groups: true,
+    ownGroups: true,
+  };
+}
+
+export { AppDataModelUserWithGroups, IIncludeGroups };
 
 export default {
   usersToUserIds,
   toUser,
   toUsers,
   formCreateUserToDataModelUser,
+  includeGroupsAndOwnGroups,
 };

@@ -10,6 +10,7 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
   async createUser(user: IUser, password: string): Promise<IUser> {
     return this.db.user
       .create({
+        include: modelUser.includeGroupsAndOwnGroups(),
         data: modelUser.formCreateUserToDataModelUser(user, password),
       })
       .then((created) => modelUser.toUser(created))
@@ -19,13 +20,8 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
   async getUser(id: string): Promise<IUser | null> {
     return this.db.user
       .findUnique({
-        where: {
-          id: id,
-        },
-        include: {
-          groups: true,
-          ownGroups: true,
-        },
+        include: modelUser.includeGroupsAndOwnGroups(),
+        where: { id },
       })
       .then((user) => {
         if (!user) {
@@ -40,10 +36,7 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
   async getUsers(): Promise<IUser[] | null> {
     return this.db.user
       .findMany({
-        include: {
-          groups: true,
-          ownGroups: true,
-        },
+        include: modelUser.includeGroupsAndOwnGroups(),
       })
       .then((users) => {
         if (!users) {
@@ -54,16 +47,21 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to get users: ${err}`));
   }
 
+  // TODO: check if groups and ownGroups was updated
   async updateUser(user: IUser): Promise<IUser | null> {
     return this.db.user
       .update({
+        include: modelUser.includeGroupsAndOwnGroups(),
         where: {
           id: user.id,
         },
         data: {
           ...user,
-          groups: {},
-          ownGroups: {},
+          ownGroups: {
+            set: user.groupsOwned()?.map((id): { id: string } => {
+              return { id: id };
+            }),
+          },
         },
       })
       .then((updated) => {
@@ -79,6 +77,7 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
   async deleteUser(id: string): Promise<IUser | null> {
     return this.db.user
       .delete({
+        include: modelUser.includeGroupsAndOwnGroups(),
         where: { id },
       })
       .then((deleted) => {

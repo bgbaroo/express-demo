@@ -1,23 +1,40 @@
-import { DataModelUser, DataModelGroup, DbOnly } from "./model";
-import userModel from "./user";
+import { DataModelGroup, DbOnly } from "./models";
+import userModel, { AppDataModelUserWithGroups, IIncludeGroups } from "./user";
 
 import { IGroup, Group } from "../../../../domain/entities/group";
 import { GroupOwner } from "../../../../domain/entities/group-owner";
 
 interface DataModelGroupWithMembers extends DataModelGroup {
-  owner: DataModelUser;
-  users: DataModelUser[];
+  owner: AppDataModelUserWithGroups;
+  users: AppDataModelUserWithGroups[];
 }
 
 type AppDataModelGroupWithMembers = Omit<DataModelGroupWithMembers, DbOnly>;
 
-interface IncludeOwnerAndUsers {
-  users: boolean;
-  owner: boolean;
+interface IIncludeOwnerAndUsers {
+  owner: {
+    include: IIncludeGroups;
+  };
+  users: {
+    include: IIncludeGroups;
+  };
 }
 
-function alwaysIncludeOwnerAndUsers(): IncludeOwnerAndUsers {
-  return { owner: true, users: true };
+function includeOwnerAndUsers(): IIncludeOwnerAndUsers {
+  return {
+    owner: {
+      include: {
+        groups: true,
+        ownGroups: true,
+      },
+    },
+    users: {
+      include: {
+        groups: true,
+        ownGroups: true,
+      },
+    },
+  };
 }
 
 function toGroupWithMembers(group: AppDataModelGroupWithMembers): IGroup {
@@ -31,5 +48,5 @@ function toGroupWithMembers(group: AppDataModelGroupWithMembers): IGroup {
 
 export default {
   toGroupWithMembers,
-  alwaysIncludeOwnerAndUsers,
+  includeOwnerAndUsers,
 };
