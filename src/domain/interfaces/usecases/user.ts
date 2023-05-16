@@ -1,21 +1,21 @@
 import { IUser } from "../../entities/user";
 
-export interface IUsecaseUserRegister {
+export interface IUseCaseUserRegister {
   execute(user: IUser, password: string): Promise<IUser>;
 }
 
-export interface IUsecaseUserLogin {
+export interface IUseCaseUserLogin {
   execute(user: IUser, password: string): Promise<IUser>;
 }
 
-export interface IUsecaseUserLogout {
+export interface IUseCaseUserLogout {
   execute(user: IUser): Promise<void>;
 }
 
-export interface IUsecaseUserChangePassword {
+export interface IUseCaseUserChangePassword {
   execute(user: IUser, newPassword: string): Promise<IUser>;
 }
 
-export interface IUsecaseUserDeleteUser {
+export interface IUseCaseUserDeleteUser {
   execute(user: IUser, password: string): Promise<IUser>;
 }

@@ -1,8 +1,8 @@
 import { IRepositoryUser } from "../interfaces/repositories/user";
-import { IUsecaseUserRegister } from "../interfaces/usecases/user";
+import { IUseCaseUserRegister } from "../interfaces/usecases/user";
 import { IUser } from "../entities/user";
 
-class BaseUsecaseUser {
+class BaseUseCaseUser {
   protected readonly repo: IRepositoryUser;
 
   constructor(repo: IRepositoryUser) {
@@ -10,9 +10,9 @@ class BaseUsecaseUser {
   }
 }
 
-export class UsecaseUserRegister
-  extends BaseUsecaseUser
-  implements IUsecaseUserRegister
+export class UseCaseUserRegister
+  extends BaseUseCaseUser
+  implements IUseCaseUserRegister
 {
   constructor(repo: IRepositoryUser) {
     super(repo);
@@ -23,18 +23,18 @@ export class UsecaseUserRegister
   }
 }
 
-export class UsecaseUserLogin
-  extends BaseUsecaseUser
-  implements IUsecaseUserRegister
+export class UseCaseUserLogin
+  extends BaseUseCaseUser
+  implements IUseCaseUserRegister
 {
   constructor(repo: IRepositoryUser) {
     super(repo);
   }
 
   async execute(user: IUser, password: string): Promise<IUser> {
-    const _user = await this.repo.getUser(user.id);
+    const _user = await this.repo.getUser({ email: user.email });
     if (!_user) {
-      return Promise.reject(`no such user: ${user.id}`);
+      return Promise.reject(`no such user: ${user.email}`);
     }
 
     if (_user.password !== password) {

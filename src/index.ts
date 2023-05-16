@@ -1,6 +1,7 @@
+import postgres from "./data/sources/postgres";
 import { RepositoryClipboards } from "./domain/repositories/clipboards";
 import { UsecaseGroup } from "./domain/usecases/group";
-import { UsecaseUser } from "./domain/usecases/user";
+import { UseCaseUserRegister, UseCaseUserLogin } from "./domain/usecases/user";
 import {
   UseCaseCreateClipboard,
   UseCaseDeleteUserClipboard,
@@ -13,8 +14,19 @@ import { App } from "./presentation/app";
 import { HandlerClipboards } from "./presentation/handlers/clipboards";
 import { HandlerGroups } from "./presentation/handlers/groups";
 import { HandlerUsers } from "./presentation/handlers/users";
+import { RepositoryUser } from "./domain/repositories/user";
+import { DataLinkUser } from "./data/sources/postgres/data-links/user";
 
 async function main(): Promise<void> {
+  const dataLink = postgres;
+
+  const userDataLink = new DataLinkUser(dataLink);
+  const userRepo = new RepositoryUser(userDataLink);
+  const handlerUsers = new HandlerUsers({
+    register: new UseCaseUserRegister(userRepo),
+    login: new UseCaseUserLogin(userRepo),
+  });
+
   const repoClipboards = new RepositoryClipboards();
   const handlerClipboards = new HandlerClipboards({
     createClipboard: new UseCaseCreateClipboard(repoClipboards),
@@ -23,10 +35,6 @@ async function main(): Promise<void> {
     deleteClipboard: new UseCaseDeleteUserClipboard(repoClipboards),
     deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboards),
   });
-
-  // Dummy
-  const usecaseUser = new UsecaseUser();
-  const handlerUsers = new HandlerUsers(usecaseUser);
 
   // Dummy
   const usecaseGroup = new UsecaseGroup();

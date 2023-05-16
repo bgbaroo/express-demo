@@ -2,31 +2,31 @@ import { Request, Response } from "express";
 import { IHandlerUsers } from "../routes/users";
 import resp from "../response";
 import {
-  IUsecaseUserRegister,
-  IUsecaseUserLogin,
-  IUsecaseUserLogout,
-  IUsecaseUserDeleteUser,
-  IUsecaseUserChangePassword,
+  IUseCaseUserRegister,
+  IUseCaseUserLogin,
+  IUseCaseUserLogout,
+  IUseCaseUserDeleteUser,
+  IUseCaseUserChangePassword,
 } from "../../domain/interfaces/usecases/user";
 import { User } from "../../domain/entities/user";
 
 export class HandlerUsers implements IHandlerUsers {
-  private readonly usecaseRegister?: IUsecaseUserRegister;
-  private readonly usecaseLogin?: IUsecaseUserLogin;
-  // private readonly usecaseLogout?: IUsecaseUserLogout;
-  // private readonly usecaseChangePassword?: IUsecaseUserChangePassword;
-  // private readonly usecaseDelete?: IUsecaseUserDeleteUser;
+  private readonly usecaseRegister?: IUseCaseUserRegister;
+  private readonly usecaseLogin?: IUseCaseUserLogin;
+  private readonly usecaseLogout?: IUseCaseUserLogout;
+  private readonly usecaseChangePassword?: IUseCaseUserChangePassword;
+  private readonly usecaseDeleteUser?: IUseCaseUserDeleteUser;
 
   constructor(arg: {
-    usecaseRegister: IUsecaseUserRegister;
-    usecaseLogin: IUsecaseUserLogin;
-    usecaseLogout: IUsecaseUserLogout;
-    usecaseDelete: IUsecaseUserDeleteUser;
+    register: IUseCaseUserRegister;
+    login: IUseCaseUserLogin;
+    logout?: IUseCaseUserLogout;
+    delete?: IUseCaseUserDeleteUser;
   }) {
-    this.usecaseRegister = arg.usecaseRegister;
-    this.usecaseLogin = arg.usecaseLogin;
-    // this.usecaseLogout = arg.usecaseLogout;
-    // this.usecaseDelete = arg.usecaseDelete;
+    this.usecaseRegister = arg.register;
+    this.usecaseLogin = arg.login;
+    this.usecaseLogout = arg.logout;
+    this.usecaseDeleteUser = arg.delete;
   }
 
   async register(req: Request, res: Response): Promise<Response> {
@@ -73,19 +73,31 @@ export class HandlerUsers implements IHandlerUsers {
       })
       .catch((err) => {
         console.error(`failed to create user ${email}: ${err}`);
-        return resp.InternalServerError(res, "failed to create user");
+        return resp.InternalServerError(res, `failed to login user ${email}`);
       });
   }
 
   async logout(_req: Request, res: Response): Promise<Response> {
+    if (this.usecaseLogout === undefined) {
+      return resp.NotImplemented(res, "login");
+    }
+
     return resp.NotImplemented(res, "login");
   }
 
   async changePassword(_req: Request, res: Response): Promise<Response> {
+    if (this.usecaseChangePassword === undefined) {
+      return resp.NotImplemented(res, "login");
+    }
+
     return resp.NotImplemented(res, "changePassword");
   }
 
   async deleteUser(_req: Request, res: Response): Promise<Response> {
+    if (this.usecaseDeleteUser === undefined) {
+      return resp.NotImplemented(res, "login");
+    }
+
     return resp.NotImplemented(res, "deleteUser");
   }
 }

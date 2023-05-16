@@ -1,6 +1,7 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./link";
 import modelUser, { IUserData } from "../data-models/user";
 
+import { WhereUser } from "../../../../domain/interfaces/repositories/user";
 import { IUser } from "../../../../domain/entities/user";
 
 export class DataLinkUser extends BasePrismaSchemaDataLink {
@@ -18,11 +19,11 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to create user: ${err}`));
   }
 
-  async getUser(id: string): Promise<IUserData | null> {
+  async getUser(where: WhereUser): Promise<IUserData | null> {
     return this.db.user
       .findUnique({
         include: modelUser.includeGroupsAndOwnGroups(),
-        where: { id },
+        where: where,
       })
       .then((user) => {
         if (!user) {
@@ -31,7 +32,11 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
 
         return Promise.resolve(modelUser.toUser(user));
       })
-      .catch((err) => Promise.reject(`failed to get user ${id}: ${err}`));
+      .catch((err) =>
+        Promise.reject(
+          `failed to get user (id: ${where.id}, email: ${where.email}): ${err}`,
+        ),
+      );
   }
 
   async getUsers(): Promise<IUserData[] | null> {
