@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import postgres from "./data/sources/postgres";
 
 import { DataLinkUser } from "./data/sources/postgres/data-links/user";
-import { RepositoryClipboards } from "./domain/repositories/clipboard";
+import { RepositoryClipboard } from "./domain/repositories/clipboard";
 import { UsecaseGroup } from "./domain/usecases/group";
 import {
   UseCaseUserRegister,
@@ -39,13 +39,13 @@ async function main(): Promise<void> {
   });
 
   const dataLinkClipboard = new DataLinkClipboard(dataLink);
-  const repoClipboards = new RepositoryClipboards(dataLinkClipboard);
+  const repoClipboard = new RepositoryClipboard(dataLinkClipboard);
   const handlerClipboards = new HandlerClipboards({
-    createClipboard: new UseCaseCreateClipboard(repoClipboards),
-    getClipboard: new UseCaseGetUserClipboard(repoClipboards),
-    getClipboards: new UseCaseGetUserClipboards(repoClipboards),
-    deleteClipboard: new UseCaseDeleteUserClipboard(repoClipboards),
-    deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboards),
+    createClipboard: new UseCaseCreateClipboard(repoClipboard),
+    getClipboard: new UseCaseGetUserClipboard(repoClipboard),
+    getClipboards: new UseCaseGetUserClipboards(repoClipboard),
+    deleteClipboard: new UseCaseDeleteUserClipboard(repoClipboard),
+    deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboard),
   });
 
   // Dummy

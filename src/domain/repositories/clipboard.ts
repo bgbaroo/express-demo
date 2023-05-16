@@ -2,7 +2,7 @@ import { DataLinkClipboard } from "../../data/sources/postgres/data-links/clipbo
 import { IClipboard } from "../entities/clipboard";
 import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 
-export class RepositoryClipboards implements IRepositoryClipboard {
+export class RepositoryClipboard implements IRepositoryClipboard {
   private readonly link: DataLinkClipboard;
 
   constructor(link: DataLinkClipboard) {
