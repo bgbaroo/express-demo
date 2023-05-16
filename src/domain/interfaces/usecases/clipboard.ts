@@ -1,19 +1,19 @@
 import { IClipboard } from "../../entities/clipboard";
 
 export interface IUseCaseCreateClipboard {
-  execute(clipboard: IClipboard): Promise<void>;
+  execute(clipboard: IClipboard): Promise<IClipboard>;
 }
 
 export interface IUseCaseGetUserClipboard {
-  execute(userId: string, id: string): Promise<IClipboard | undefined>;
+  execute(userId: string, id: string): Promise<IClipboard | null>;
 }
 
 export interface IUseCaseGetUserClipboards {
-  execute(userId: string): Promise<IClipboard[]>;
+  execute(userId: string): Promise<IClipboard[] | null>;
 }
 
 export interface IUseCaseDeleteUserClipboard {
-  execute(userId: string, id: string): Promise<boolean>;
+  execute(userId: string, id: string): Promise<IClipboard>;
 }
 
 export interface IUseCaseDeleteUserClipboards {

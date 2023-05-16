@@ -25,7 +25,7 @@ export class UseCaseCreateClipboard
     super(repo);
   }
 
-  async execute(clipboard: IClipboard): Promise<void> {
+  async execute(clipboard: IClipboard): Promise<IClipboard> {
     return this.repository.createClipboard(clipboard);
   }
 }
@@ -38,8 +38,7 @@ export class UseCaseGetUserClipboard
     super(repo);
   }
 
-  async execute(userId: string, id: string): Promise<IClipboard | undefined> {
-    console.log("foo", userId + id);
+  async execute(userId: string, id: string): Promise<IClipboard | null> {
     return this.repository.getUserClipboard(userId, id);
   }
 }
@@ -52,7 +51,7 @@ export class UseCaseGetUserClipboards
     super(repo);
   }
 
-  async execute(userId: string): Promise<IClipboard[]> {
+  async execute(userId: string): Promise<IClipboard[] | null> {
     return this.repository.getUserClipboards(userId);
   }
 }
@@ -65,7 +64,7 @@ export class UseCaseDeleteUserClipboard
     super(repo);
   }
 
-  async execute(userId: string, id: string): Promise<boolean> {
+  async execute(userId: string, id: string): Promise<IClipboard> {
     return this.repository.deleteUserClipboard(userId, id);
   }
 }

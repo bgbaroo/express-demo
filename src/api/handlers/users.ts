@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { AuthRequest, JwtTokenPayload, generateJwt } from "../auth/jwt";
 import { IHandlerUsers } from "../routes/users";
 import resp from "../response";
 import {
@@ -8,35 +9,32 @@ import {
   IUseCaseUserDeleteUser,
   IUseCaseUserChangePassword,
 } from "../../domain/interfaces/usecases/user";
+
+import { AppErrors } from "../../domain/errors";
 import { User } from "../../domain/entities/user";
-import { AuthRequest, JwtTokenPayload, generateJwt } from "../auth/jwt";
 
 export class HandlerUsers implements IHandlerUsers {
-  private readonly usecaseRegister?: IUseCaseUserRegister;
-  private readonly usecaseLogin?: IUseCaseUserLogin;
+  private readonly usecaseRegister: IUseCaseUserRegister;
+  private readonly usecaseLogin: IUseCaseUserLogin;
   private readonly usecaseLogout?: IUseCaseUserLogout;
-  private readonly usecaseChangePassword?: IUseCaseUserChangePassword;
-  private readonly usecaseDeleteUser?: IUseCaseUserDeleteUser;
+  private readonly usecaseChangePassword: IUseCaseUserChangePassword;
+  private readonly usecaseDeleteUser: IUseCaseUserDeleteUser;
 
   constructor(arg: {
     register: IUseCaseUserRegister;
     login: IUseCaseUserLogin;
     logout?: IUseCaseUserLogout;
-    changePassword?: IUseCaseUserChangePassword;
-    delete?: IUseCaseUserDeleteUser;
+    changePassword: IUseCaseUserChangePassword;
+    deleteUser: IUseCaseUserDeleteUser;
   }) {
     this.usecaseRegister = arg.register;
     this.usecaseLogin = arg.login;
     this.usecaseLogout = arg.logout;
     this.usecaseChangePassword = arg.changePassword;
-    this.usecaseDeleteUser = arg.delete;
+    this.usecaseDeleteUser = arg.deleteUser;
   }
 
   async register(req: Request, res: Response): Promise<Response> {
-    if (this.usecaseRegister === undefined) {
-      return resp.NotImplemented(res, "register");
-    }
-
     const { email, password } = req.body;
     if (!email) {
       return resp.MissingField(res, "email");
@@ -57,10 +55,6 @@ export class HandlerUsers implements IHandlerUsers {
   }
 
   async login(req: Request, res: Response): Promise<Response> {
-    if (this.usecaseLogin === undefined) {
-      return resp.NotImplemented(res, "login");
-    }
-
     const { email, password } = req.body;
     if (!email) {
       return resp.MissingField(res, "email");
@@ -95,17 +89,16 @@ export class HandlerUsers implements IHandlerUsers {
   }
 
   async changePassword(req: AuthRequest, res: Response): Promise<Response> {
-    if (this.usecaseChangePassword === undefined) {
-      return resp.NotImplemented(res, "login");
+    if (!req.payload || !req.payload.email || req.payload.id) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
-    const { email, newPassword } = req.body;
-    if (!email) {
-      return resp.MissingField(res, "email");
-    }
+    const { newPassword } = req.body;
     if (!newPassword) {
       return resp.MissingField(res, "password");
     }
+
+    const email = req.payload.email;
 
     return this.usecaseChangePassword
       .execute(new User({ email }), newPassword)
@@ -119,11 +112,30 @@ export class HandlerUsers implements IHandlerUsers {
       });
   }
 
-  async deleteUser(_req: AuthRequest, res: Response): Promise<Response> {
-    if (this.usecaseDeleteUser === undefined) {
-      return resp.NotImplemented(res, "login");
+  async deleteUser(req: AuthRequest, res: Response): Promise<Response> {
+    if (!req.payload || !req.payload.email || req.payload.id) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
-    return resp.NotImplemented(res, "deleteUser");
+    const { email, id } = req.payload;
+    if (!email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
+    }
+    if (!id) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
+    }
+
+    const { password } = req.body;
+    if (!password) {
+      return resp.MissingField(res, "password");
+    }
+
+    return this.usecaseDeleteUser
+      .execute(new User({ email, id }), password)
+      .then(() => resp.Ok(res, `user ${email} deleted`))
+      .catch((err) => {
+        console.error(`failed to delete user ${email}: ${err}`);
+        return resp.InternalServerError(res, `failed to delete user ${email}`);
+      });
   }
 }

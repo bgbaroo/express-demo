@@ -59,6 +59,9 @@ export class HandlerClipboards implements IHandlerClipboards {
   }
 
   async getClipboard(req: AuthRequest, res: Response): Promise<Response> {
+    if (!req.payload) {
+      return resp.InternalServerError(res, "");
+    }
     const { id, userId } = req.body;
     if (!id) {
       return resp.MissingField(res, "id");

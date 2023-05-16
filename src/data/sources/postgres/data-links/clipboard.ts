@@ -141,4 +141,33 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
       })
       .catch((err) => Promise.reject(`failed to get group clipboards: ${err}`));
   }
+
+  async deleteClipboard(id: string): Promise<IClipboard> {
+    return this.db.clipboard
+      .delete({
+        include: {
+          user: {
+            include: userModel.includeGroupsAndOwnGroups(),
+          },
+        },
+        where: {
+          id,
+        },
+      })
+      .then((result) => Promise.resolve(model.toClipboard(result)))
+      .catch((err) => Promise.reject(`failed to delete clipboard: ${err}`));
+  }
+
+  async deleteUserClipboards(userId: string): Promise<number> {
+    return this.db.clipboard
+      .deleteMany({
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+      })
+      .then((result) => Promise.resolve(result.count))
+      .catch((err) => Promise.reject(`failed to delete clipboard: ${err}`));
+  }
 }

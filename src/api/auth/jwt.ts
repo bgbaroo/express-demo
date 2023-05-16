@@ -10,7 +10,8 @@ export interface JwtTokenPayload {
 }
 
 export interface AuthRequest extends Request {
-  token?: string | JwtPayload;
+  token: string | JwtPayload;
+  payload: JwtTokenPayload;
 }
 
 export function generateJwt(payload: JwtTokenPayload): string {
@@ -38,6 +39,11 @@ export function authenticateJwt(
 
     const decoded = jwt.verify(token, authSecret);
     (req as AuthRequest).token = decoded;
+    (req as AuthRequest).payload = {
+      id: decoded["id"],
+      email: decoded["email"],
+    };
+
     return next();
   } catch (err) {
     return response.Unauthorized(res, "authentication failed");
