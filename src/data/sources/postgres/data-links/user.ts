@@ -57,9 +57,14 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
         },
         data: {
           ...user,
+          groups: {
+            set: user.groups().map((group): { id: string } => {
+              return { id: group.id };
+            }),
+          },
           ownGroups: {
-            set: user.groupsOwned()?.map((id): { id: string } => {
-              return { id: id };
+            set: user.groupsOwned().map((group): { id: string } => {
+              return { id: group.id };
             }),
           },
         },

@@ -37,14 +37,24 @@ function includeOwnerAndUsers(): IIncludeOwnerAndUsers {
   };
 }
 
+// TODO: Decide recursiveness of group members and owners
 function toGroupWithMembers(group: AppDataModelGroupWithMembers): IGroup {
   return new Group({
     id: group.id,
     name: group.name,
-    owner: new GroupOwner(group.owner.email, group.owner.id),
+    owner: new GroupOwner({
+      id: group.owner.id,
+      email: group.owner.email,
+      // groups: group.owner.groups.map((group) => toGroupWithMembers(group)),
+      // ownGroups: group.owner.ownGroups.map((group) =>
+      //   toGroupWithMembers(group),
+      // ),
+    }),
     users: userModel.toUsers(group.users),
   });
 }
+
+export { AppDataModelGroupWithMembers };
 
 export default {
   toGroupWithMembers,

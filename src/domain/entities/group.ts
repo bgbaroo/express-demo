@@ -65,7 +65,7 @@ export class Group implements IGroup {
       return;
     }
 
-    owner.ownNewGroup(this.id);
+    owner.ownNewGroup(this);
     this.ownerId = owner.id;
     this._addMember(owner, owner);
   }

@@ -1,28 +1,35 @@
-import { IUser, User } from "./user";
+import { IUser, User, IUserArg } from "./user";
+import { IGroup } from "./group";
 
 export interface IGroupOwner extends IUser {
-  groupsOwned(): string[];
+  groupsOwned(): IGroup[];
   ownsGroup(groupId: string): boolean;
-  ownNewGroup(groupId: string);
+  ownNewGroup(group: IGroup);
+}
+
+export interface IGroupOwnerArg extends IUserArg {
+  ownGroups?: IGroup[];
 }
 
 export class GroupOwner extends User implements IGroupOwner {
-  private ownGroups: Set<string>;
+  private _ownGroups: Set<IGroup>;
 
-  constructor(email: string, id?: string, ownGroups?: Set<string>) {
-    super(email, id);
-    this.ownGroups = ownGroups || new Set();
+  constructor(arg: IGroupOwnerArg) {
+    super(arg);
+    this._ownGroups = new Set(arg.ownGroups);
   }
 
-  groupsOwned(): string[] {
-    return Array.from(this.ownGroups);
+  groupsOwned(): IGroup[] {
+    return Array.from(this._ownGroups);
   }
 
   ownsGroup(groupId: string): boolean {
-    return this.ownGroups.has(groupId);
+    return this.groupsOwned()
+      .map((group) => group.id)
+      .includes(groupId);
   }
 
-  ownNewGroup(groupId: string) {
-    this.ownGroups.add(groupId);
+  ownNewGroup(group: IGroup) {
+    this._ownGroups.add(group);
   }
 }

@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
+import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
 
-import { DataLinkUser } from "../../src/data/sources/postgres/datalink/user";
-import { DataLinkGroup } from "../../src/data/sources/postgres/datalink/group";
 import { GroupOwner } from "../../src/domain/entities/group-owner";
 import { Group } from "../../src/domain/entities/group";
 import { User } from "../../src/domain/entities/user";
@@ -42,10 +42,10 @@ async function testUserAndGroupWrites(
   try {
     // Insert group owner
     const ownerUser = await userDb.createUser(
-      new GroupOwner(arg.gOwner),
+      new GroupOwner({ email: arg.gOwner }),
       "passOwner",
     );
-    const owner = new GroupOwner(ownerUser.email, ownerUser.id);
+    const owner = new GroupOwner({ ...ownerUser, groups: ownerUser.groups() });
 
     // Insert all other users
     const users = await Promise.all(
@@ -56,7 +56,7 @@ async function testUserAndGroupWrites(
           ...arg.gNonMembers,
           ...arg.gExMembers,
         ]),
-      ).map((user, i) => userDb.createUser(new User(user), `pass_${i}`)),
+      ).map((email, i) => userDb.createUser(new User({ email }), `pass_${i}`)),
     );
     const groupMembers = users.filter((user) =>
       arg.gMembers.includes(user.email),

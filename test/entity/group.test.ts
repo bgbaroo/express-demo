@@ -1,9 +1,9 @@
 import { Group } from "../../src/domain/entities/group";
-import { IGroupOwner, GroupOwner } from "../../src/domain/entities/group_owner";
+import { IGroupOwner, GroupOwner } from "../../src/domain/entities/group-owner";
 import { IUser, User } from "../../src/domain/entities/user";
 
 function mockOwner(email?: string, id?: string): IGroupOwner {
-  return new GroupOwner(email || "ownerEmail", id || "ownerId");
+  return new GroupOwner({ email: email || "ownerEmail", id: id || "ownerId" });
 }
 
 function ownerForgot(owner: IGroupOwner, gids: string[]): string | undefined {
@@ -54,15 +54,15 @@ describe("Creating owner and groups", () => {
 describe("no duplicate emails", () => {
   const fooAtBar = "foo@bar.com";
   const id = "1234";
-  const myUser: IUser = new User(fooAtBar, id);
+  const myUser: IUser = new User({ email: fooAtBar, id });
 
   const users: IUser[] = [
     {
       ...myUser,
     },
-    new User("bar@baz.com"),
-    new User("baz@foo.com"),
-    new User(fooAtBar, id), // Group should not add this user, as ID is a duplicate
+    new User({ email: "bar@baz.com" }),
+    new User({ email: "baz@foo.com" }),
+    new User({ email: fooAtBar, id }), // Group should not add this user, as ID is a duplicate
   ];
 
   const owner = mockOwner();
@@ -98,10 +98,14 @@ describe("no duplicate emails", () => {
   });
 
   it("duplicate User.id was added", () => {
-    expect(group.addMember(owner, new User(fooAtBar, id))).toBe(false);
+    expect(group.addMember(owner, new User({ email: fooAtBar, id }))).toBe(
+      false,
+    );
   });
 
   it("new User was not added", () => {
-    expect(group.addMember(owner, new User("new email", "new id"))).toBe(true);
+    expect(
+      group.addMember(owner, new User({ email: "new email", id: "new id" })),
+    ).toBe(true);
   });
 });

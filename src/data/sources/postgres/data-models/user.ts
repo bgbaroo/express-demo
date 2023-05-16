@@ -38,7 +38,7 @@ function usersToUserIds(users: IUser[]): IUserId[] {
 }
 
 function toUser(data: AppDataModelUserWithGroups): IUser {
-  return new User(data.email, data.id);
+  return new User({ ...data, groups: [] });
 }
 
 function toUsers(data: AppDataModelUserWithGroups[]): IUser[] {
@@ -46,14 +46,14 @@ function toUsers(data: AppDataModelUserWithGroups[]): IUser[] {
 }
 
 function mapUserCreateGroups(
-  groupNames: string[] | undefined,
+  groups: { name: string }[] | undefined,
 ): UserCreateGroup[] | undefined {
-  if (!groupNames) {
+  if (!groups) {
     return undefined;
   }
 
-  return groupNames.map((groupName) => {
-    return { name: groupName };
+  return groups.map((groupName) => {
+    return { name: groupName.name };
   });
 }
 

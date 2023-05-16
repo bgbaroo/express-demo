@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { DataLinkUser } from "../../src/data/sources/postgres/datalink/user";
-import { DataLinkGroup } from "../../src/data/sources/postgres/datalink/group";
-import { DataLinkClipboard } from "../../src/data/sources/postgres/datalink/clipboard";
+import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
+import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
+import { DataLinkClipboard } from "../../src/data/sources/postgres/data-links/clipboard";
 
 import { GroupOwner } from "../../src/domain/entities/group-owner";
 import { IGroup, Group } from "../../src/domain/entities/group";
@@ -16,7 +16,12 @@ describe("clipboards datalink", () => {
 
   it("create clipboard", async () => {
     console.log("Creating owner");
-    const ownerUser = await userDb.createUser(new User("owner"), "ownerPass");
+    const ownerUser = await userDb.createUser(
+      new User({
+        email: "owner",
+      }),
+      "ownerPass",
+    );
 
     console.log("Creating clipboards");
     const clipboards = await createClipboards(clipboardDb, [
@@ -48,13 +53,16 @@ describe("clipboards datalink", () => {
     console.table(clipboards);
 
     console.log("Creating users");
-    const users = ["user1", "user2"].map((email) => new User(email));
+    const users = ["user1", "user2"].map((email) => new User({ email }));
     await Promise.all(
       users.map((user, i) => userDb.createUser(user, `pass_${i}`)),
     );
 
     console.log("Creating group");
-    const owner = new GroupOwner(ownerUser.email, ownerUser.id);
+    const owner = new GroupOwner({
+      ...ownerUser,
+      groups: ownerUser.groups(),
+    });
     const group = await createGroup(groupDb, owner, users);
 
     console.log("Getting group clipboards");
