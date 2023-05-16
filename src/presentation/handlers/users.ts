@@ -21,11 +21,13 @@ export class HandlerUsers implements IHandlerUsers {
     register: IUseCaseUserRegister;
     login: IUseCaseUserLogin;
     logout?: IUseCaseUserLogout;
+    changePassword?: IUseCaseUserChangePassword;
     delete?: IUseCaseUserDeleteUser;
   }) {
     this.usecaseRegister = arg.register;
     this.usecaseLogin = arg.login;
     this.usecaseLogout = arg.logout;
+    this.usecaseChangePassword = arg.changePassword;
     this.usecaseDeleteUser = arg.delete;
   }
 
@@ -85,12 +87,29 @@ export class HandlerUsers implements IHandlerUsers {
     return resp.NotImplemented(res, "login");
   }
 
-  async changePassword(_req: Request, res: Response): Promise<Response> {
+  async changePassword(req: Request, res: Response): Promise<Response> {
     if (this.usecaseChangePassword === undefined) {
       return resp.NotImplemented(res, "login");
     }
 
-    return resp.NotImplemented(res, "changePassword");
+    const { email, newPassword } = req.body;
+    if (!email) {
+      return resp.MissingField(res, "email");
+    }
+    if (!newPassword) {
+      return resp.MissingField(res, "password");
+    }
+
+    return this.usecaseChangePassword
+      .execute(new User({ email }), newPassword)
+      .then((user) => resp.Ok(res, `password for ${user.email} updated`))
+      .catch((err) => {
+        console.error(`failed to change password for ${email}: ${err}`);
+        return resp.InternalServerError(
+          res,
+          `failed to update password for ${email}`,
+        );
+      });
   }
 
   async deleteUser(_req: Request, res: Response): Promise<Response> {

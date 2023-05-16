@@ -1,7 +1,11 @@
 import postgres from "./data/sources/postgres";
 import { RepositoryClipboards } from "./domain/repositories/clipboards";
 import { UsecaseGroup } from "./domain/usecases/group";
-import { UseCaseUserRegister, UseCaseUserLogin } from "./domain/usecases/user";
+import {
+  UseCaseUserRegister,
+  UseCaseUserLogin,
+  UseCaseUserChangePassword,
+} from "./domain/usecases/user";
 import {
   UseCaseCreateClipboard,
   UseCaseDeleteUserClipboard,
@@ -25,6 +29,7 @@ async function main(): Promise<void> {
   const handlerUsers = new HandlerUsers({
     register: new UseCaseUserRegister(userRepo),
     login: new UseCaseUserLogin(userRepo),
+    changePassword: new UseCaseUserChangePassword(userRepo),
   });
 
   const repoClipboards = new RepositoryClipboards();

@@ -54,13 +54,11 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
   }
 
   // TODO: check if groups and ownGroups was updated
-  async updateUser(user: IUser): Promise<IUserData | null> {
+  async updateUser(user: IUser, where: WhereUser): Promise<IUserData> {
     return this.db.user
       .update({
         include: modelUser.includeGroupsAndOwnGroups(),
-        where: {
-          id: user.id,
-        },
+        where,
         data: {
           ...user,
           groups: {
@@ -73,6 +71,27 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
               return { id: group.id };
             }),
           },
+        },
+      })
+      .then((updated) => {
+        if (!updated) {
+          return Promise.reject(null);
+        }
+
+        return Promise.resolve(modelUser.toUser(updated));
+      })
+      .catch((err) => Promise.reject(`failed to update user ${user}: ${err}`));
+  }
+
+  async changePassword(user: IUser, newPassword: string): Promise<IUserData> {
+    return this.db.user
+      .update({
+        include: modelUser.includeGroupsAndOwnGroups(),
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: newPassword,
         },
       })
       .then((updated) => {

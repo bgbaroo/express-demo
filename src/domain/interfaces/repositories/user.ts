@@ -9,8 +9,9 @@ export interface WhereUser {
 
 export interface IRepositoryUser {
   createUser(user: IUser, password: string): Promise<IUserData>;
-  getUser(where: WhereUser): Promise<IUserData | null>;
-  getUsers(): Promise<IUserData[] | null>;
-  updateUser(user: IUser): Promise<IUserData | null>;
-  deleteUser(id: string): Promise<IUserData | null>;
+  getUser(where: WhereUser): Promise<IUserData>;
+  getUsers(): Promise<IUserData[]>;
+  updateUser(user: IUser, where: WhereUser): Promise<IUserData>;
+  changePassword(user: IUser, newPassword: string): Promise<IUserData>;
+  deleteUser(id: string): Promise<IUserData>;
 }

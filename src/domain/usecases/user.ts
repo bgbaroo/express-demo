@@ -1,5 +1,8 @@
 import { IRepositoryUser } from "../interfaces/repositories/user";
-import { IUseCaseUserRegister } from "../interfaces/usecases/user";
+import {
+  IUseCaseUserChangePassword,
+  IUseCaseUserRegister,
+} from "../interfaces/usecases/user";
 import { IUser } from "../entities/user";
 
 class BaseUseCaseUser {
@@ -42,5 +45,27 @@ export class UseCaseUserLogin
     }
 
     return Promise.resolve(_user);
+  }
+}
+
+export class UseCaseUserChangePassword
+  extends BaseUseCaseUser
+  implements IUseCaseUserChangePassword
+{
+  constructor(repo: IRepositoryUser) {
+    super(repo);
+  }
+
+  async execute(user: IUser, newPassword: string): Promise<IUser> {
+    const _user = await this.repo.getUser({ email: user.email });
+    if (!_user) {
+      return Promise.reject(`no such user: ${user.email}`);
+    }
+
+    if (_user.password === newPassword) {
+      return Promise.reject("password unchanged");
+    }
+
+    return await this.repo.changePassword(_user, newPassword);
   }
 }
