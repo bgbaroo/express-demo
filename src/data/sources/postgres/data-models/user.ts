@@ -2,6 +2,9 @@ import { DbOnly, DataModelUser, DataModelGroup } from "./models";
 
 import { IUser, User } from "../../../../domain/entities/user";
 
+// Extends DataModelUser with shallow group information.
+// DataModelUserWithGroups.groups only contains what's available
+// in the table `groups`, and nothing more, to save on costs.
 interface DataModelUserWithGroups extends DataModelUser {
   groups: DataModelGroup[];
   ownGroups: DataModelGroup[];

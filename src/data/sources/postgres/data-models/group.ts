@@ -20,6 +20,9 @@ interface IIncludeOwnerAndUsers {
   };
 }
 
+// Only includes:
+// (1) Group owner's groups and his owned groups as shallow DataModelGroup (no membership data)
+// (2) Group users' groups and their owned groups as shallow DataModelGroup (no membership data)
 function includeOwnerAndUsers(): IIncludeOwnerAndUsers {
   return {
     owner: {
@@ -37,20 +40,24 @@ function includeOwnerAndUsers(): IIncludeOwnerAndUsers {
   };
 }
 
-// TODO: Decide recursiveness of group members and owners
-function toGroupWithMembers(group: AppDataModelGroupWithMembers): IGroup {
+// Converts data from database into IGroup
+function toGroupWithMembers(data: AppDataModelGroupWithMembers): IGroup {
+  // We did not get owner's groups (not owned groups) information
+  // to save costs.
+  const owner = new GroupOwner({
+    id: data.owner.id,
+    email: data.owner.email,
+  });
+
+  data.owner.groups.forEach((groupData) => {
+    owner.ownNewGroup(new Group({ ...groupData, owner }));
+  });
+
   return new Group({
-    id: group.id,
-    name: group.name,
-    owner: new GroupOwner({
-      id: group.owner.id,
-      email: group.owner.email,
-      // groups: group.owner.groups.map((group) => toGroupWithMembers(group)),
-      // ownGroups: group.owner.ownGroups.map((group) =>
-      //   toGroupWithMembers(group),
-      // ),
-    }),
-    users: userModel.toUsers(group.users),
+    id: data.id,
+    name: data.name,
+    owner: owner,
+    users: userModel.toUsers(data.users),
   });
 }
 
