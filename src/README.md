@@ -68,7 +68,7 @@ We classify code roughly into 3 levels:
    In this project, the [code interfacing with PostgreSQL](./data/sources/postgres/) will be in this layer,
    as well as the [code talking to Redis](./data/sources/redis/), as well as [the higher-level code](./data/interfaces/) that abstracts he SQL ORM queries and Redis commands.
 
-3. [Presentation layer](./presentation/)
+3. [Presentation layer](./api/)
 
    The presentation is where the output of our programs are supposed to go.
 

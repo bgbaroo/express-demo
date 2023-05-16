@@ -1,22 +1,23 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 
 import resp from "../response";
 import { IHandlerGroups } from "../routes/groups";
 import { IUsecaseGroup } from "../../domain/interfaces/usecases/group";
+import { AuthRequest } from "../auth/jwt";
 
 export class HandlerGroups implements IHandlerGroups {
-  private usecase: IUsecaseGroup;
+  private readonly usecase: IUsecaseGroup;
 
   constructor(usecase: IUsecaseGroup) {
     this.usecase = usecase;
   }
 
-  async createGroup(_req: Request, res: Response): Promise<Response> {
+  async createGroup(_req: AuthRequest, res: Response): Promise<Response> {
     console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "createGroup");
   }
 
-  async deleteGroup(_req: Request, res: Response): Promise<Response> {
+  async deleteGroup(_req: AuthRequest, res: Response): Promise<Response> {
     console.log(this.usecase === undefined);
     return resp.NotImplemented(res, "deleteGroup");
   }

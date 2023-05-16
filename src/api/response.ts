@@ -88,6 +88,10 @@ async function InternalServerError(
   return new JsonResp(Codes.InternalServerError, body).marshal(res, "message");
 }
 
+async function Unauthorized(res: Response, body: any) {
+  return new JsonResp(Codes.Unauthorized, body).marshal(res, "reason");
+}
+
 export default {
   NotImplemented,
   MissingField,
@@ -95,5 +99,6 @@ export default {
   Created,
   NotFound,
   InternalServerError,
+  Unauthorized,
   Status,
 };

@@ -9,6 +9,7 @@ import {
   IUseCaseUserChangePassword,
 } from "../../domain/interfaces/usecases/user";
 import { User } from "../../domain/entities/user";
+import { AuthRequest, JwtTokenPayload, generateJwt } from "../auth/jwt";
 
 export class HandlerUsers implements IHandlerUsers {
   private readonly usecaseRegister?: IUseCaseUserRegister;
@@ -71,7 +72,13 @@ export class HandlerUsers implements IHandlerUsers {
     return this.usecaseLogin
       .execute(new User({ email }), password)
       .then((user) => {
-        return resp.Ok(res, { email: user.email, id: user.id });
+        const payload: JwtTokenPayload = {
+          email: user.email,
+          id: user.id,
+        };
+
+        const token = generateJwt(payload);
+        return resp.Ok(res, { email: user.email, id: user.id, token });
       })
       .catch((err) => {
         console.error(`failed to create user ${email}: ${err}`);
@@ -79,7 +86,7 @@ export class HandlerUsers implements IHandlerUsers {
       });
   }
 
-  async logout(_req: Request, res: Response): Promise<Response> {
+  async logout(_req: AuthRequest, res: Response): Promise<Response> {
     if (this.usecaseLogout === undefined) {
       return resp.NotImplemented(res, "login");
     }
@@ -87,7 +94,7 @@ export class HandlerUsers implements IHandlerUsers {
     return resp.NotImplemented(res, "login");
   }
 
-  async changePassword(req: Request, res: Response): Promise<Response> {
+  async changePassword(req: AuthRequest, res: Response): Promise<Response> {
     if (this.usecaseChangePassword === undefined) {
       return resp.NotImplemented(res, "login");
     }
@@ -112,7 +119,7 @@ export class HandlerUsers implements IHandlerUsers {
       });
   }
 
-  async deleteUser(_req: Request, res: Response): Promise<Response> {
+  async deleteUser(_req: AuthRequest, res: Response): Promise<Response> {
     if (this.usecaseDeleteUser === undefined) {
       return resp.NotImplemented(res, "login");
     }

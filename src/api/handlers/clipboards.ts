@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 
 import resp from "../response";
+import { AuthRequest } from "../auth/jwt";
 import { IHandlerClipboards } from "../routes/clipboards";
 import {
   IUseCaseCreateClipboard,
@@ -9,6 +10,7 @@ import {
   IUseCaseGetUserClipboard,
   IUseCaseGetUserClipboards,
 } from "../../domain/interfaces/usecases/clipboard";
+
 import { IClipboard, Clipboard } from "../../domain/entities/clipboard";
 import { User } from "../../domain/entities/user";
 
@@ -32,7 +34,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     this.usecaseDeleteUserClipboards = arg.deleteClipboards;
   }
 
-  async createClipboard(req: Request, res: Response): Promise<Response> {
+  async createClipboard(req: AuthRequest, res: Response): Promise<Response> {
     const { userId, content, title } = req.body;
     if (!userId) {
       return resp.MissingField(res, "userId");
@@ -56,7 +58,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async getClipboard(req: Request, res: Response): Promise<Response> {
+  async getClipboard(req: AuthRequest, res: Response): Promise<Response> {
     const { id, userId } = req.body;
     if (!id) {
       return resp.MissingField(res, "id");
@@ -80,7 +82,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async getClipboards(req: Request, res: Response): Promise<Response> {
+  async getClipboards(req: AuthRequest, res: Response): Promise<Response> {
     const { userId } = req.body;
 
     if (!userId) {
@@ -107,7 +109,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async deleteClipboard(req: Request, res: Response): Promise<Response> {
+  async deleteClipboard(req: AuthRequest, res: Response): Promise<Response> {
     const { id, userId } = req.body;
     if (!id) {
       return resp.MissingField(res, "id");
@@ -134,7 +136,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async deleteClipboards(req: Request, res: Response): Promise<Response> {
+  async deleteClipboards(req: AuthRequest, res: Response): Promise<Response> {
     const { userId } = req.body;
 
     if (!userId) {

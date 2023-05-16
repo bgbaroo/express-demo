@@ -1,4 +1,7 @@
+import dotenv from "dotenv";
+
 import postgres from "./data/sources/postgres";
+import { DataLinkUser } from "./data/sources/postgres/data-links/user";
 import { RepositoryClipboards } from "./domain/repositories/clipboards";
 import { UsecaseGroup } from "./domain/usecases/group";
 import {
@@ -14,14 +17,14 @@ import {
   UseCaseGetUserClipboards,
 } from "./domain/usecases/clipboard";
 
-import { App } from "./presentation/app";
-import { HandlerClipboards } from "./presentation/handlers/clipboards";
-import { HandlerGroups } from "./presentation/handlers/groups";
-import { HandlerUsers } from "./presentation/handlers/users";
+import { App } from "./api/app";
+import { HandlerClipboards } from "./api/handlers/clipboards";
+import { HandlerGroups } from "./api/handlers/groups";
+import { HandlerUsers } from "./api/handlers/users";
 import { RepositoryUser } from "./domain/repositories/user";
-import { DataLinkUser } from "./data/sources/postgres/data-links/user";
 
 async function main(): Promise<void> {
+  dotenv.config();
   const dataLink = postgres;
 
   const userDataLink = new DataLinkUser(dataLink);

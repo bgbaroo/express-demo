@@ -5,8 +5,12 @@ import resp from "./response";
 import { IHandlerClipboards, RouterClipboard } from "./routes/clipboards";
 import { IHandlerUsers, RouterUsers } from "./routes/users";
 import { IHandlerGroups, RouterGroups } from "./routes/groups";
+import { AuthRequest } from "./auth/jwt";
 
+// Handlers that do not require authentication middleware
 export type HandlerFunc = (Request, Response) => Promise<Response>;
+// Handlers that require authentication middleware
+export type HandlerFuncAuth = (AuthRequest, Response) => Promise<Response>;
 
 export class App {
   private app: express.Express;
