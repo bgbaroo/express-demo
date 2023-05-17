@@ -5,8 +5,11 @@ like a [normal hash function](https://en.wikipedia.org/wiki/Hash_function),
 takes in an input, and then _digests_ it into a _hash_,
 which is a string of bytes of fixed length.
 
-For each identical input, the function returns different
-hash, although [_hash collisions_](https://en.wikipedia.org/wiki/Hash_collision)
+For each identical input, the function returns identical
+hash.
+
+Different inputs produce different hashes,
+although [_hash collisions_](https://en.wikipedia.org/wiki/Hash_collision)
 are still possible.
 
 As hash functions are one-way function, computing a hash
