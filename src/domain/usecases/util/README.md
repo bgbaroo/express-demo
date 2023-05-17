@@ -12,36 +12,43 @@ Different inputs produce different hashes,
 although [_hash collisions_](https://en.wikipedia.org/wiki/Hash_collision)
 are still possible.
 
-As hash functions are one-way function, computing a hash
-from a given input is cheap, but computing the input from
+As hash functions are one-way functions, computing a hash
+from a given input is cheap - but computing the input from
 a given hash is extremely expensive.
 
 ## [Cryptanalysis attack](https://en.wikipedia.org/wiki/Cryptanalysis)
 
 Attackers usually use [_brute-force attacks_](https://en.wikipedia.org/wiki/Brute-force_attack)
-to reverse hashes, by trying every possible combinations
-of inputs and feed them to hash function to see one
-produces a matching hash.
+to _crack_ hashes, by trying every possible combinations
+of inputs and feed them to the same hash function to see
+which one produces a match to a known hash.
 
 Another class of attack is [_rainbow table attack_](https://en.wikipedia.org/wiki/Rainbow_table),
 where the attacker pre-computes hashes of so many
 possible combinations of the input into a lookup table,
-and then do a table lookup to see which entry matches
-the hash being attacked.
+and then perform a lookup to see which entry matches
+the known hash being attacked.
 
-The rainbow table attacks are sometimes known as dictionary attacks.
+Rainbow attacks on password hashes are generally done
+by pre-computed lookup table of popular passwords and
+their hashes. Passwords like `1234` or `guest` are
+already in these pre-computed tables.
+
+The rainbow table attacks are sometimes known as dictionary
+attacks due to its key-value nature.
 
 Cryptographic hash functions differ from normal hash functions
-in that they (crypto) are designed to be appropriate for use
-with other cryptography applications, and thus are more
+in that they (crypto hashes) are designed to be appropriate
+for use in other cryptography applications, and thus are more
 resilient and expensive to brute-force attacks.
 
 # Password hashing
 
 Password hashing is a security practice in which
-plaintext passwords are given to a cryptographic hash
-and later saved to the database instead of the user's
-actual password.
+plaintext passwords are fed into a cryptographic hash
+function to generate the password's hash, which is later
+saved to the database instead of the user's actual
+plaintext password.
 
 This means that if bad actors had access to our database,
 user's passwords are still safe, unless the attacker does
@@ -79,22 +86,23 @@ when compared to implementing your own password hashing
 with generic cryptography primitives provided in the
 Node.js `crypto` module.
 
-Bcrypt hash output is in Base64 string, so it can be
-easily saved in text files (as with UNIX `/etc/passwd`)
-or into the database as text.
+Bcrypt hash output is in highly portable Base64 string,
+so it can be conveniently saved in text files (as with
+UNIX `/etc/passwd`) or into the database as text.
 
-## Bcrypt salt and dictionary attack
+## Bcrypt salt - a defense against dictionary attacks
 
 In addition to the ease of use, Bcrypt also requires
 a _salt_ everytime it generates a new hash for a new
 password.
 
-The addition of salt is like when a chef's finishing
-a dish - a pinch of salt and everything's great.
+The addition of salt is like a chef's finishing
+touch - a pinch of salt and everything's great.
 
 Salt is a random number, used to mutate
-the input to the hash function so that each call
-to the hash function receives different input.
+the input before being fed into the hash function,
+so that each call to the hash function receives
+different input.
 
 This means in popular passwords like `1234` cannot
 be guessed from a rainbow table or other dictionary
