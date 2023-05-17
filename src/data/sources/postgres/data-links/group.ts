@@ -1,4 +1,4 @@
-import { BasePrismaSchemaDataLink, DbDriver } from "./link";
+import { BasePrismaSchemaDataLink, DbDriver } from "../";
 import modelGroup from "../data-models/group";
 import modelUser from "../data-models/user";
 

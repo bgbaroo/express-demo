@@ -1,4 +1,4 @@
-import { BasePrismaSchemaDataLink, DbDriver } from "./link";
+import { BasePrismaSchemaDataLink, DbDriver } from "../";
 import modelUser, { IUserData } from "../data-models/user";
 
 import { IWhereUser } from "../../../../domain/interfaces/repositories/user";

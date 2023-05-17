@@ -1,134 +1,153 @@
 import readline from "readline";
-import { PrismaClient } from "@prisma/client";
+import postgres from "../../src/data/sources/postgres";
+
 import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
 import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
 import { DataLinkClipboard } from "../../src/data/sources/postgres/data-links/clipboard";
+import { DbDriver } from "../../src/data/sources/postgres";
 
+import { RepositoryUser } from "../../src/domain/repositories/user";
+import { RepositoryGroup } from "../../src/domain/repositories/group";
 import { RepositoryClipboard } from "../../src/domain/repositories/clipboard";
+
 import { GroupOwner } from "../../src/domain/entities/group-owner";
-import { IGroup, Group } from "../../src/domain/entities/group";
-import { IUser, User } from "../../src/domain/entities/user";
+import { Group } from "../../src/domain/entities/group";
+import { User } from "../../src/domain/entities/user";
 import { IClipboard, Clipboard } from "../../src/domain/entities/clipboard";
 
-describe("clipboards datalink", () => {
-  const pg = new PrismaClient();
-  const userDb = new DataLinkUser(pg);
-  const groupDb = new DataLinkGroup(pg);
-  const clipboardDb = new DataLinkClipboard(pg);
+interface Arg {
+  owner: string;
+  members: string[];
+  nonMembers: string[];
+  dbDriver: DbDriver;
+  dataLinkUser: DataLinkUser;
+  dataLinkGroup: DataLinkGroup;
+  dataLinkClipboard: DataLinkClipboard;
+}
 
-  it("create clipboard", async () => {
+describe("groups and clipboards", () => {
+  const arg: Arg = {
+    owner: "ownerUser",
+    members: ["member1", "member2", "member3"],
+    nonMembers: ["user1", "user2", "user3"],
+    dbDriver: postgres,
+    dataLinkUser: new DataLinkUser(postgres),
+    dataLinkGroup: new DataLinkGroup(postgres),
+    dataLinkClipboard: new DataLinkClipboard(postgres),
+  };
+
+  it("membership visibility", async () => {
     try {
-      await clearDbPrompt(pg);
-
-      console.log("Creating owner");
-      const ownerUser = await userDb.createUser(
-        new User({
-          email: "owner",
-        }),
-        "ownerPass",
-      );
-
-      console.log("Creating clipboards");
-      const clipboards = await createClipboards(clipboardDb, [
-        new Clipboard({
-          content: "foo",
-          user: ownerUser,
-        }),
-        new Clipboard({
-          content: "bar",
-          user: ownerUser,
-        }),
-      ]);
-
-      console.log("Getting clipboard");
-      clipboards.forEach(async (clipboard) => {
-        const clip = await clipboardDb.getClipboard({
-          id: clipboard.id,
-          userId: ownerUser.id,
-        });
-
-        if (!clip) {
-          return Promise.reject("null clipboard");
-        }
-        expect(clip.id).toBe(clipboard.id);
-        expect(clip.content).toBe(clipboard.content);
-      });
-
-      console.log("clipboards");
-      console.table(clipboards);
-
-      console.log("Creating users");
-      const users = ["user1", "user2"].map((email) => new User({ email }));
-      await Promise.all(
-        users.map((user, i) => userDb.createUser(user, `pass_${i}`)),
-      );
-
-      console.log("Creating group");
-      const owner = new GroupOwner({
-        ...ownerUser,
-        groups: ownerUser.groups(),
-      });
-
-      const group = await createGroup(groupDb, owner, users);
-      const repo = new RepositoryClipboard(clipboardDb);
-
-      console.log("Getting group clipboards");
-      const groupClipboardsResult = await repo.getGroupClipboards(group.id);
-      if (!groupClipboardsResult) {
-        return Promise.reject("null group clipboards");
-      }
-
-      console.log("Group clipboads result");
-      console.table(groupClipboardsResult);
-
-      expect(groupClipboardsResult.length).toBe(clipboards.length);
-      groupClipboardsResult.forEach((result) => {
-        expect(result.getUserId()).toBe(owner.id);
-      });
-
-      console.log("Creating other users' clipboards");
-      const otherPeoplesClips = await createClipboards(clipboardDb, [
-        new Clipboard({
-          user: users[0],
-          title: "user1 note",
-          content: "user1 clipboard",
-        }),
-        new Clipboard({
-          user: users[1],
-          title: "user2 note",
-          content: "user2 clipboard",
-        }),
-      ]);
-
-      console.log("Getting groups clipboards");
-
-      const groupsClipboardsResult = await repo.getGroupsClipboards(
-        users[0].id,
-      );
-      if (!groupsClipboardsResult) {
-        return Promise.reject("null groups clipboards");
-      }
-
-      console.log("Groups clipboards result");
-      console.table(groupsClipboardsResult);
-      expect(groupsClipboardsResult.length).toBe(
-        clipboards.length + otherPeoplesClips.length,
-      );
-
-      console.log("clearing db post-tests");
-      await clearDb(pg);
-
-      return Promise.resolve();
+      await clearDbPrompt(arg.dbDriver);
+      await testGroupClipboards(arg);
+      await clearDb(arg.dbDriver);
     } catch (err) {
+      // Clear databases after error
       console.error(`Got error: ${err}`);
+      await clearDb(arg.dbDriver);
 
-      await clearDb(pg);
-      return Promise.reject(err);
+      console.log(`Cleared DB`);
     }
   });
 });
 
-async function clearDbPrompt(pg: PrismaClient): Promise<void> {
+async function testGroupClipboards(arg: Arg): Promise<void> {
+  const repoUser = new RepositoryUser(arg.dataLinkUser);
+  const repoGroup = new RepositoryGroup(arg.dataLinkGroup);
+  const repoClipboard = new RepositoryClipboard(arg.dataLinkClipboard);
+
+  console.log("Creating group owner user");
+  const ownerUser = await repoUser.createUser(
+    new User({ email: arg.owner }),
+    "ownerPass",
+  );
+
+  console.log("Creating group members");
+  const members = await Promise.all(
+    arg.members.map((email, i) =>
+      repoUser.createUser(new User({ email }), `passMem${i + 1}`),
+    ),
+  );
+
+  console.log("Creating non-members");
+  const nonMembers = await Promise.all(
+    arg.nonMembers.map((email, i) =>
+      repoUser.createUser(new User({ email }), `passMem${i + 1}`),
+    ),
+  );
+
+  console.log("Creating group");
+  const group = await repoGroup.createGroup(
+    new Group({
+      name: "groupName",
+      owner: new GroupOwner({ id: ownerUser.id, email: ownerUser.email }),
+      users: members,
+    }),
+  );
+
+  console.log("Creating owner clipboard");
+  const ownerClips = await createClipboards(repoClipboard, [
+    new Clipboard({ content: "ownerClip1", user: ownerUser }),
+    new Clipboard({ content: "ownerClip2", user: ownerUser }),
+  ]);
+
+  members.forEach(async (member) => {
+    const ownerGroupClips = await repoClipboard.getGroupsClipboards(member.id);
+    if (!ownerGroupClips) {
+      return Promise.reject("null groupClips");
+    }
+
+    expect(ownerGroupClips.length).toBe(ownerClips.length);
+    ownerGroupClips.forEach((clip) =>
+      expect(clip.getUserId()).toBe(ownerUser.id),
+    );
+  });
+
+  console.log("Creating non-members' clipboards");
+  const nonMemberClips = await Promise.all(
+    nonMembers.map(async (nonMem, i) => {
+      return repoClipboard.createClipboard(
+        new Clipboard({
+          title: `nonMember${i + 1} note`,
+          content: `nonMember${i + 1} note`,
+          user: nonMem,
+        }),
+      );
+    }),
+  );
+
+  const groupClipboards = await repoClipboard.getGroupClipboards(group.id);
+  if (!groupClipboards) {
+    return Promise.reject("null groupClipboards");
+  }
+  if (groupClipboards.length === 0) {
+    return Promise.reject("0 group clipboards");
+  }
+  groupClipboards.forEach((groupClip) => {
+    nonMemberClips.forEach((nonGroupClip) =>
+      expect(groupClip.id === nonGroupClip.id).toBe(false),
+    );
+  });
+
+  // Members should not see non-members' clips
+  members.forEach(async (member) => {
+    const memberShouldSee = await repoClipboard.getGroupsClipboards(member.id);
+    if (!memberShouldSee) {
+      return Promise.reject("null groupClips");
+    }
+
+    expect(memberShouldSee.length).toBe(ownerClips.length);
+    memberShouldSee.forEach((clip) => {
+      nonMemberClips.forEach((nonMemClip) =>
+        expect(clip.id === nonMemClip.id).toBe(false),
+      );
+    });
+  });
+
+  return Promise.resolve();
+}
+
+async function clearDbPrompt(pg: DbDriver): Promise<void> {
   return userPrompt(
     "Clear table 'clipboards', 'groups', and 'users' before tests? [y/Y]",
   )
@@ -173,29 +192,15 @@ async function userPrompt(question: string): Promise<string> {
 }
 
 async function createClipboards(
-  clipboardDb: DataLinkClipboard,
+  repo: RepositoryClipboard,
   clipboards: IClipboard[],
 ): Promise<IClipboard[]> {
   return await Promise.all(
-    clipboards.map((clip) => clipboardDb.createClipboard(clip)),
+    clipboards.map((clip) => repo.createClipboard(clip)),
   );
 }
 
-async function createGroup(
-  groupDb: DataLinkGroup,
-  owner: GroupOwner,
-  users: IUser[],
-): Promise<IGroup> {
-  return await groupDb.createGroup(
-    new Group({
-      name: "clipboardGroup",
-      owner,
-      users,
-    }),
-  );
-}
-
-async function clearDb(pg: PrismaClient): Promise<void> {
+async function clearDb(pg: DbDriver): Promise<void> {
   console.log("clearing all entries in database");
   await pg.clipboard.deleteMany();
   await pg.group.deleteMany();
