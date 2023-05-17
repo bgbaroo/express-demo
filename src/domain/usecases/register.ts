@@ -1,5 +1,6 @@
 import { IRepositoryUser } from "../interfaces/repositories/user";
 import { IUseCaseUserRegister } from "../interfaces/usecases/user";
+
 import { IUser } from "../entities/user";
 
 export class UseCaseUserRegister implements IUseCaseUserRegister {

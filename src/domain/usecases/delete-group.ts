@@ -1,6 +1,7 @@
-import { IGroup } from "../entities/group";
-import { IRepositoryGroup } from "../interfaces/repositories/group";
 import { IUseCaseGroupDeleteGroup } from "../interfaces/usecases/group";
+import { IRepositoryGroup } from "../interfaces/repositories/group";
+
+import { IGroup } from "../entities/group";
 
 export class UseCaseGroupDeleteGroup implements IUseCaseGroupDeleteGroup {
   private readonly repo: IRepositoryGroup;

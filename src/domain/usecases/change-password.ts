@@ -1,5 +1,6 @@
-import { IRepositoryUser } from "../interfaces/repositories/user";
 import { IUseCaseUserChangePassword } from "../interfaces/usecases/user";
+import { IRepositoryUser } from "../interfaces/repositories/user";
+
 import { IUser } from "../entities/user";
 
 export class UseCaseUserChangePassword implements IUseCaseUserChangePassword {

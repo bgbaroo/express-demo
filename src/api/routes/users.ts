@@ -1,6 +1,6 @@
-import { Router } from "./router";
 import { HandlerFunc, HandlerFuncAuth } from "../app";
 import { authenticateJwt } from "../auth/jwt";
+import { Router } from "./router";
 
 export interface IHandlerUsers {
   register: HandlerFunc;

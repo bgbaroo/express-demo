@@ -1,4 +1,5 @@
 import { IRepositoryUser } from "../interfaces/repositories/user";
+
 import { IUser } from "../entities/user";
 
 export class UseCaseUserDeleteUser {

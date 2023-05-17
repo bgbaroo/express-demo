@@ -33,6 +33,12 @@ export class RepositoryClipboard implements IRepositoryClipboard {
     return await this.link.getClipboards(whereClipboard({ groupId }));
   }
 
+  async getGroupsClipboards(userId: string): Promise<IClipboard[] | null> {
+    return await this.link.getClipboards(
+      whereClipboard({ allGroups: true, userId }),
+    );
+  }
+
   async deleteUserClipboard(userId: string, id: string): Promise<IClipboard> {
     return await this.link.deleteClipboard({ id, userId });
   }

@@ -1,12 +1,13 @@
 import { HandlerFuncAuth } from "../app";
-import { Router } from "./router";
 import { authenticateJwt } from "../auth/jwt";
+import { Router } from "./router";
 
 export interface IHandlerClipboards {
   createClipboard: HandlerFuncAuth;
   getClipboard: HandlerFuncAuth;
   getClipboards: HandlerFuncAuth;
   getGroupClipboards: HandlerFuncAuth;
+  getGroupsClipboards: HandlerFuncAuth;
   deleteClipboard: HandlerFuncAuth;
   deleteClipboards: HandlerFuncAuth;
 }
@@ -19,6 +20,11 @@ export class RouterClipboard extends Router {
       "/group/:groupId",
       authenticateJwt,
       handler.getGroupClipboards.bind(handler),
+    );
+    this.router().get(
+      "/group",
+      authenticateJwt,
+      handler.getGroupsClipboards.bind(handler),
     );
     this.router().get(
       "/:id",

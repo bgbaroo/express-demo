@@ -31,7 +31,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to create clipboard: ${err}`));
   }
 
-  async getClipboard(where: IWhereClipboard): Promise<IClipboard | null> {
+  async getClipboard(
+    where: IWhereClipboard | undefined,
+  ): Promise<IClipboard | null> {
     return this.db.clipboard
       .findFirst({
         include: {
@@ -51,7 +53,9 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to get user clipboard ${err}`));
   }
 
-  async getClipboards(where: IWhereClipboard): Promise<IClipboard[] | null> {
+  async getClipboards(
+    where: IWhereClipboard | undefined,
+  ): Promise<IClipboard[] | null> {
     return this.db.clipboard
       .findMany({
         include: {

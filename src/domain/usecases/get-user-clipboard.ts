@@ -1,5 +1,6 @@
 import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
 import { IUseCaseGetUserClipboard } from "../interfaces/usecases/clipboard";
+
 import { IClipboard } from "../entities/clipboard";
 
 export class UseCaseGetUserClipboard implements IUseCaseGetUserClipboard {
