@@ -1,3 +1,4 @@
+import readline from "readline";
 import { PrismaClient } from "@prisma/client";
 import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
 import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
@@ -7,6 +8,7 @@ import { GroupOwner } from "../../src/domain/entities/group-owner";
 import { IGroup, Group } from "../../src/domain/entities/group";
 import { IUser, User } from "../../src/domain/entities/user";
 import { IClipboard, Clipboard } from "../../src/domain/entities/clipboard";
+import { whereClipboard } from "../../src/domain/interfaces/repositories/clipboard";
 
 describe("clipboards datalink", () => {
   const pg = new PrismaClient();
@@ -15,6 +17,8 @@ describe("clipboards datalink", () => {
   const clipboardDb = new DataLinkClipboard(pg);
 
   it("create clipboard", async () => {
+    await clearDbPrompt(pg);
+
     console.log("Creating owner");
     const ownerUser = await userDb.createUser(
       new User({
@@ -37,10 +41,10 @@ describe("clipboards datalink", () => {
 
     console.log("Getting clipboard");
     clipboards.forEach(async (clipboard) => {
-      const clip = await clipboardDb.getUserClipboard(
-        clipboard.id,
-        ownerUser.id,
-      );
+      const clip = await clipboardDb.getClipboard({
+        id: clipboard.id,
+        userId: ownerUser.id,
+      });
 
       if (!clip) {
         return Promise.reject("null clipboard");
@@ -68,7 +72,6 @@ describe("clipboards datalink", () => {
     console.log("Getting group clipboards");
     const groupClipboardsResult = await getGroupClipboards(
       clipboardDb,
-      users[0].id,
       group.id,
     );
     if (!groupClipboardsResult) {
@@ -81,9 +84,56 @@ describe("clipboards datalink", () => {
       expect(result.getUserId()).toBe(owner.id);
     });
 
+    console.log("clearing db post-tests");
+    await clearDb(pg);
+
     return Promise.resolve();
   });
 });
+
+async function clearDbPrompt(pg: PrismaClient): Promise<void> {
+  return userPrompt(
+    "Clear table 'clipboards', 'groups', and 'users' before tests? [y/Y]",
+  )
+    .then((answer) => {
+      if (answer.toUpperCase().includes("y")) {
+        Promise.resolve();
+      }
+
+      Promise.reject();
+    })
+    .then(async () => {
+      console.log("Clearing db pre-tests");
+
+      await clearDb(pg);
+    })
+    .catch((err) => {
+      if (err) {
+        console.error(`Got error: ${err}`);
+      }
+
+      console.log("Not clearing db before tests");
+    })
+    .finally(() => {
+      console.log("Starting tests");
+
+      return Promise.resolve();
+    });
+}
+
+async function userPrompt(question: string): Promise<string> {
+  return new Promise((resolve) => {
+    const readLine = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    readLine.question(question, (userInput: string) => {
+      readLine.close();
+      resolve(userInput);
+    });
+  });
+}
 
 async function createClipboards(
   clipboardDb: DataLinkClipboard,
@@ -110,9 +160,15 @@ async function createGroup(
 
 async function getGroupClipboards(
   clipboardDb: DataLinkClipboard,
-  userId: string,
   groupId: string,
 ): Promise<IClipboard[] | null> {
   console.log("Getting group clipboards");
-  return await clipboardDb.getGroupClipboards(groupId);
+  return await clipboardDb.getClipboards(whereClipboard({ groupId }));
+}
+
+async function clearDb(pg: PrismaClient): Promise<void> {
+  console.log("clearing all entries in database");
+  await pg.clipboard.deleteMany();
+  await pg.group.deleteMany();
+  await pg.user.deleteMany();
 }

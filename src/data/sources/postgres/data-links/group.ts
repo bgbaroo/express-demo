@@ -3,7 +3,7 @@ import modelGroup from "../data-models/group";
 import modelUser from "../data-models/user";
 
 import { IGroup } from "../../../../domain/entities/group";
-import { WhereGroup } from "../../../../domain/interfaces/repositories/group";
+import { IWhereGroup } from "../../../../domain/interfaces/repositories/group";
 
 export class DataLinkGroup extends BasePrismaSchemaDataLink {
   constructor(db: DbDriver) {
@@ -33,7 +33,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to create group: ${err}`));
   }
 
-  async getGroup(where: WhereGroup): Promise<IGroup | null> {
+  async getGroup(where: IWhereGroup): Promise<IGroup | null> {
     return this.db.group
       .findUnique({
         include: modelGroup.includeOwnerAndUsers(),
@@ -49,7 +49,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to get group: ${err}`));
   }
 
-  async getGroups(where: WhereGroup): Promise<IGroup[]> {
+  async getGroups(where: IWhereGroup): Promise<IGroup[]> {
     return this.db.group
       .findMany({
         include: modelGroup.includeOwnerAndUsers(),
@@ -87,7 +87,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to update group: ${err}`));
   }
 
-  async deleteGroup(where: WhereGroup): Promise<IGroup> {
+  async deleteGroup(where: IWhereGroup): Promise<IGroup> {
     return this.db.group
       .delete({
         include: modelGroup.includeOwnerAndUsers(),
@@ -97,7 +97,7 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`not implemented ${err}`));
   }
 
-  async deleteGroups(where: WhereGroup): Promise<number> {
+  async deleteGroups(where: IWhereGroup): Promise<number> {
     return this.db.group
       .deleteMany({
         where,

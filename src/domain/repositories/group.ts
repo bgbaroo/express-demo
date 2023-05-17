@@ -1,4 +1,7 @@
-import { IRepositoryGroup, WhereGroup } from "../interfaces/repositories/group";
+import {
+  IRepositoryGroup,
+  IWhereGroup,
+} from "../interfaces/repositories/group";
 import { IGroup } from "../entities/group";
 import { DataLinkGroup } from "../../data/sources/postgres/data-links/group";
 
@@ -13,11 +16,11 @@ export class RepositoryGroup implements IRepositoryGroup {
     return await this.link.createGroup(group);
   }
 
-  async getGroup(where: WhereGroup): Promise<IGroup | null> {
+  async getGroup(where: IWhereGroup): Promise<IGroup | null> {
     return await this.link.getGroup(where);
   }
 
-  async getGroups(where: WhereGroup): Promise<IGroup[]> {
+  async getGroups(where: IWhereGroup): Promise<IGroup[]> {
     return await this.link.getGroups(where);
   }
 
@@ -29,7 +32,7 @@ export class RepositoryGroup implements IRepositoryGroup {
     return await this.link.deleteGroup(group);
   }
 
-  async deleteGroups(where: WhereGroup): Promise<number> {
+  async deleteGroups(where: IWhereGroup): Promise<number> {
     return await this.link.deleteGroups(where);
   }
 }

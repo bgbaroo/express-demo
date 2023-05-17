@@ -1,7 +1,7 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "./link";
 import modelUser, { IUserData } from "../data-models/user";
 
-import { WhereUser } from "../../../../domain/interfaces/repositories/user";
+import { IWhereUser } from "../../../../domain/interfaces/repositories/user";
 import { IUser } from "../../../../domain/entities/user";
 
 export class DataLinkUser extends BasePrismaSchemaDataLink {
@@ -19,7 +19,7 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to create user: ${err}`));
   }
 
-  async getUser(where: WhereUser): Promise<IUserData | null> {
+  async getUser(where: IWhereUser): Promise<IUserData | null> {
     return this.db.user
       .findUnique({
         include: modelUser.includeGroupsAndOwnGroups(),
@@ -54,7 +54,7 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
   }
 
   // TODO: check if groups and ownGroups was updated
-  async updateUser(user: IUser, where: WhereUser): Promise<IUserData> {
+  async updateUser(user: IUser, where: IWhereUser): Promise<IUserData> {
     return this.db.user
       .update({
         include: modelUser.includeGroupsAndOwnGroups(),

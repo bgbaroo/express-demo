@@ -1,6 +1,9 @@
 import { DataLinkClipboard } from "../../data/sources/postgres/data-links/clipboard";
 import { IClipboard } from "../entities/clipboard";
-import { IRepositoryClipboard } from "../interfaces/repositories/clipboard";
+import {
+  IRepositoryClipboard,
+  whereClipboard,
+} from "../interfaces/repositories/clipboard";
 
 export class RepositoryClipboard implements IRepositoryClipboard {
   private readonly link: DataLinkClipboard;
@@ -17,31 +20,24 @@ export class RepositoryClipboard implements IRepositoryClipboard {
     id: string,
     userId: string,
   ): Promise<IClipboard | null> {
-    return await this.link.getUserClipboard(id, userId);
+    return await this.link.getClipboard(
+      whereClipboard({ clipboardId: id, userId: userId }),
+    );
   }
 
   async getUserClipboards(userId: string): Promise<IClipboard[] | null> {
-    return await this.link.getUserClipboards(userId);
+    return await this.link.getClipboards({ userId });
   }
 
   async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
-    return await this.link.getGroupClipboards(groupId);
+    return await this.link.getClipboards(whereClipboard({ groupId }));
   }
 
   async deleteUserClipboard(userId: string, id: string): Promise<IClipboard> {
-    const clip = await this.link.getUserClipboard(id, userId);
-    if (!clip) {
-      return Promise.reject(`no such clipboard: ${id}`);
-    }
-
-    if (clip.getUserId() != userId) {
-      return Promise.reject(`clipboard does not belong to userId ${userId}`);
-    }
-
-    return await this.link.deleteClipboard(clip.id);
+    return await this.link.deleteClipboard({ id, userId });
   }
 
   async deleteUserClipboards(userId: string): Promise<number> {
-    return await this.link.deleteUserClipboards(userId);
+    return await this.link.deleteClipboards({ userId });
   }
 }

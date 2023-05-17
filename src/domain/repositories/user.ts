@@ -1,7 +1,7 @@
 import { DataLinkUser } from "../../data/sources/postgres/data-links/user";
 import { IUserData } from "../../data/sources/postgres/data-models/user";
 import { IUser } from "../entities/user";
-import { IRepositoryUser, WhereUser } from "../interfaces/repositories/user";
+import { IRepositoryUser, IWhereUser } from "../interfaces/repositories/user";
 
 export class RepositoryUser implements IRepositoryUser {
   private link: DataLinkUser;
@@ -14,7 +14,7 @@ export class RepositoryUser implements IRepositoryUser {
     return await this.link.createUser(user, password);
   }
 
-  async getUser(where: WhereUser): Promise<IUserData> {
+  async getUser(where: IWhereUser): Promise<IUserData> {
     const user = await this.link.getUser(where);
     if (!user) {
       return Promise.reject(`null user: ${where}`);
@@ -32,7 +32,7 @@ export class RepositoryUser implements IRepositoryUser {
     return Promise.resolve(users);
   }
 
-  async updateUser(user: IUser, where: WhereUser): Promise<IUserData> {
+  async updateUser(user: IUser, where: IWhereUser): Promise<IUserData> {
     return await this.link.updateUser(user, where);
   }
 

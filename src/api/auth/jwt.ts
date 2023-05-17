@@ -1,6 +1,6 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import response from "../response";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const authSecret = process.env.AUTH_SECRET || "express-demo";
 
