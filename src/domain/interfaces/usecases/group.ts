@@ -19,3 +19,7 @@ export interface IUseCaseGroupGetUserOwnedGroups {
 export interface IUseCaseGroupDeleteGroup {
   execute(userId: string, id: String): Promise<IGroup>;
 }
+
+export interface IUseCaseGroupDeleteUserGroups {
+  execute(userId: string): Promise<number>;
+}

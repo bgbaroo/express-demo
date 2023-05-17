@@ -17,6 +17,7 @@ enum Codes {
 enum Bodies {
   NotImplemented = "api not yet implemented",
   MissingField = "missing field",
+  MissingParam = "missing param",
 }
 
 class JsonResp {
@@ -65,7 +66,12 @@ async function NotImplemented(
 }
 
 async function MissingField(res: Response, field: string): Promise<Response> {
-  const body = Bodies.MissingField + ` '${field}'`;
+  const body = `${Bodies.MissingField}: '${field}'`;
+  return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
+}
+
+async function MissingParam(res: Response, param: string): Promise<Response> {
+  const body = `${Bodies.MissingParam}: '${param}'`;
   return new JsonResp(Codes.BadRequest, body).marshal(res, "error");
 }
 
@@ -95,6 +101,7 @@ async function Unauthorized(res: Response, body: any) {
 export default {
   NotImplemented,
   MissingField,
+  MissingParam,
   Ok,
   Created,
   NotFound,

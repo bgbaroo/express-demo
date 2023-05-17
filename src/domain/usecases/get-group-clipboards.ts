@@ -9,7 +9,7 @@ export class UseCaseGetGroupClipboards implements IUseCaseGetGroupClipboards {
     this.repo = repo;
   }
 
-  async execute(groupId: string): Promise<IClipboard[] | null> {
-    return await this.repo.getGroupClipboards(groupId);
+  async execute(userId: string, groupId: string): Promise<IClipboard[] | null> {
+    return await this.repo.getGroupClipboards(userId, groupId);
   }
 }

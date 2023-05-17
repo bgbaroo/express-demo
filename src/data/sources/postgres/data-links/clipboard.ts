@@ -114,7 +114,10 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
       );
   }
 
-  async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
+  async getGroupClipboards(
+    groupId: string,
+    userId?: string,
+  ): Promise<IClipboard[] | null> {
     return this.db.clipboard
       .findMany({
         include: {
@@ -127,6 +130,11 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
             groups: {
               some: {
                 id: groupId,
+                users: {
+                  some: {
+                    id: userId,
+                  },
+                },
               },
             },
           },

@@ -14,6 +14,7 @@ export interface IHandlerUsers {
 export class RouterUsers extends Router {
   constructor(handler: IHandlerUsers) {
     super();
+
     this.router().post("/register", handler.register.bind(handler));
     this.router().post("/login", handler.login.bind(handler));
 

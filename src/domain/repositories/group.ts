@@ -28,4 +28,8 @@ export class RepositoryGroup implements IRepositoryGroup {
   async deleteGroup(group: IGroup): Promise<IGroup> {
     return await this.link.deleteGroup(group);
   }
+
+  async deleteGroups(where: WhereGroup): Promise<number> {
+    return await this.link.deleteGroups(where);
+  }
 }

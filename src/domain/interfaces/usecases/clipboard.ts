@@ -13,7 +13,7 @@ export interface IUseCaseGetUserClipboards {
 }
 
 export interface IUseCaseGetGroupClipboards {
-  execute(groupId: string): Promise<IClipboard[] | null>;
+  execute(userId: string, groupId: string): Promise<IClipboard[] | null>;
 }
 
 export interface IUseCaseDeleteUserClipboard {

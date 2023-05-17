@@ -9,7 +9,8 @@ export interface JwtTokenPayload {
   email: string;
 }
 
-export interface AuthRequest extends Request {
+export interface AuthRequest<Params, ResBody, ReqBody, ReqQuery>
+  extends Request<Params, ResBody, ReqBody, ReqQuery> {
   token: string | JwtPayload;
   payload: JwtTokenPayload;
 }
@@ -38,8 +39,8 @@ export function authenticateJwt(
     }
 
     const decoded = jwt.verify(token, authSecret);
-    (req as AuthRequest).token = decoded;
-    (req as AuthRequest).payload = {
+    (req as AuthRequest<any, any, any, any>).token = decoded;
+    (req as AuthRequest<any, any, any, any>).payload = {
       id: decoded["id"],
       email: decoded["email"],
     };

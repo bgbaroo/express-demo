@@ -96,4 +96,13 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .then((result) => Promise.resolve(modelGroup.toGroupWithMembers(result)))
       .catch((err) => Promise.reject(`not implemented ${err}`));
   }
+
+  async deleteGroups(where: WhereGroup): Promise<number> {
+    return this.db.group
+      .deleteMany({
+        where,
+      })
+      .then(({ count }) => Promise.resolve(count))
+      .catch((err) => Promise.reject(`not implemented ${err}`));
+  }
 }

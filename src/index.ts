@@ -15,6 +15,8 @@ import { UseCaseUserChangePassword } from "./domain/usecases/change-password";
 import { UseCaseUserDeleteUser } from "./domain/usecases/delete-user";
 
 import { UseCaseGroupCreateGroup } from "./domain/usecases/create-group";
+import { UseCaseGroupDeleteGroup } from "./domain/usecases/delete-group";
+import { UseCaseGroupDeleteUserGroups } from "./domain/usecases/delete-user-groups";
 
 import { UseCaseCreateClipboard } from "./domain/usecases/create-clipboard";
 import { UseCaseDeleteUserClipboard } from "./domain/usecases/delete-user-clipboard";
@@ -26,7 +28,7 @@ import { App } from "./api/app";
 import { HandlerClipboards } from "./api/handlers/clipboards";
 import { HandlerGroups } from "./api/handlers/groups";
 import { HandlerUsers } from "./api/handlers/users";
-import { UseCaseGroupDeleteGroup } from "./domain/usecases/delete-group";
+import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboards";
 
 async function main(): Promise<void> {
   dotenv.config();
@@ -41,21 +43,23 @@ async function main(): Promise<void> {
     deleteUser: new UseCaseUserDeleteUser(repoUser),
   });
 
+  const dataLinkGroup = new DataLinkGroup(dataLink);
+  const repoGroup = new RepositoryGroup(dataLinkGroup);
+  const handlerGroups = new HandlerGroups({
+    createGroup: new UseCaseGroupCreateGroup(repoGroup),
+    deleteGroup: new UseCaseGroupDeleteGroup(repoGroup),
+    deleteGroups: new UseCaseGroupDeleteUserGroups(repoGroup),
+  });
+
   const dataLinkClipboard = new DataLinkClipboard(dataLink);
   const repoClipboard = new RepositoryClipboard(dataLinkClipboard);
   const handlerClipboards = new HandlerClipboards({
     createClipboard: new UseCaseCreateClipboard(repoClipboard),
     getClipboard: new UseCaseGetUserClipboard(repoClipboard),
     getClipboards: new UseCaseGetUserClipboards(repoClipboard),
+    getGroupClipboards: new UseCaseGetGroupClipboards(repoClipboard),
     deleteClipboard: new UseCaseDeleteUserClipboard(repoClipboard),
     deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboard),
-  });
-
-  const dataLinkGroup = new DataLinkGroup(dataLink);
-  const repoGroup = new RepositoryGroup(dataLinkGroup);
-  const handlerGroups = new HandlerGroups({
-    createGroup: new UseCaseGroupCreateGroup(repoGroup),
-    deleteGroup: new UseCaseGroupDeleteGroup(repoGroup),
   });
 
   const app = new App({

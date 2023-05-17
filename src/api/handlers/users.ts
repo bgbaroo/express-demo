@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import resp from "../response";
-import { AuthRequest, JwtTokenPayload, generateJwt } from "../auth/jwt";
+import { JwtTokenPayload, generateJwt } from "../auth/jwt";
 import { IHandlerUsers } from "../routes/users";
 import {
   IUseCaseUserRegister,
@@ -13,6 +13,7 @@ import {
 
 import { AppErrors } from "../../domain/errors";
 import { User } from "../../domain/entities/user";
+import { GenericAuthRequest } from "../request";
 
 export class HandlerUsers implements IHandlerUsers {
   private readonly usecaseRegister: IUseCaseUserRegister;
@@ -76,20 +77,23 @@ export class HandlerUsers implements IHandlerUsers {
         return resp.Ok(res, { email: user.email, id: user.id, token });
       })
       .catch((err) => {
-        console.error(`failed to create user ${email}: ${err}`);
+        console.error(`failed to login user ${email}: ${err}`);
         return resp.InternalServerError(res, `failed to login user ${email}`);
       });
   }
 
-  async logout(_req: AuthRequest, res: Response): Promise<Response> {
+  async logout(_req: GenericAuthRequest, res: Response): Promise<Response> {
     if (this.usecaseLogout === undefined) {
-      return resp.NotImplemented(res, "login");
+      return resp.NotImplemented(res, "logout");
     }
 
-    return resp.NotImplemented(res, "login");
+    return resp.NotImplemented(res, "logout");
   }
 
-  async changePassword(req: AuthRequest, res: Response): Promise<Response> {
+  async changePassword(
+    req: GenericAuthRequest,
+    res: Response,
+  ): Promise<Response> {
     if (!req.payload || !req.payload.email || req.payload.id) {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
@@ -113,7 +117,7 @@ export class HandlerUsers implements IHandlerUsers {
       });
   }
 
-  async deleteUser(req: AuthRequest, res: Response): Promise<Response> {
+  async deleteUser(req: GenericAuthRequest, res: Response): Promise<Response> {
     if (!req.payload || !req.payload.email || req.payload.id) {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }

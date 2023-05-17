@@ -68,6 +68,7 @@ describe("clipboards datalink", () => {
     console.log("Getting group clipboards");
     const groupClipboardsResult = await getGroupClipboards(
       clipboardDb,
+      users[0].id,
       group.id,
     );
     if (!groupClipboardsResult) {
@@ -109,6 +110,7 @@ async function createGroup(
 
 async function getGroupClipboards(
   clipboardDb: DataLinkClipboard,
+  userId: string,
   groupId: string,
 ): Promise<IClipboard[] | null> {
   console.log("Getting group clipboards");

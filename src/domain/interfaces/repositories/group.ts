@@ -14,4 +14,5 @@ export interface IRepositoryGroup {
   getGroups(where: WhereGroup): Promise<IGroup[]>;
   updateGroup(group: IGroup): Promise<IGroup>;
   deleteGroup(where: WhereGroup): Promise<IGroup>;
+  deleteGroups(where: WhereGroup): Promise<number>;
 }

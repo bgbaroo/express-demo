@@ -1,23 +1,32 @@
 import { Response } from "express";
 
 import resp from "../response";
+import { GenericAuthRequest } from "../request";
 import { AuthRequest } from "../auth/jwt";
+import { AppErrors } from "../../domain/errors";
 import { IHandlerClipboards } from "../routes/clipboards";
 import {
   IUseCaseCreateClipboard,
   IUseCaseDeleteUserClipboard,
   IUseCaseDeleteUserClipboards,
+  IUseCaseGetGroupClipboards,
   IUseCaseGetUserClipboard,
   IUseCaseGetUserClipboards,
 } from "../../domain/interfaces/usecases/clipboard";
 
-import { IClipboard, Clipboard } from "../../domain/entities/clipboard";
+import { Clipboard } from "../../domain/entities/clipboard";
 import { User } from "../../domain/entities/user";
+
+interface CreateClipboardBody {
+  title?: string;
+  content: string;
+}
 
 export class HandlerClipboards implements IHandlerClipboards {
   private readonly usecaseCreateClipboard: IUseCaseCreateClipboard;
   private readonly usecaseGetUserClipboard: IUseCaseGetUserClipboard;
   private readonly usecaseGetUserClipboards: IUseCaseGetUserClipboards;
+  private readonly usecaseGetGroupClipboards: IUseCaseGetGroupClipboards;
   private readonly usecaseDeleteUserClipboard: IUseCaseDeleteUserClipboard;
   private readonly usecaseDeleteUserClipboards: IUseCaseDeleteUserClipboards;
 
@@ -25,56 +34,65 @@ export class HandlerClipboards implements IHandlerClipboards {
     createClipboard: IUseCaseCreateClipboard;
     getClipboard: IUseCaseGetUserClipboard;
     getClipboards: IUseCaseGetUserClipboards;
+    getGroupClipboards: IUseCaseGetGroupClipboards;
     deleteClipboard: IUseCaseDeleteUserClipboard;
     deleteClipboards: IUseCaseDeleteUserClipboards;
   }) {
     this.usecaseCreateClipboard = arg.createClipboard;
     this.usecaseGetUserClipboard = arg.getClipboard;
+    this.usecaseGetUserClipboards = arg.getClipboards;
+    this.usecaseGetGroupClipboards = arg.getGroupClipboards;
     this.usecaseDeleteUserClipboard = arg.deleteClipboard;
     this.usecaseDeleteUserClipboards = arg.deleteClipboards;
   }
 
-  async createClipboard(req: AuthRequest, res: Response): Promise<Response> {
-    const { userId, content, title } = req.body;
-    if (!userId) {
-      return resp.MissingField(res, "userId");
-    }
+  async createClipboard(
+    req: AuthRequest<any, any, CreateClipboardBody, any>,
+    res: Response,
+  ): Promise<Response> {
+    const { content, title } = req.body;
     if (!content) {
       return resp.MissingField(res, "content");
     }
 
-    // PreClipboard is clipboard without field id (not known yet)
-    const clipboard: IClipboard = new Clipboard({
-      user: new User({ email: "foo" }),
-      title: title,
-      content: "bar",
-    });
+    const { id: userId, email } = req.payload;
+    if (!userId || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
+    }
 
     return this.usecaseCreateClipboard
-      .execute(clipboard)
-      .then(() => resp.Created(res, clipboard))
+      .execute(
+        new Clipboard({
+          title,
+          content,
+          user: new User({ id: userId, email }),
+        }),
+      )
+      .then((clipboard) => resp.Created(res, clipboard))
       .catch((err) =>
         resp.InternalServerError(res, `failed to create clipboard: ${err}`),
       );
   }
 
-  async getClipboard(req: AuthRequest, res: Response): Promise<Response> {
-    if (!req.payload) {
-      return resp.InternalServerError(res, "");
-    }
-    const { id, userId } = req.body;
-    if (!id) {
-      return resp.MissingField(res, "id");
+  async getClipboard(
+    req: AuthRequest<{ id: string }, any, any, any>,
+    res: Response,
+  ): Promise<Response> {
+    if (!req.params.id) {
+      return resp.MissingParam(res, "id");
     }
 
-    if (!userId) {
-      return resp.MissingField(res, "userId");
+    const { id: userId, email } = req.payload;
+    if (!userId || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
+
+    const id = req.params.id;
 
     return this.usecaseGetUserClipboard
       .execute(userId, id)
       .then((clip) => {
-        if (clip === undefined) {
+        if (!clip) {
           return resp.NotFound(res, `clipboard ${id} not found`);
         }
 
@@ -85,24 +103,26 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async getClipboards(req: AuthRequest, res: Response): Promise<Response> {
-    const { userId } = req.body;
-
-    if (!userId) {
-      return resp.MissingField(res, "userId");
+  async getClipboards(
+    req: GenericAuthRequest,
+    res: Response,
+  ): Promise<Response> {
+    const { id: userId, email } = req.payload;
+    if (!userId || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
     return this.usecaseGetUserClipboards
       .execute(userId)
       .then((clipboards) => {
-        if (clipboards) {
-          return resp.Ok(res, clipboards);
+        if (!clipboards) {
+          return resp.NotFound(
+            res,
+            `clipboards for user ${userId} was not found`,
+          );
         }
 
-        return resp.NotFound(
-          res,
-          `clipboards for user ${userId} was not found`,
-        );
+        return resp.Ok(res, clipboards);
       })
       .catch((err) =>
         resp.InternalServerError(
@@ -112,16 +132,51 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async deleteClipboard(req: AuthRequest, res: Response): Promise<Response> {
-    const { id, userId } = req.body;
+  async getGroupClipboards(
+    req: AuthRequest<{ id: string }, any, any, any>,
+    res: Response,
+  ): Promise<Response> {
+    const id = req.params.id;
     if (!id) {
       return resp.MissingField(res, "id");
     }
-
-    if (!userId) {
-      return resp.MissingField(res, "userId");
+    const { id: userId, email } = req.payload;
+    if (!userId || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
+    return this.usecaseGetGroupClipboards
+      .execute(userId, id)
+      .then((clipboards) => {
+        if (!clipboards || clipboards.length === 0) {
+          return resp.NotFound(res, `clipboards not found for group ${id}`);
+        }
+
+        return resp.Ok(res, clipboards);
+      })
+      .catch((err) => {
+        console.error(`failed to get group ${id} clipboards`);
+        return resp.InternalServerError(
+          res,
+          `failed to get group ${id} clipboards`,
+        );
+      });
+  }
+
+  async deleteClipboard(
+    req: AuthRequest<{ id: string }, any, any, any>,
+    res: Response,
+  ): Promise<Response> {
+    if (!req.params.id) {
+      return resp.MissingParam(res, "id");
+    }
+
+    const { id: userId, email } = req.payload;
+    if (!userId || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
+    }
+
+    const id = req.params.id;
     return this.usecaseDeleteUserClipboard
       .execute(userId, id)
       .then((deleted) => {
@@ -139,26 +194,28 @@ export class HandlerClipboards implements IHandlerClipboards {
       );
   }
 
-  async deleteClipboards(req: AuthRequest, res: Response): Promise<Response> {
-    const { userId } = req.body;
-
-    if (!userId) {
-      return resp.MissingField(res, "userId");
+  async deleteClipboards(
+    req: GenericAuthRequest,
+    res: Response,
+  ): Promise<Response> {
+    const { id: userId, email } = req.payload;
+    if (!userId || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
     return this.usecaseDeleteUserClipboards
       .execute(userId)
       .then((deleteds) => {
-        if (deleteds) {
-          return resp.Ok(
+        if (deleteds === 0) {
+          return resp.NotFound(
             res,
-            `${deleteds} clipboards from user ${userId} deleted`,
+            `clipboards for user ${userId} was not found`,
           );
         }
 
-        return resp.NotFound(
+        return resp.Ok(
           res,
-          `clipboards for user ${userId} was not found`,
+          `${deleteds} clipboards from user ${userId} deleted`,
         );
       })
       .catch((err) =>
