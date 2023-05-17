@@ -42,7 +42,7 @@ describe("groups and clipboards", () => {
       await testGroupClipboards(arg);
       await clearDb(arg.dbDriver);
     } catch (err) {
-      // Clear databases after error
+      // Clear databases after error too
       console.error(`Got error: ${err}`);
       await clearDb(arg.dbDriver);
 
