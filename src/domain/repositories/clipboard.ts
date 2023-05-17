@@ -1,4 +1,4 @@
-import { DataLinkClipboard } from "../../data/sources/postgres/data-links/clipboard";
+import { IDataLinkClipboard } from "../../data/interfaces/data-links";
 import { IClipboard } from "../entities/clipboard";
 import {
   IRepositoryClipboard,
@@ -6,9 +6,9 @@ import {
 } from "../interfaces/repositories/clipboard";
 
 export class RepositoryClipboard implements IRepositoryClipboard {
-  private readonly link: DataLinkClipboard;
+  private readonly link: IDataLinkClipboard;
 
-  constructor(link: DataLinkClipboard) {
+  constructor(link: IDataLinkClipboard) {
     this.link = link;
   }
 

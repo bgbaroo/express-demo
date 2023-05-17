@@ -4,8 +4,12 @@ import userModel from "../data-models/user";
 
 import { IWhereClipboard } from "../../../../domain/interfaces/repositories/clipboard";
 import { IClipboard } from "../../../../domain/entities/clipboard";
+import { IDataLinkClipboard } from "../../../interfaces/data-links";
 
-export class DataLinkClipboard extends BasePrismaSchemaDataLink {
+export class DataLinkClipboard
+  extends BasePrismaSchemaDataLink
+  implements IDataLinkClipboard
+{
   constructor(db: DbDriver) {
     super(db);
   }

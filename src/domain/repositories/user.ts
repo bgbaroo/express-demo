@@ -1,12 +1,12 @@
-import { DataLinkUser } from "../../data/sources/postgres/data-links/user";
+import { IDataLinkUser } from "../../data/interfaces/data-links";
 import { IUserData } from "../../data/sources/postgres/data-models/user";
 import { IUser } from "../entities/user";
 import { IRepositoryUser, IWhereUser } from "../interfaces/repositories/user";
 
 export class RepositoryUser implements IRepositoryUser {
-  private link: DataLinkUser;
+  private link: IDataLinkUser;
 
-  constructor(link: DataLinkUser) {
+  constructor(link: IDataLinkUser) {
     this.link = link;
   }
 

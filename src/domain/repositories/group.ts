@@ -1,14 +1,14 @@
+import { IDataLinkGroup } from "../../data/interfaces/data-links";
 import {
   IRepositoryGroup,
   IWhereGroup,
 } from "../interfaces/repositories/group";
+
 import { IGroup } from "../entities/group";
-import { DataLinkGroup } from "../../data/sources/postgres/data-links/group";
-
 export class RepositoryGroup implements IRepositoryGroup {
-  private link: DataLinkGroup;
+  private link: IDataLinkGroup;
 
-  constructor(link: DataLinkGroup) {
+  constructor(link: IDataLinkGroup) {
     this.link = link;
   }
 
