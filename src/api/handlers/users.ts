@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
+
+import resp from "../response";
 import { AuthRequest, JwtTokenPayload, generateJwt } from "../auth/jwt";
 import { IHandlerUsers } from "../routes/users";
-import resp from "../response";
 import {
   IUseCaseUserRegister,
   IUseCaseUserLogin,

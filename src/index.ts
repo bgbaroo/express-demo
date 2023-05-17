@@ -2,31 +2,31 @@ import dotenv from "dotenv";
 import postgres from "./data/sources/postgres";
 
 import { DataLinkUser } from "./data/sources/postgres/data-links/user";
+import { DataLinkGroup } from "./data/sources/postgres/data-links/group";
+import { DataLinkClipboard } from "./data/sources/postgres/data-links/clipboard";
+
+import { RepositoryUser } from "./domain/repositories/user";
 import { RepositoryClipboard } from "./domain/repositories/clipboard";
-import { UseCaseGroupCreateGroup } from "./domain/usecases/group";
-import {
-  UseCaseUserRegister,
-  UseCaseUserLogin,
-  UseCaseUserChangePassword,
-  UseCaseUserDeleteUser,
-  UseCaseUserGetUser,
-} from "./domain/usecases/user";
-import {
-  UseCaseCreateClipboard,
-  UseCaseDeleteUserClipboard,
-  UseCaseDeleteUserClipboards,
-  UseCaseGetUserClipboard,
-  UseCaseGetUserClipboards,
-} from "./domain/usecases/clipboard";
+import { RepositoryGroup } from "./domain/repositories/group";
+
+import { UseCaseUserRegister } from "./domain/usecases/register";
+import { UseCaseUserLogin } from "./domain/usecases/login";
+import { UseCaseUserChangePassword } from "./domain/usecases/change-password";
+import { UseCaseUserDeleteUser } from "./domain/usecases/delete-user";
+
+import { UseCaseGroupCreateGroup } from "./domain/usecases/create-group";
+
+import { UseCaseCreateClipboard } from "./domain/usecases/create-clipboard";
+import { UseCaseDeleteUserClipboard } from "./domain/usecases/delete-user-clipboard";
+import { UseCaseGetUserClipboard } from "./domain/usecases/get-user-clipboard";
+import { UseCaseDeleteUserClipboards } from "./domain/usecases/delete-user-clipboards";
+import { UseCaseGetUserClipboards } from "./domain/usecases/get-user-clipboards";
 
 import { App } from "./api/app";
 import { HandlerClipboards } from "./api/handlers/clipboards";
 import { HandlerGroups } from "./api/handlers/groups";
 import { HandlerUsers } from "./api/handlers/users";
-import { RepositoryUser } from "./domain/repositories/user";
-import { DataLinkClipboard } from "./data/sources/postgres/data-links/clipboard";
-import { DataLinkGroup } from "./data/sources/postgres/data-links/group";
-import { RepositoryGroup } from "./domain/repositories/group";
+import { UseCaseGroupDeleteGroup } from "./domain/usecases/delete-group";
 
 async function main(): Promise<void> {
   dotenv.config();
@@ -55,7 +55,7 @@ async function main(): Promise<void> {
   const repoGroup = new RepositoryGroup(dataLinkGroup);
   const handlerGroups = new HandlerGroups({
     createGroup: new UseCaseGroupCreateGroup(repoGroup),
-    getUser: new UseCaseUserGetUser(repoUser),
+    deleteGroup: new UseCaseGroupDeleteGroup(repoGroup),
   });
 
   const app = new App({
@@ -64,7 +64,7 @@ async function main(): Promise<void> {
     group: handlerGroups,
   });
 
-  // Graceful shutdowns are implemented in listenAndServe
+  // Graceful shutdowns for HTTP server are implemented in listenAndServe
   return app.listenAndServe(8000);
 }
 

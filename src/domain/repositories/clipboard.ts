@@ -24,6 +24,10 @@ export class RepositoryClipboard implements IRepositoryClipboard {
     return await this.link.getUserClipboards(userId);
   }
 
+  async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
+    return await this.link.getGroupClipboards(groupId);
+  }
+
   async deleteUserClipboard(userId: string, id: string): Promise<IClipboard> {
     const clip = await this.link.getUserClipboard(id, userId);
     if (!clip) {
@@ -38,6 +42,6 @@ export class RepositoryClipboard implements IRepositoryClipboard {
   }
 
   async deleteUserClipboards(userId: string): Promise<number> {
-    return this.link.deleteUserClipboards(userId);
+    return await this.link.deleteUserClipboards(userId);
   }
 }

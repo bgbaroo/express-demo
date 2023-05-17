@@ -87,13 +87,11 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
       .catch((err) => Promise.reject(`failed to update group: ${err}`));
   }
 
-  async deleteGroup(group: IGroup): Promise<IGroup> {
+  async deleteGroup(where: WhereGroup): Promise<IGroup> {
     return this.db.group
       .delete({
         include: modelGroup.includeOwnerAndUsers(),
-        where: {
-          id: group.id,
-        },
+        where,
       })
       .then((result) => Promise.resolve(modelGroup.toGroupWithMembers(result)))
       .catch((err) => Promise.reject(`not implemented ${err}`));
