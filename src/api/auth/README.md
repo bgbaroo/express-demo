@@ -10,8 +10,8 @@ yet connected:
 
 1. Registration and logins
 
-   > Storing user sensitive information like passwords deserves its
-   > own topic.
+   > Storing user sensitive information like passwords deserves
+   > [its own topic](../../domain/usecases/util/).
 
    Registration is when your user first signs up to your service.
    It generally requires a user ID, like an email, and a secret,
