@@ -38,12 +38,12 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
   ): Promise<IClipboard | null> {
     return this.db.clipboard
       .findFirst({
+        where,
         include: {
           user: {
             include: userModel.includeGroupsAndOwnGroups(),
           },
         },
-        where: where,
       })
       .then((result) => {
         if (!result) {
@@ -60,12 +60,12 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
   ): Promise<IClipboard[] | null> {
     return this.db.clipboard
       .findMany({
+        where,
         include: {
           user: {
             include: userModel.includeGroupsAndOwnGroups(),
           },
         },
-        where,
       })
       .then((result) => {
         if (!result) {
@@ -80,12 +80,12 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
   async deleteClipboard(where: IWhereClipboard): Promise<IClipboard> {
     return this.db.clipboard
       .delete({
+        where,
         include: {
           user: {
             include: userModel.includeGroupsAndOwnGroups(),
           },
         },
-        where,
       })
       .then((result) => Promise.resolve(model.toClipboard(result)))
       .catch((err) => Promise.reject(`failed to delete clipboard: ${err}`));

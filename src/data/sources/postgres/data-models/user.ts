@@ -13,9 +13,15 @@ interface DataModelUserWithGroups extends DataModelUser {
 type AppDataModelUser = Omit<DataModelUser, DbOnly>;
 type AppDataModelUserWithGroups = Omit<DataModelUserWithGroups, DbOnly>;
 
+// Includes ownly top-level information of DataModelGroup
 interface IIncludeGroups {
   groups: boolean;
   ownGroups: boolean;
+}
+
+// Fields of a group required for the user to create it
+interface UserCreateGroup {
+  name: string;
 }
 
 interface ICreateGroupOwner extends AppDataModelUser {
@@ -25,9 +31,6 @@ interface ICreateGroupOwner extends AppDataModelUser {
   };
 }
 
-interface UserCreateGroup {
-  name: string;
-}
 interface IUserId {
   id: string;
 }

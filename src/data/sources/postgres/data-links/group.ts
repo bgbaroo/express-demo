@@ -36,8 +36,8 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroup(where: IWhereGroup): Promise<IGroup | null> {
     return this.db.group
       .findUnique({
+        where,
         include: modelGroup.includeOwnerAndUsers(),
-        where: where,
       })
       .then((result) => {
         if (!result) {
@@ -52,8 +52,8 @@ export class DataLinkGroup extends BasePrismaSchemaDataLink {
   async getGroups(where: IWhereGroup): Promise<IGroup[]> {
     return this.db.group
       .findMany({
+        where,
         include: modelGroup.includeOwnerAndUsers(),
-        where: where,
       })
       .then((groups) =>
         groups.map((group) => {

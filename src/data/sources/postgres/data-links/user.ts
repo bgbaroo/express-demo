@@ -23,7 +23,7 @@ export class DataLinkUser extends BasePrismaSchemaDataLink {
     return this.db.user
       .findUnique({
         include: modelUser.includeGroupsAndOwnGroups(),
-        where: where,
+        where,
       })
       .then((user) => {
         if (!user) {
