@@ -11,7 +11,7 @@ yet connected:
 1. Registration and logins
 
    > Storing user sensitive information like passwords deserves its
-   > own topic
+   > own topic.
 
    Registration is when your user first signs up to your service.
    It generally requires a user ID, like an email, and a secret,
@@ -38,7 +38,9 @@ yet connected:
 ## JWT authentication
 
 [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) is one of the most popular
-strategy for authention. It is stateless by design, which means that it does not
+strategy for authentication.
+
+It is stateless by design, which means that it does not
 store states, so features like logging out cannot be implemented entirely
 using JWT.
 
@@ -49,26 +51,31 @@ The resulting token contains all of the information about the JWT, including
 the payload, the algorithms used to encode/decode the token, other metadata
 like issuer and audience of the token, and token expiration.
 
-In our app, when the users login, the server signs a new JWT with a simple
-payload `{id: string, email: string}` with its secret key string.
+The information embedded in the token allows the token issuer to know
+how to decode the token, as well as its expiration status.
 
-The server returns the token to the client, which then attaches the token to
-its subsequent HTTP request header `Authorization`
+In our app, when the users login, the server signs a new JWT with a simple
+payload `{id: string, email: string}` with its secret key (supplied via env).
+
+In the login response, the server returns the token to the client,
+which then attaches the token to its subsequent HTTP request header
+`Authorization Bearer <JWT string>`
 
 When users access protected resources, the server takes the token out of the
-client's request header. If none is found, the server returns a
-`401 Unauthorized` error.
+client's request header and tries to decode it. If none is found,
+the server returns a `401 Unauthorized` error.
 
 If the token was found in the header, the server then decodes it with its
-secret key, and if that went bad, also returns a `401` error. Expired tokens
+secret key, and if unsuccessful, returns a `401` error. Expired tokens
 will produce the same result.
 
-If the token was successfully verified and decoded, the server stores the
-reconstructed payload for its own use.
+If the token was successfully verified and decoded, the server does something
+with the reconstructed payload for its own use.
 
 This means that if the token is good, then the client did not have to
-authenticate again, or tell the server who it is, since the payload information
-(by our own choice) already contains the `id` and `email` information.
+authenticate again, or tell the server who it is, since the JWT already contains
+authorization information (via _payload_, by our own choice) already contains
+the `id` and `email` information.
 
 ## JWT middleware
 
@@ -77,13 +84,14 @@ need to have JWT authentication. It would be tiring to write the authorization
 strategy in every endpoint handler, so instead of creating duplicate code,
 we will instead use a middleware.
 
-An Express middleware is basically a handler. Tntercepts a request,
-does something with it, and passes the request on to the _next_ handler.
+An Express middleware is basically a handler. Middleware intercept requests,
+do something with it, and passes the request on to the _next_ handler if
+they think so.
 
 In our context, [our JWT authentication middleware `authenticateJwt`](./jwt.ts)
-will intercept all incoming requests for protected routes, extracted JWTs from
-the headers, and early-returns a `401` if authentication went bad without our
-_next handler_ having to do anything.
+will intercept all incoming requests for protected routes, extracts JWTs from
+the headers, and early-returns a `401` if authentication went bad, all this without
+our _next handler_ having to do anything.
 
 If the authentication went through, the middleware decodes the payload from
 the request, and passes it on to the _next handler_ by attaching it to the request.
@@ -91,11 +99,12 @@ the request, and passes it on to the _next handler_ by attaching it to the reque
 The next handlers can then have access to the payload attached to the requests,
 and uses the payload information as if those information came from the clients themselves.
 
-This means our next handlers can know the user email without requiring the user to
+This means our _next handlers_ can know the user email without requiring the user to
 send anything about his email, as this information was already extracted from JWTs
-and attached to the request by the JWT middleware.
+and attached to the request by the JWT middleware before the request reaches
+the _next handler_.
 
-In other words, the next handlers can just look at the requests, and know all
+In other words, the _next handlers_ can just look at the requests, and know all
 of the JWT payload information.
 
 ### JWT logout
@@ -109,5 +118,6 @@ retire a token.
 Instead, we'll need to hack around, like creating a cached list of invalidated
 tokens and having the middleware check each request's JWT token against the list.
 
-Everytime a user logs out, our server pushes the JWT to the list and stores it
-until its eventual expiration.
+To implement this, everytime a user logs out, the server may add the token to the
+list and stores it until its eventual expiration. If another request comes in with
+the logged out JWT, the server finds it in the list and denies access with a `401`.
