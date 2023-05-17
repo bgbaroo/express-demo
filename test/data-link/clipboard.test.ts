@@ -1,11 +1,13 @@
-import readline from "readline";
 import postgres from "../../src/data/sources/postgres";
+
+import { clearDb, clearDbPrompt } from "../util";
 
 import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
 import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
 import { DataLinkClipboard } from "../../src/data/sources/postgres/data-links/clipboard";
 import { DbDriver } from "../../src/data/sources/postgres";
 
+import { IRepositoryClipboard } from "../../src/domain/interfaces/repositories/clipboard";
 import { RepositoryUser } from "../../src/domain/repositories/user";
 import { RepositoryGroup } from "../../src/domain/repositories/group";
 import { RepositoryClipboard } from "../../src/domain/repositories/clipboard";
@@ -27,9 +29,17 @@ interface Arg {
 
 describe("groups and clipboards", () => {
   const arg: Arg = {
-    owner: "ownerUser",
-    members: ["member1", "member2", "member3"],
-    nonMembers: ["user1", "user2", "user3"],
+    owner: "clipboard.test-ownerUser",
+    members: [
+      "clipboard.test-member1",
+      "clipboard.test-member2",
+      "clipboard.test-member3",
+    ],
+    nonMembers: [
+      "clipboard.test-user1",
+      "clipboard.test-user2",
+      "clipboard.test-user3",
+    ],
     dbDriver: postgres,
     dataLinkUser: new DataLinkUser(postgres),
     dataLinkGroup: new DataLinkGroup(postgres),
@@ -199,62 +209,11 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
   return Promise.resolve();
 }
 
-async function clearDbPrompt(pg: DbDriver): Promise<void> {
-  return userPrompt(
-    "Clear table 'clipboards', 'groups', and 'users' before tests? [y/Y]",
-  )
-    .then((answer) => {
-      if (answer.toUpperCase().includes("y")) {
-        Promise.resolve();
-      }
-
-      Promise.reject();
-    })
-    .then(async () => {
-      console.log("Clearing db pre-tests");
-
-      await clearDb(pg);
-    })
-    .catch((err) => {
-      if (err) {
-        console.error(`Got error: ${err}`);
-      }
-
-      console.log("Not clearing db before tests");
-    })
-    .finally(() => {
-      console.log("Starting tests");
-
-      return Promise.resolve();
-    });
-}
-
-async function userPrompt(question: string): Promise<string> {
-  return new Promise((resolve) => {
-    const readLine = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    readLine.question(question, (userInput: string) => {
-      readLine.close();
-      resolve(userInput);
-    });
-  });
-}
-
 async function createClipboards(
-  repo: RepositoryClipboard,
+  repo: IRepositoryClipboard,
   clipboards: IClipboard[],
 ): Promise<IClipboard[]> {
   return await Promise.all(
     clipboards.map((clip) => repo.createClipboard(clip)),
   );
-}
-
-async function clearDb(pg: DbDriver): Promise<void> {
-  console.log("clearing all entries in database");
-  await pg.clipboard.deleteMany();
-  await pg.group.deleteMany();
-  await pg.user.deleteMany();
 }

@@ -4,7 +4,7 @@
   "description": "A demo for Express back-end written in TypeScript",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest",
+    "test": "npx jest --collectCoverage",
     "dev": "ts-node-dev src/index.ts",
     "prisma": "npx prisma generate --schema ./src/data/sources/postgres/prisma/schema.prisma",
     "migrate": "npx prisma migrate dev --schema ./src/data/sources/postgres/prisma/schema.prisma",
