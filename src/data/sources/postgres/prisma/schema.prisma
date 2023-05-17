@@ -16,6 +16,7 @@ model Clipboard {
   content    String
   user       User     @relation(fields: [userId], references: [id])
   userId     String
+  shared     Boolean  @default(false)
   expiration DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

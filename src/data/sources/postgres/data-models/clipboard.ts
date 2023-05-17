@@ -14,6 +14,7 @@ function toClipboard(data: IDataModelClipboardWithUser): IClipboard {
     id: data.id,
     title: data.title || undefined,
     content: data.content,
+    shared: data.shared,
     expiration: data.expiration || undefined,
     user: userModel.toUser(data.user),
   });

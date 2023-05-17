@@ -21,6 +21,8 @@ import { User } from "../../domain/entities/user";
 interface CreateClipboardBody {
   title?: string;
   content: string;
+  shared: boolean;
+  expiration?: Date;
 }
 
 export class HandlerClipboards implements IHandlerClipboards {
@@ -54,9 +56,12 @@ export class HandlerClipboards implements IHandlerClipboards {
     req: AuthRequest<any, any, CreateClipboardBody, any>,
     res: Response,
   ): Promise<Response> {
-    const { content, title } = req.body;
+    const { content, title, shared, expiration } = req.body;
     if (!content) {
       return resp.MissingField(res, "content");
+    }
+    if (!shared) {
+      return resp.MissingField(res, "shared");
     }
 
     const { id: userId, email } = req.payload;
@@ -70,6 +75,8 @@ export class HandlerClipboards implements IHandlerClipboards {
           title,
           content,
           user: new User({ id: userId, email }),
+          shared,
+          expiration,
         }),
       )
       .then((clipboard) => resp.Created(res, clipboard))

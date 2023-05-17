@@ -87,8 +87,8 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
 
   console.log("Creating owner clipboard");
   const ownerClips = await createClipboards(repoClipboard, [
-    new Clipboard({ content: "ownerClip1", user: ownerUser }),
-    new Clipboard({ content: "ownerClip2", user: ownerUser }),
+    new Clipboard({ content: "ownerClip1", user: ownerUser, shared: true }),
+    new Clipboard({ content: "ownerClip2", user: ownerUser, shared: true }),
   ]);
 
   members.forEach(async (member) => {
@@ -111,6 +111,20 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
           title: `nonMember${i + 1} note`,
           content: `nonMember${i + 1} note`,
           user: nonMem,
+          shared: true,
+        }),
+      );
+    }),
+  );
+
+  const memberSharedClips = await Promise.all(
+    members.map(async (member, i) => {
+      return repoClipboard.createClipboard(
+        new Clipboard({
+          title: `member${i + 1} note`,
+          content: `member${i + 1} note`,
+          user: member,
+          shared: true,
         }),
       );
     }),
@@ -123,6 +137,9 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
   if (groupClipboards.length === 0) {
     return Promise.reject("0 group clipboards");
   }
+  expect(groupClipboards.length).toBe(
+    ownerClips.length + memberSharedClips.length,
+  );
   groupClipboards.forEach((groupClip) => {
     nonMemberClips.forEach((nonGroupClip) =>
       expect(groupClip.id === nonGroupClip.id).toBe(false),
@@ -131,16 +148,51 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
 
   // Members should not see non-members' clips
   members.forEach(async (member) => {
-    const memberShouldSee = await repoClipboard.getGroupsClipboards(member.id);
-    if (!memberShouldSee) {
+    const groupsClipboards = await repoClipboard.getGroupsClipboards(member.id);
+    if (!groupsClipboards) {
       return Promise.reject("null groupClips");
     }
 
-    expect(memberShouldSee.length).toBe(ownerClips.length);
-    memberShouldSee.forEach((clip) => {
+    expect(groupsClipboards.length).toBe(
+      ownerClips.length + memberSharedClips.length,
+    );
+    groupsClipboards.forEach((clip) => {
       nonMemberClips.forEach((nonMemClip) =>
         expect(clip.id === nonMemClip.id).toBe(false),
       );
+    });
+  });
+
+  const memberPrivateClips = await Promise.all(
+    members.map(async (member, i) => {
+      return repoClipboard.createClipboard(
+        new Clipboard({
+          title: `member${i + 1} private note`,
+          content: `member${i + 1} private note`,
+          user: member,
+          shared: false,
+        }),
+      );
+    }),
+  );
+
+  // Members should only see shared clips
+  members.forEach(async (member) => {
+    const groupsClipboards = await repoClipboard.getGroupsClipboards(member.id);
+    if (!groupsClipboards) {
+      return Promise.reject("null groupClips");
+    }
+
+    expect(groupsClipboards.length).toBe(
+      ownerClips.length + memberSharedClips.length,
+    );
+    groupsClipboards.forEach((clip) => {
+      nonMemberClips.forEach((nonMemClip) =>
+        expect(clip.id === nonMemClip.id).toBe(false),
+      );
+      memberPrivateClips.forEach((privateClip) => {
+        expect(clip.id === privateClip.id).toBe(false);
+      });
     });
   });
 

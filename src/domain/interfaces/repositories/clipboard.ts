@@ -3,6 +3,7 @@ import { IClipboard } from "../../entities/clipboard";
 export interface IWhereClipboard {
   id?: string;
   userId?: string;
+  shared?: boolean;
   user?: {
     groups?: {
       some?: {
@@ -20,6 +21,7 @@ export interface IWhereClipboard {
 export function whereClipboard(arg: {
   clipboardId?: string;
   userId?: string;
+  shared?: boolean;
   groupId?: string;
   allGroups?: boolean; // For getting all clipboards from groups whose members include userId
 }): IWhereClipboard | undefined {
@@ -31,6 +33,7 @@ export function whereClipboard(arg: {
 
     // All clipboards from groups whose members include userId
     return {
+      shared: arg.shared,
       user: {
         groups: {
           some: {
@@ -48,6 +51,7 @@ export function whereClipboard(arg: {
   if (!arg.groupId) {
     // User clipboard(s)
     return {
+      shared: arg.shared,
       id: arg.clipboardId,
       userId: arg.userId,
     };
@@ -57,6 +61,7 @@ export function whereClipboard(arg: {
     // User's own clipboards from group groupId
     id: arg.clipboardId,
     userId: arg.userId,
+    shared: arg.shared,
     user: {
       groups: {
         some: {

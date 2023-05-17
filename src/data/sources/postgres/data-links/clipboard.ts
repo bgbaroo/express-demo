@@ -22,9 +22,11 @@ export class DataLinkClipboard extends BasePrismaSchemaDataLink {
           id: clipboard.id,
           title: clipboard.title,
           content: clipboard.content,
+          shared: clipboard.shared,
           user: {
             connect: { id: clipboard.getUserId() },
           },
+          expiration: clipboard.expiration,
         },
       })
       .then((result) => Promise.resolve(model.toClipboard(result)))

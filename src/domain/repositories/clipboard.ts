@@ -30,12 +30,14 @@ export class RepositoryClipboard implements IRepositoryClipboard {
   }
 
   async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
-    return await this.link.getClipboards(whereClipboard({ groupId }));
+    return await this.link.getClipboards(
+      whereClipboard({ shared: true, groupId }),
+    );
   }
 
   async getGroupsClipboards(userId: string): Promise<IClipboard[] | null> {
     return await this.link.getClipboards(
-      whereClipboard({ allGroups: true, userId }),
+      whereClipboard({ shared: true, allGroups: true, userId }),
     );
   }
 
