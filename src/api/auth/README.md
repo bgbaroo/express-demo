@@ -84,9 +84,9 @@ need to have JWT authentication. It would be tiring to write the authorization
 strategy in every endpoint handler, so instead of creating duplicate code,
 we will instead use a middleware.
 
-An Express middleware is basically a handler. Middleware intercept requests,
-do something with it, and passes the request on to the _next_ handler if
-they think so.
+An Express middleware is basically a handler. Middleware handlers intercept
+requests, do something with it, and passes the request on to the _next_ handler
+if they think so.
 
 In our context, [our JWT authentication middleware `authenticateJwt`](./jwt.ts)
 will intercept all incoming requests for protected routes, extracts JWTs from
