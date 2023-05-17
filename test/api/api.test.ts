@@ -1,11 +1,10 @@
 import request from "supertest";
 import dotenv from "dotenv";
 
-import { init } from "../../src/init";
+import app from "../../src/init-app";
 
 describe("Register API", () => {
   dotenv.config();
-  const app = init();
 
   it("Missing email should fail", async () => {
     const payload = { password: "foo" };

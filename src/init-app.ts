@@ -31,7 +31,7 @@ import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboard
 import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboards";
 import { App } from "./api/app";
 
-export function init(): App {
+function init(): App {
   dotenv.config();
   const dataLink = postgres;
 
@@ -70,3 +70,5 @@ export function init(): App {
     group: handlerGroups,
   });
 }
+
+export default init();

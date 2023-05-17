@@ -10,7 +10,7 @@ The demo will include:
 
 3. Connecting to databases with [ORM](./src/data/sources/postgres/)
 
-4. (TODO) Authorizations
+4. [Authorizations](./src/api/auth/)
 
 5. (TODO) Other advanced concepts
 
