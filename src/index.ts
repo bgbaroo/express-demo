@@ -14,9 +14,9 @@ import { UseCaseUserLogin } from "./domain/usecases/login";
 import { UseCaseUserChangePassword } from "./domain/usecases/change-password";
 import { UseCaseUserDeleteUser } from "./domain/usecases/delete-user";
 
-import { UseCaseGroupCreateGroup } from "./domain/usecases/create-group";
-import { UseCaseGroupDeleteGroup } from "./domain/usecases/delete-group";
-import { UseCaseGroupDeleteUserGroups } from "./domain/usecases/delete-user-groups";
+import { UseCaseCreateGroup } from "./domain/usecases/create-group";
+import { UseCaseDeleteGroup } from "./domain/usecases/delete-group";
+import { UseCaseDeleteUserGroups } from "./domain/usecases/delete-user-groups";
 
 import { UseCaseCreateClipboard } from "./domain/usecases/create-clipboard";
 import { UseCaseDeleteUserClipboard } from "./domain/usecases/delete-user-clipboard";
@@ -29,6 +29,7 @@ import { HandlerClipboards } from "./api/handlers/clipboards";
 import { HandlerGroups } from "./api/handlers/groups";
 import { HandlerUsers } from "./api/handlers/users";
 import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboards";
+import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboards";
 
 async function main(): Promise<void> {
   dotenv.config();
@@ -46,9 +47,9 @@ async function main(): Promise<void> {
   const dataLinkGroup = new DataLinkGroup(dataLink);
   const repoGroup = new RepositoryGroup(dataLinkGroup);
   const handlerGroups = new HandlerGroups({
-    createGroup: new UseCaseGroupCreateGroup(repoGroup),
-    deleteGroup: new UseCaseGroupDeleteGroup(repoGroup),
-    deleteGroups: new UseCaseGroupDeleteUserGroups(repoGroup),
+    createGroup: new UseCaseCreateGroup(repoGroup),
+    deleteGroup: new UseCaseDeleteGroup(repoGroup),
+    deleteGroups: new UseCaseDeleteUserGroups(repoGroup),
   });
 
   const dataLinkClipboard = new DataLinkClipboard(dataLink);
@@ -58,6 +59,7 @@ async function main(): Promise<void> {
     getClipboard: new UseCaseGetUserClipboard(repoClipboard),
     getClipboards: new UseCaseGetUserClipboards(repoClipboard),
     getGroupClipboards: new UseCaseGetGroupClipboards(repoClipboard),
+    getGroupsClipboards: new UseCaseGetGroupsClipboards(repoClipboard),
     deleteClipboard: new UseCaseDeleteUserClipboard(repoClipboard),
     deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboard),
   });

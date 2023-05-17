@@ -1,25 +1,25 @@
 import { IGroup } from "../../entities/group";
 
-export interface IUseCaseGroupCreateGroup {
+export interface IUseCaseCreateGroup {
   execute(group: IGroup): Promise<IGroup>;
 }
 
-export interface IUseCaseGroupGetGroup {
+export interface IUseCaseGetGroup {
   execute(id: string): Promise<IGroup | null>;
 }
 
-export interface IUseCaseGroupGetUserGroups {
+export interface IUseCaseGetUserGroups {
   execute(userId: string): Promise<IGroup[] | null>;
 }
 
-export interface IUseCaseGroupGetUserOwnedGroups {
+export interface IUseCaseGetOwnedGroups {
   execute(userId: string): Promise<IGroup[] | null>;
 }
 
-export interface IUseCaseGroupDeleteGroup {
+export interface IUseCaseDeleteGroup {
   execute(userId: string, id: String): Promise<IGroup>;
 }
 
-export interface IUseCaseGroupDeleteUserGroups {
+export interface IUseCaseDeleteUserGroups {
   execute(userId: string): Promise<number>;
 }

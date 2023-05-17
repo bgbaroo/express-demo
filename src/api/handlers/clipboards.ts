@@ -10,6 +10,7 @@ import {
   IUseCaseDeleteUserClipboard,
   IUseCaseDeleteUserClipboards,
   IUseCaseGetGroupClipboards,
+  IUseCaseGetGroupsClipboards,
   IUseCaseGetUserClipboard,
   IUseCaseGetUserClipboards,
 } from "../../domain/interfaces/usecases/clipboard";
@@ -27,6 +28,7 @@ export class HandlerClipboards implements IHandlerClipboards {
   private readonly usecaseGetUserClipboard: IUseCaseGetUserClipboard;
   private readonly usecaseGetUserClipboards: IUseCaseGetUserClipboards;
   private readonly usecaseGetGroupClipboards: IUseCaseGetGroupClipboards;
+  private readonly usecaseGetGroupsClipboards: IUseCaseGetGroupsClipboards;
   private readonly usecaseDeleteUserClipboard: IUseCaseDeleteUserClipboard;
   private readonly usecaseDeleteUserClipboards: IUseCaseDeleteUserClipboards;
 
@@ -35,6 +37,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     getClipboard: IUseCaseGetUserClipboard;
     getClipboards: IUseCaseGetUserClipboards;
     getGroupClipboards: IUseCaseGetGroupClipboards;
+    getGroupsClipboards: IUseCaseGetGroupsClipboards;
     deleteClipboard: IUseCaseDeleteUserClipboard;
     deleteClipboards: IUseCaseDeleteUserClipboards;
   }) {
@@ -42,6 +45,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     this.usecaseGetUserClipboard = arg.getClipboard;
     this.usecaseGetUserClipboards = arg.getClipboards;
     this.usecaseGetGroupClipboards = arg.getGroupClipboards;
+    this.usecaseGetUserClipboards = arg.getGroupsClipboards;
     this.usecaseDeleteUserClipboard = arg.deleteClipboard;
     this.usecaseDeleteUserClipboards = arg.deleteClipboards;
   }
@@ -155,7 +159,34 @@ export class HandlerClipboards implements IHandlerClipboards {
         return resp.Ok(res, clipboards);
       })
       .catch((err) => {
-        console.error(`failed to get group ${id} clipboards`);
+        console.error(`failed to get group ${id} clipboards: ${err}`);
+        return resp.InternalServerError(
+          res,
+          `failed to get group ${id} clipboards`,
+        );
+      });
+  }
+
+  async getGroupsClipboards(
+    req: GenericAuthRequest,
+    res: Response,
+  ): Promise<Response> {
+    const { id, email } = req.payload;
+    if (!id || !email) {
+      return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
+    }
+
+    return this.usecaseGetGroupsClipboards
+      .execute(id)
+      .then((clipboards) => {
+        if (!clipboards || clipboards.length === 0) {
+          return resp.NotFound(res, `clipboards not found for group ${id}`);
+        }
+
+        return resp.Ok(res, clipboards);
+      })
+      .catch((err) => {
+        console.error(`failed to get group ${id} clipboards: ${err}`);
         return resp.InternalServerError(
           res,
           `failed to get group ${id} clipboards`,

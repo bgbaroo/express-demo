@@ -1,8 +1,9 @@
+import { IUseCaseUserDeleteUser } from "../interfaces/usecases/user";
 import { IRepositoryUser } from "../interfaces/repositories/user";
 
 import { IUser } from "../entities/user";
 
-export class UseCaseUserDeleteUser {
+export class UseCaseUserDeleteUser implements IUseCaseUserDeleteUser {
   private readonly repo: IRepositoryUser;
 
   constructor(repo: IRepositoryUser) {

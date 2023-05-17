@@ -1,9 +1,9 @@
-import { IUseCaseGroupDeleteGroup } from "../interfaces/usecases/group";
+import { IUseCaseDeleteGroup } from "../interfaces/usecases/group";
 import { IRepositoryGroup } from "../interfaces/repositories/group";
 
 import { IGroup } from "../entities/group";
 
-export class UseCaseGroupDeleteGroup implements IUseCaseGroupDeleteGroup {
+export class UseCaseDeleteGroup implements IUseCaseDeleteGroup {
   private readonly repo: IRepositoryGroup;
 
   constructor(repo: IRepositoryGroup) {

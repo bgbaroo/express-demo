@@ -9,9 +9,9 @@ import { GroupOwner } from "../../domain/entities/group-owner";
 import { Group } from "../../domain/entities/group";
 import { User } from "../../domain/entities/user";
 import {
-  IUseCaseGroupCreateGroup,
-  IUseCaseGroupDeleteGroup,
-  IUseCaseGroupDeleteUserGroups,
+  IUseCaseCreateGroup,
+  IUseCaseDeleteGroup,
+  IUseCaseDeleteUserGroups,
 } from "../../domain/interfaces/usecases/group";
 
 interface CreateGroupBody {
@@ -20,18 +20,18 @@ interface CreateGroupBody {
 }
 
 export class HandlerGroups implements IHandlerGroups {
-  private readonly create: IUseCaseGroupCreateGroup;
-  private readonly delete: IUseCaseGroupDeleteGroup;
-  private readonly deletes: IUseCaseGroupDeleteUserGroups;
+  private readonly usecaseCreateGroup: IUseCaseCreateGroup;
+  private readonly usecaseDeleteGroup: IUseCaseDeleteGroup;
+  private readonly usecaseDeleteGroups: IUseCaseDeleteUserGroups;
 
   constructor(arg: {
-    createGroup: IUseCaseGroupCreateGroup;
-    deleteGroup: IUseCaseGroupDeleteGroup;
-    deleteGroups: IUseCaseGroupDeleteUserGroups;
+    createGroup: IUseCaseCreateGroup;
+    deleteGroup: IUseCaseDeleteGroup;
+    deleteGroups: IUseCaseDeleteUserGroups;
   }) {
-    this.create = arg.createGroup;
-    this.delete = arg.deleteGroup;
-    this.deletes = arg.deleteGroups;
+    this.usecaseCreateGroup = arg.createGroup;
+    this.usecaseDeleteGroup = arg.deleteGroup;
+    this.usecaseDeleteGroups = arg.deleteGroups;
   }
 
   async createGroup(
@@ -48,7 +48,7 @@ export class HandlerGroups implements IHandlerGroups {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
-    return this.create
+    return this.usecaseCreateGroup
       .execute(
         new Group({
           name,
@@ -79,7 +79,7 @@ export class HandlerGroups implements IHandlerGroups {
     }
 
     const id = req.params.id;
-    return this.delete
+    return this.usecaseDeleteGroup
       .execute(userId, id)
       .then((group) =>
         resp.Ok(res, `group ${group.name} deleted by user ${email}`),
@@ -99,7 +99,7 @@ export class HandlerGroups implements IHandlerGroups {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
-    return this.deletes
+    return this.usecaseDeleteGroups
       .execute(userId)
       .then((count) => resp.Ok(res, `${count} groups deleted by user ${email}`))
       .catch((err) => {
