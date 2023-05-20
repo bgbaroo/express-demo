@@ -13,7 +13,7 @@ export type HandlerFunc = (Request, Response) => Promise<Response>;
 export type HandlerFuncAuth = (AuthRequest, Response) => Promise<Response>;
 
 export class App {
-  private app: express.Express;
+  server: express.Express;
 
   constructor(arg: {
     clipboard: IHandlerClipboards;
@@ -21,21 +21,21 @@ export class App {
     group: IHandlerGroups;
   }) {
     // Setup our Express app
-    this.app = express();
-    this.app.use(express.json());
+    this.server = express();
+    this.server.use(express.json());
 
-    this.app.get("/status", (_req: Request, res: Response) => {
+    this.server.get("/status", (_req: Request, res: Response) => {
       return resp.Ok(res, "ok");
     });
 
     // Register routers
-    this.app.use("/clipboards", new RouterClipboard(arg.clipboard).router());
-    this.app.use("/users", new RouterUsers(arg.user).router());
-    this.app.use("/groups", new RouterGroups(arg.group).router());
+    this.server.use("/clipboards", new RouterClipboard(arg.clipboard).router());
+    this.server.use("/users", new RouterUsers(arg.user).router());
+    this.server.use("/groups", new RouterGroups(arg.group).router());
   }
 
   async listenAndServe(port: number | string): Promise<void> {
-    const server = this.app.listen(port, () => {
+    const server = this.server.listen(port, () => {
       console.log(`Express server is listening on ${port}`);
     });
 
