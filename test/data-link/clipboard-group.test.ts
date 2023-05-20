@@ -1,6 +1,6 @@
 import postgres from "../../src/data/sources/postgres";
 
-import { clearDb, clearDbPrompt } from "../util";
+import { clearDb } from "../util";
 
 import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
 import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
@@ -48,7 +48,7 @@ describe("groups and clipboards", () => {
 
   it("membership visibility", async () => {
     try {
-      await clearDbPrompt(arg.dbDriver);
+      await clearDb(arg.dbDriver);
       await testGroupClipboards(arg);
       await clearDb(arg.dbDriver);
     } catch (err) {

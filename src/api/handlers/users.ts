@@ -94,7 +94,8 @@ export class HandlerUsers implements IHandlerUsers {
     req: GenericAuthRequest,
     res: Response,
   ): Promise<Response> {
-    if (!req.payload || !req.payload.email || req.payload.id) {
+    if (!req.payload || !req.payload.email || !req.payload.id) {
+      console.log(req.payload);
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
@@ -118,7 +119,7 @@ export class HandlerUsers implements IHandlerUsers {
   }
 
   async deleteUser(req: GenericAuthRequest, res: Response): Promise<Response> {
-    if (!req.payload || !req.payload.email || req.payload.id) {
+    if (!req.payload || !req.payload.email || !req.payload.id) {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 

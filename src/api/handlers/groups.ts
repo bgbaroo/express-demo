@@ -40,7 +40,7 @@ export class HandlerGroups implements IHandlerGroups {
   ): Promise<Response> {
     const { name, memberEmails } = req.body;
     if (!name) {
-      return resp.MissingField(res, "groupName");
+      return resp.MissingField(res, "name");
     }
 
     const { id: userId, email } = req.payload;

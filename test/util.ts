@@ -1,6 +1,12 @@
 import readline from "readline";
 import { DbDriver } from "../src/data/sources/postgres";
 
+export enum ClearTable {
+  Clipboard,
+  Group,
+  User,
+}
+
 export async function clearDbPrompt(pg: DbDriver): Promise<void> {
   return userPrompt(
     "Clear table 'clipboards', 'groups', and 'users' before tests? [y/Y]",
@@ -45,9 +51,35 @@ export async function userPrompt(question: string): Promise<string> {
   });
 }
 
-export async function clearDb(pg: DbDriver): Promise<void> {
+export async function clearDb(
+  pg: DbDriver,
+  tables?: ClearTable[],
+): Promise<void> {
   console.log("clearing all entries in database");
-  await pg.clipboard.deleteMany();
-  await pg.group.deleteMany();
-  await pg.user.deleteMany();
+
+  if (!tables) {
+    try {
+      await pg.clipboard.deleteMany();
+      await pg.group.deleteMany();
+      await pg.user.deleteMany();
+
+      return Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  Array.from(new Set(tables))
+    .sort((a, b) => a - b)
+    .forEach(async (table) => {
+      console.error(table);
+      switch (table) {
+        case ClearTable.Clipboard:
+          await pg.clipboard.deleteMany();
+        case ClearTable.Group:
+          await pg.group.deleteMany();
+        case ClearTable.User:
+          await pg.user.deleteMany();
+      }
+    });
 }

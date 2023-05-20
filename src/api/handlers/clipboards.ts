@@ -47,7 +47,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     this.usecaseGetUserClipboard = arg.getClipboard;
     this.usecaseGetUserClipboards = arg.getClipboards;
     this.usecaseGetGroupClipboards = arg.getGroupClipboards;
-    this.usecaseGetUserClipboards = arg.getGroupsClipboards;
+    this.usecaseGetGroupsClipboards = arg.getGroupsClipboards;
     this.usecaseDeleteUserClipboard = arg.deleteClipboard;
     this.usecaseDeleteUserClipboards = arg.deleteClipboards;
   }
@@ -80,9 +80,12 @@ export class HandlerClipboards implements IHandlerClipboards {
         }),
       )
       .then((clipboard) => resp.Created(res, clipboard))
-      .catch((err) =>
-        resp.InternalServerError(res, `failed to create clipboard: ${err}`),
-      );
+      .catch((err) => {
+        return resp.InternalServerError(
+          res,
+          `failed to create clipboard: ${err}`,
+        );
+      });
   }
 
   async getClipboard(
@@ -123,7 +126,7 @@ export class HandlerClipboards implements IHandlerClipboards {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
-    return this.usecaseGetUserClipboards
+    return await this.usecaseGetUserClipboards
       .execute(userId)
       .then((clipboards) => {
         if (!clipboards) {

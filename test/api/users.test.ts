@@ -12,6 +12,11 @@ beforeEach(() => {
   return clearDb(postgres);
 });
 
+afterAll(async () => {
+  await clearDb(postgres);
+  return postgres.$disconnect();
+});
+
 describe("Register API", () => {
   dotenv.config();
   const apiPath = "/users/register";
@@ -86,8 +91,4 @@ describe("Login API", () => {
 
     expect(res.status === 401).toEqual(false);
   });
-});
-
-afterAll(() => {
-  return postgres.$disconnect();
 });
