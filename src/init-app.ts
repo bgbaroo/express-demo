@@ -1,6 +1,4 @@
-import dotenv from "dotenv";
-import postgres from "./data/sources/postgres";
-
+import { DbDriver } from "./data/sources/postgres";
 import { DataLinkUser } from "./data/sources/postgres/data-links/user";
 import { DataLinkGroup } from "./data/sources/postgres/data-links/group";
 import { DataLinkClipboard } from "./data/sources/postgres/data-links/clipboard";
@@ -31,11 +29,8 @@ import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboard
 import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboards";
 import { App } from "./api/app";
 
-function init(): App {
-  dotenv.config();
-  const dataLink = postgres;
-
-  const dataLinkUser = new DataLinkUser(dataLink);
+function initApp(arg: { db: DbDriver }): App {
+  const dataLinkUser = new DataLinkUser(arg.db);
   const repoUser = new RepositoryUser(dataLinkUser);
   const handlerUsers = new HandlerUsers({
     register: new UseCaseUserRegister(repoUser),
@@ -44,7 +39,7 @@ function init(): App {
     deleteUser: new UseCaseUserDeleteUser(repoUser),
   });
 
-  const dataLinkGroup = new DataLinkGroup(dataLink);
+  const dataLinkGroup = new DataLinkGroup(arg.db);
   const repoGroup = new RepositoryGroup(dataLinkGroup);
   const handlerGroups = new HandlerGroups({
     createGroup: new UseCaseCreateGroup(repoGroup),
@@ -52,7 +47,7 @@ function init(): App {
     deleteGroups: new UseCaseDeleteUserGroups(repoGroup),
   });
 
-  const dataLinkClipboard = new DataLinkClipboard(dataLink);
+  const dataLinkClipboard = new DataLinkClipboard(arg.db);
   const repoClipboard = new RepositoryClipboard(dataLinkClipboard);
   const handlerClipboards = new HandlerClipboards({
     createClipboard: new UseCaseCreateClipboard(repoClipboard),
@@ -71,4 +66,4 @@ function init(): App {
   });
 }
 
-export default init();
+export default initApp;
