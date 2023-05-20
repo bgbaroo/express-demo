@@ -17,8 +17,8 @@ export class RepositoryClipboard implements IRepositoryClipboard {
   }
 
   async getUserClipboard(
-    id: string,
     userId: string,
+    id: string,
   ): Promise<IClipboard | null> {
     return await this.link.getClipboard(
       whereClipboard({ clipboardId: id, userId: userId }),

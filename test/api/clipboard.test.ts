@@ -22,7 +22,6 @@ async function initDb() {
     .expect(200);
 
   token = `Bearer ${res.body.data.token}`;
-  console.log(`User token ${token}`);
 }
 
 beforeEach(async () => {
