@@ -126,58 +126,58 @@ import { mul, periodReturn, fromPercent, compound } from "./bank_return";
 describe("mul", () => {
   // it defines sub-test within a describe test suite
   it("multiply with 0 should give 0", () => {
-    expect(mul(0, 0)).toBe(0);
-    expect(mul(0, 1)).toBe(0);
-    expect(mul(2, 0)).toBe(0);
+    expect(mul(0, 0)).toEqual(0);
+    expect(mul(0, 1)).toEqual(0);
+    expect(mul(2, 0)).toEqual(0);
   });
 
   it("multiply x with 1 should give x", () => {
-    expect(mul(1, 7)).toBe(7);
-    expect(mul(7, 1)).toBe(7);
-    expect(mul(2, 1)).toBe(2);
+    expect(mul(1, 7)).toEqual(7);
+    expect(mul(7, 1)).toEqual(7);
+    expect(mul(2, 1)).toEqual(2);
   });
 
   it("basic multiplication", () => {
-    expect(mul(2, 2)).toBe(4);
-    expect(mul(5, 10)).toBe(50);
+    expect(mul(2, 2)).toEqual(4);
+    expect(mul(5, 10)).toEqual(50);
   });
 });
 
 describe("fromPercent", () => {
   it("100% is whole 1", () => {
-    expect(fromPercent(100)).toBe(1);
+    expect(fromPercent(100)).toEqual(1);
   });
 
   it("0% is 0", () => {
-    expect(fromPercent(0)).toBe(0);
+    expect(fromPercent(0)).toEqual(0);
   });
 
   it("unexpected fromPercent value", () => {
-    expect(fromPercent(2)).toBe(0.02);
-    expect(fromPercent(5)).toBe(0.02);
-    expect(fromPercent(10)).toBe(0.1);
+    expect(fromPercent(2)).toEqual(0.02);
+    expect(fromPercent(5)).toEqual(0.02);
+    expect(fromPercent(10)).toEqual(0.1);
   });
 });
 
 describe("compound", () => {
   it("0 interest => unchanged amount", () => {
-    expect(periodReturn(100, 0, 1)).toBe(100);
-    expect(periodReturn(69, 0, 1)).toBe(69);
+    expect(periodReturn(100, 0, 1)).toEqual(100);
+    expect(periodReturn(69, 0, 1)).toEqual(69);
   });
 
   it("unexpected periodReturn value", () => {
-    expect(periodReturn(100, 10)).toBe(110); // 100 x 1.1
-    expect(periodReturn(100, 20)).toBe(120); // 100 x 1.2
+    expect(periodReturn(100, 10)).toEqual(110); // 100 x 1.1
+    expect(periodReturn(100, 20)).toEqual(120); // 100 x 1.2
   });
 });
 
 describe("compound", () => {
   it("0 interest => unchanged amount", () => {
-    expect(periodReturn(100, 10, 0)).toBe(100); // 100 x 1.1
+    expect(periodReturn(100, 10, 0)).toEqual(100); // 100 x 1.1
   });
   it("unexpected compound value", () => {
-    expect(periodReturn(100, 10, 1)).toBe(110); // 100 x 1.1
-    expect(periodReturn(100, 10, 2)).toBe(121); // (100 x 1.1) x 1.1
+    expect(periodReturn(100, 10, 1)).toEqual(110); // 100 x 1.1
+    expect(periodReturn(100, 10, 2)).toEqual(121); // (100 x 1.1) x 1.1
   });
 });
 ```

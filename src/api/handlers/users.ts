@@ -78,7 +78,7 @@ export class HandlerUsers implements IHandlerUsers {
       })
       .catch((err) => {
         console.error(`failed to login user ${email}: ${err}`);
-        return resp.InternalServerError(res, `failed to login user ${email}`);
+        return resp.Unauthorized(res, `failed to login user ${email}`);
       });
   }
 

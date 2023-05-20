@@ -28,11 +28,11 @@ function testGroupOwner(owner: IGroupOwner, _gids: Set<string>) {
       it("empty group.size() != 1", () => {
         // Owner is also a member,
         // and Groups will always have 1 owner
-        expect(group.size()).toBe(1);
+        expect(group.size()).toEqual(1);
       });
 
       it("group has invalid owner", () => {
-        expect(group.getOwnerId()).toBe(owner.id);
+        expect(group.getOwnerId()).toEqual(owner.id);
       });
 
       it("owner forgot some groups", () => {
@@ -41,7 +41,7 @@ function testGroupOwner(owner: IGroupOwner, _gids: Set<string>) {
 
       const len = owner.groupsOwned().length;
       it("owner groups length mismatch", () => {
-        expect(len).toBe(i + 1);
+        expect(len).toEqual(i + 1);
       });
     }
   });
@@ -70,11 +70,11 @@ describe("no duplicate emails", () => {
   const target = group.getMember(id);
 
   it("unexpected Group.ownerId()", () => {
-    expect(group.getOwnerId()).toBe(owner.id);
+    expect(group.getOwnerId()).toEqual(owner.id);
   });
 
   it("unexpected Group.size()", () => {
-    expect(group.size()).toBe(4); // Plus the owner
+    expect(group.size()).toEqual(4); // Plus the owner
   });
 
   it("User undefined", () => {
@@ -86,7 +86,7 @@ describe("no duplicate emails", () => {
   });
 
   it("User.id unexpected", () => {
-    expect(target?.id).toBe(id);
+    expect(target?.id).toEqual(id);
   });
 
   it("User.email undefined", () => {
@@ -94,11 +94,11 @@ describe("no duplicate emails", () => {
   });
 
   it("User.email unexpected", () => {
-    expect(target?.email).toBe(myUser.email);
+    expect(target?.email).toEqual(myUser.email);
   });
 
   it("duplicate User.id was added", () => {
-    expect(group.addMember(owner, new User({ email: fooAtBar, id }))).toBe(
+    expect(group.addMember(owner, new User({ email: fooAtBar, id }))).toEqual(
       false,
     );
   });
@@ -106,6 +106,6 @@ describe("no duplicate emails", () => {
   it("new User was not added", () => {
     expect(
       group.addMember(owner, new User({ email: "new email", id: "new id" })),
-    ).toBe(true);
+    ).toEqual(true);
   });
 });

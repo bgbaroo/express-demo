@@ -107,9 +107,9 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
       return Promise.reject("null groupClips");
     }
 
-    expect(ownerGroupClips.length).toBe(ownerClips.length);
+    expect(ownerGroupClips.length).toEqual(ownerClips.length);
     ownerGroupClips.forEach((clip) =>
-      expect(clip.getUserId()).toBe(ownerUser.id),
+      expect(clip.getUserId()).toEqual(ownerUser.id),
     );
   });
 
@@ -147,12 +147,12 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
   if (groupClipboards.length === 0) {
     return Promise.reject("0 group clipboards");
   }
-  expect(groupClipboards.length).toBe(
+  expect(groupClipboards.length).toEqual(
     ownerClips.length + memberSharedClips.length,
   );
   groupClipboards.forEach((groupClip) => {
     nonMemberClips.forEach((nonGroupClip) =>
-      expect(groupClip.id === nonGroupClip.id).toBe(false),
+      expect(groupClip.id === nonGroupClip.id).toEqual(false),
     );
   });
 
@@ -163,12 +163,12 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
       return Promise.reject("null groupClips");
     }
 
-    expect(groupsClipboards.length).toBe(
+    expect(groupsClipboards.length).toEqual(
       ownerClips.length + memberSharedClips.length,
     );
     groupsClipboards.forEach((clip) => {
       nonMemberClips.forEach((nonMemClip) =>
-        expect(clip.id === nonMemClip.id).toBe(false),
+        expect(clip.id === nonMemClip.id).toEqual(false),
       );
     });
   });
@@ -193,15 +193,15 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
       return Promise.reject("null groupClips");
     }
 
-    expect(groupsClipboards.length).toBe(
+    expect(groupsClipboards.length).toEqual(
       ownerClips.length + memberSharedClips.length,
     );
     groupsClipboards.forEach((clip) => {
       nonMemberClips.forEach((nonMemClip) =>
-        expect(clip.id === nonMemClip.id).toBe(false),
+        expect(clip.id === nonMemClip.id).toEqual(false),
       );
       memberPrivateClips.forEach((privateClip) => {
-        expect(clip.id === privateClip.id).toBe(false);
+        expect(clip.id === privateClip.id).toEqual(false);
       });
     });
   });
