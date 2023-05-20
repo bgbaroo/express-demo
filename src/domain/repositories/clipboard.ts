@@ -16,12 +16,12 @@ export class RepositoryClipboard implements IRepositoryClipboard {
     return await this.link.createClipboard(clipboard);
   }
 
-  async getUserClipboard(
-    userId: string,
-    id: string,
-  ): Promise<IClipboard | null> {
+  async getUserClipboard(arg: {
+    userId: string;
+    id: string;
+  }): Promise<IClipboard | null> {
     return await this.link.getClipboard(
-      whereClipboard({ clipboardId: id, userId: userId }),
+      whereClipboard({ clipboardId: arg.id, userId: arg.userId }),
     );
   }
 
@@ -41,8 +41,11 @@ export class RepositoryClipboard implements IRepositoryClipboard {
     );
   }
 
-  async deleteUserClipboard(userId: string, id: string): Promise<IClipboard> {
-    return await this.link.deleteClipboard({ id, userId });
+  async deleteUserClipboard(arg: {
+    userId: string;
+    id: string;
+  }): Promise<IClipboard> {
+    return await this.link.deleteClipboard(arg);
   }
 
   async deleteUserClipboards(userId: string): Promise<number> {

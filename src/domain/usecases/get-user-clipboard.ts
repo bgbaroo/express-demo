@@ -10,7 +10,10 @@ export class UseCaseGetUserClipboard implements IUseCaseGetUserClipboard {
     this.repo = repo;
   }
 
-  async execute(userId: string, id: string): Promise<IClipboard | null> {
-    return await this.repo.getUserClipboard(userId, id);
+  async execute(arg: {
+    userId: string;
+    id: string;
+  }): Promise<IClipboard | null> {
+    return await this.repo.getUserClipboard(arg);
   }
 }

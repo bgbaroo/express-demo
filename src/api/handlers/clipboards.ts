@@ -104,7 +104,7 @@ export class HandlerClipboards implements IHandlerClipboards {
     const id = req.params.id;
 
     return this.usecaseGetUserClipboard
-      .execute(userId, id)
+      .execute({ userId, id })
       .then((clip) => {
         if (!clip) {
           return resp.NotFound(res, `clipboard ${id} not found`);
@@ -219,7 +219,7 @@ export class HandlerClipboards implements IHandlerClipboards {
 
     const id = req.params.id;
     return this.usecaseDeleteUserClipboard
-      .execute(userId, id)
+      .execute({ userId, id })
       .then((deleted) => {
         if (deleted) {
           return resp.Ok(res, `clipboard ${id} deleted`);

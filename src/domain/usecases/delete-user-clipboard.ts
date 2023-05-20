@@ -10,7 +10,7 @@ export class UseCaseDeleteUserClipboard implements IUseCaseDeleteUserClipboard {
     this.repo = repo;
   }
 
-  async execute(userId: string, id: string): Promise<IClipboard> {
-    return await this.repo.deleteUserClipboard(userId, id);
+  async execute(arg: { userId: string; id: string }): Promise<IClipboard> {
+    return await this.repo.deleteUserClipboard(arg);
   }
 }

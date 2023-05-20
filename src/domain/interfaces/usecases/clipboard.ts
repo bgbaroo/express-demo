@@ -5,7 +5,7 @@ export interface IUseCaseCreateClipboard {
 }
 
 export interface IUseCaseGetUserClipboard {
-  execute(userId: string, id: string): Promise<IClipboard | null>;
+  execute(arg: { userId: string; id: string }): Promise<IClipboard | null>;
 }
 
 export interface IUseCaseGetUserClipboards {
@@ -21,7 +21,7 @@ export interface IUseCaseGetGroupsClipboards {
 }
 
 export interface IUseCaseDeleteUserClipboard {
-  execute(userId: string, id: string): Promise<IClipboard>;
+  execute(arg: { userId: string; id: string }): Promise<IClipboard>;
 }
 
 export interface IUseCaseDeleteUserClipboards {

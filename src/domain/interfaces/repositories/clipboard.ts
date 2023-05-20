@@ -1,5 +1,28 @@
 import { IClipboard } from "../../entities/clipboard";
 
+export interface IRepositoryClipboard {
+  createClipboard(clipboard: IClipboard): Promise<IClipboard>;
+
+  // Get all user clipboards
+  getUserClipboards(userId: string): Promise<IClipboard[] | null>;
+  // Get user clipboard by id
+  getUserClipboard(arg: {
+    userId: string;
+    id: string;
+  }): Promise<IClipboard | null>;
+
+  // Get shared clipboards from user's groups
+  getGroupsClipboards(userId: string): Promise<IClipboard[] | null>;
+  // Get shared clipboards from a user's group
+  getGroupClipboards(
+    userId: string,
+    groupId: string,
+  ): Promise<IClipboard[] | null>;
+
+  deleteUserClipboard(arg: { userId: string; id: string }): Promise<IClipboard>;
+  deleteUserClipboards(userId: string): Promise<number>;
+}
+
 export interface IWhereClipboard {
   id?: string;
   userId?: string;
@@ -74,17 +97,4 @@ export function whereClipboard(arg: {
       },
     },
   };
-}
-
-export interface IRepositoryClipboard {
-  createClipboard(clipboard: IClipboard): Promise<IClipboard>;
-  getUserClipboard(userId: string, id: string): Promise<IClipboard | null>;
-  getUserClipboards(userId: string): Promise<IClipboard[] | null>;
-  getGroupClipboards(
-    userId: string,
-    groupId: string,
-  ): Promise<IClipboard[] | null>;
-  getGroupsClipboards(userId: string): Promise<IClipboard[] | null>;
-  deleteUserClipboard(userId: string, id: string): Promise<IClipboard>;
-  deleteUserClipboards(userId: string): Promise<number>;
 }
