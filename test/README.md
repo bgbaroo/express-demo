@@ -189,14 +189,15 @@ npx jest;
 ```
 
 Jest will scan all files with `*.test.ts` or `*.test.js` in our project,
-and run those tests.
+and run tests in those files. Tests are defined with `describe` function calls.
 
 From the tests, it seems the bug comes from `"compound"` => `"unexpected compound value"`.
 This helps us rule out other code as buggy, and we can just focus on
 fixing that function.
 
 The bug seems to come from the fact that our for loop is initialized with
-incorrect `i` counter - so here's the fixed version of `compound`:
+incorrect `i` counter - so here's the fixed version of `compound`, with
+`i` initialized to `0` instead of `1`:
 
 ```typescript
 function compound(
