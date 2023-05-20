@@ -18,6 +18,10 @@ export interface IWhereClipboard {
   };
 }
 
+export function whereUserId(userId: string): IWhereClipboard {
+  return { userId };
+}
+
 export function whereClipboard(arg: {
   clipboardId?: string;
   userId?: string;

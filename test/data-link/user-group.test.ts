@@ -85,12 +85,12 @@ async function testUserAndGroupWrites(
 
     // Test getMembers and isMembers
     group.getMembers().forEach((member) => {
-      expect(group.isMember(member.id)).toBe(true);
+      expect(group.isMember(member.id)).toEqual(true);
 
       if (member.email == arg.gOwner) {
         return;
       }
-      expect(arg.gMembers.includes(member.email)).toBe(true);
+      expect(arg.gMembers.includes(member.email)).toEqual(true);
     });
 
     // Add new members arg.NewMembers
@@ -103,14 +103,14 @@ async function testUserAndGroupWrites(
       .getMembers()
       .filter((newMember) => !arg.gMembers.includes(newMember.email))
       .forEach((newMember) => {
-        expect(groupNewMembers.isMember(newMember.id)).toBe(true);
+        expect(groupNewMembers.isMember(newMember.id)).toEqual(true);
         if (newMember.email == arg.gOwner) {
           return;
         }
 
         console.log(`checking new user ${newMember.email}`);
-        expect(arg.gNewMembers.includes(newMember.email)).toBe(true);
-        expect(arg.gNonMembers.includes(newMember.email)).toBe(false);
+        expect(arg.gNewMembers.includes(newMember.email)).toEqual(true);
+        expect(arg.gNonMembers.includes(newMember.email)).toEqual(false);
       });
 
     console.table({
@@ -139,8 +139,8 @@ async function testUserAndGroupWrites(
         return;
       }
 
-      expect(arg.gExMembers.includes(member.email)).toBe(false);
-      expect(arg.gNonMembers.includes(member.email)).toBe(false);
+      expect(arg.gExMembers.includes(member.email)).toEqual(false);
+      expect(arg.gNonMembers.includes(member.email)).toEqual(false);
     });
   } catch (err) {
     console.error(err);

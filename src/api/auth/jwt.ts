@@ -19,7 +19,7 @@ export function generateJwt(payload: JwtTokenPayload): string {
   return jwt.sign(payload, authSecret, {
     algorithm: "HS512",
     /** expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms.js).  Eg: 60, "2 days", "10h", "7d" */
-    expiresIn: "1m",
+    expiresIn: "12h",
     issuer: "express-demo",
     subject: "user-login",
     audience: "user",
@@ -31,9 +31,8 @@ export function authenticateJwt(
   res: Response,
   next: NextFunction,
 ) {
+  const token = req.header("Authorization")?.replace("Bearer ", "");
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
-
     if (!token) {
       return response.Unauthorized(res, "missing JWT token");
     }
@@ -47,6 +46,7 @@ export function authenticateJwt(
 
     return next();
   } catch (err) {
+    console.error(`Auth failed for token ${token}: ${err}`);
     return response.Unauthorized(res, "authentication failed");
   }
 }
