@@ -2,12 +2,12 @@ import request from "supertest";
 import dotenv from "dotenv";
 
 import { AppDev } from "../../src/api/app";
-import initApp from "../../src/init-app";
+import init from "../../src/init";
 import postgres from "../../src/data/sources/postgres";
 import { clearDb } from "../util";
 
 // TODO: mock DB
-const server = initApp<AppDev>(AppDev, { db: postgres }).server();
+const server = init<AppDev>(AppDev, { db: postgres }).server();
 
 beforeEach(() => {
   return clearDb(postgres);

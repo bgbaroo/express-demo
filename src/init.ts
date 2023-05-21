@@ -29,7 +29,7 @@ import { HandlerGroups } from "./api/handlers/groups";
 import { HandlerClipboards } from "./api/handlers/clipboards";
 import { App, ArgCreateApp } from "./api/app";
 
-function initApp<T extends App>(
+function init<T extends App>(
   // t is class symbol of any type whose
   // constructor takes in ArgCreateApp and returns T
   t: { new (arg: ArgCreateApp): T },
@@ -71,4 +71,4 @@ function initApp<T extends App>(
   });
 }
 
-export default initApp;
+export default init;
