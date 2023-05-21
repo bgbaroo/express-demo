@@ -13,6 +13,18 @@ const defaultClip = { title: "fooNote", content: "note", shared: true };
 
 let token: string;
 
+beforeEach(async () => {
+  await clearDb(postgres);
+
+  return initDb();
+});
+
+afterAll(() => {
+  clearDb(postgres);
+
+  return postgres.$disconnect();
+});
+
 async function initDb() {
   await request(app.server).post("/users/register").send(userCredential);
 
@@ -23,16 +35,6 @@ async function initDb() {
 
   token = `Bearer ${res.body.data.token}`;
 }
-
-beforeEach(async () => {
-  await clearDb(postgres);
-  return initDb();
-});
-
-afterAll(() => {
-  clearDb(postgres);
-  return postgres.$disconnect();
-});
 
 describe("Create clipboard", () => {
   test("Missing token should return 401", async () => {
