@@ -1,6 +1,6 @@
 import { DbOnly, DataModelUser, DataModelGroup } from "./models";
 
-import { IUser, IUserArg, User } from "../../../../domain/entities/user";
+import { IUser, ArgCreateUser, User } from "../../../../domain/entities/user";
 
 // Extends DataModelUser with shallow group information.
 // DataModelUserWithGroups.groups only contains what's available
@@ -41,7 +41,7 @@ interface IUserData extends IUser {
 
 class UserData extends User implements IUserData {
   password: string;
-  constructor(arg: IUserArg & { password: string }) {
+  constructor(arg: ArgCreateUser & { password: string }) {
     super(arg);
     this.password = arg.password;
   }

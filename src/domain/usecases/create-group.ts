@@ -1,5 +1,5 @@
 import {
-  CreateGroupArg,
+  ArgCreateGroup,
   IUseCaseCreateGroup,
 } from "../interfaces/usecases/group";
 import { IRepositoryGroup } from "../interfaces/repositories/group";
@@ -47,7 +47,7 @@ export class UseCaseCreateGroup implements IUseCaseCreateGroup {
     this.repoUser = arg.repoUser;
   }
 
-  async execute(arg: CreateGroupArg): Promise<IGroup> {
+  async execute(arg: ArgCreateGroup): Promise<IGroup> {
     return await this.repoGroup.createGroup(
       new Group({
         name: arg.name,

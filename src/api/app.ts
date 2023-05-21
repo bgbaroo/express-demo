@@ -12,35 +12,50 @@ export type HandlerFunc = (Request, Response) => Promise<Response>;
 // Handlers that require authentication middleware
 export type HandlerFuncAuth = (AuthRequest, Response) => Promise<Response>;
 
+export interface ArgCreateApp {
+  clipboard: IHandlerClipboards;
+  user: IHandlerUsers;
+  group: IHandlerGroups;
+}
+
 export class App {
-  server: express.Express;
+  protected readonly _server: express.Express;
 
-  constructor(arg: {
-    clipboard: IHandlerClipboards;
-    user: IHandlerUsers;
-    group: IHandlerGroups;
-  }) {
+  constructor(arg: ArgCreateApp) {
     // Setup our Express app
-    this.server = express();
-    this.server.use(express.json());
+    this._server = express();
+    this._server.use(express.json());
 
-    this.server.get("/status", (_req: Request, res: Response) => {
+    this._server.get("/status", (_req: Request, res: Response) => {
       return resp.Ok(res, "ok");
     });
 
     // Register routers
-    this.server.use("/clipboards", new RouterClipboard(arg.clipboard).router());
-    this.server.use("/users", new RouterUsers(arg.user).router());
-    this.server.use("/groups", new RouterGroups(arg.group).router());
+    this._server.use(
+      "/clipboards",
+      new RouterClipboard(arg.clipboard).router(),
+    );
+    this._server.use("/users", new RouterUsers(arg.user).router());
+    this._server.use("/groups", new RouterGroups(arg.group).router());
   }
 
   async listenAndServe(port: number | string): Promise<void> {
-    const server = this.server.listen(port, () => {
+    const server = this._server.listen(port, () => {
       console.log(`Express server is listening on ${port}`);
     });
 
     shutdown(server, "SIGINT");
     shutdown(server, "SIGTERM");
+  }
+}
+
+export class AppDev extends App {
+  constructor(arg: ArgCreateApp) {
+    super(arg);
+  }
+
+  server(): express.Express {
+    return this._server;
   }
 }
 

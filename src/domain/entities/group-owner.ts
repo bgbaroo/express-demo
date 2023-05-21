@@ -1,4 +1,4 @@
-import { IUser, User, IUserArg } from "./user";
+import { IUser, User, ArgCreateUser } from "./user";
 import { IGroup } from "./group";
 
 export interface IGroupOwner extends IUser {
@@ -7,14 +7,14 @@ export interface IGroupOwner extends IUser {
   ownNewGroup(group: IGroup);
 }
 
-export interface IGroupOwnerArg extends IUserArg {
+export interface ArgCreateGroupOwner extends ArgCreateUser {
   ownGroups?: IGroup[];
 }
 
 export class GroupOwner extends User implements IGroupOwner {
   private _ownGroups: Set<IGroup>;
 
-  constructor(arg: IGroupOwnerArg) {
+  constructor(arg: ArgCreateGroupOwner) {
     super(arg);
     this._ownGroups = new Set(arg.ownGroups);
   }

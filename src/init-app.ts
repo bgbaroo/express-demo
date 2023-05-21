@@ -27,9 +27,14 @@ import { HandlerGroups } from "./api/handlers/groups";
 import { HandlerUsers } from "./api/handlers/users";
 import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboards";
 import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboards";
-import { App } from "./api/app";
+import { App, ArgCreateApp } from "./api/app";
 
-function initApp(arg: { db: DbDriver }): App {
+function initApp<T extends App>(
+  // t is class symbol of any type whose
+  // constructor takes in ArgCreateApp and returns T
+  t: { new (arg: ArgCreateApp): T },
+  arg: { db: DbDriver },
+): T {
   const dataLinkUser = new DataLinkUser(arg.db);
   const repoUser = new RepositoryUser(dataLinkUser);
   const handlerUsers = new HandlerUsers({
@@ -59,7 +64,7 @@ function initApp(arg: { db: DbDriver }): App {
     deleteClipboards: new UseCaseDeleteUserClipboards(repoClipboard),
   });
 
-  return new App({
+  return new t({
     clipboard: handlerClipboards,
     user: handlerUsers,
     group: handlerGroups,

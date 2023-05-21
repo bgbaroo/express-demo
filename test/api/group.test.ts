@@ -1,11 +1,12 @@
 import request from "supertest";
 
+import { AppDev } from "../../src/api/app";
 import initApp from "../../src/init-app";
 import postgres from "../../src/data/sources/postgres";
 import { clearDb } from "../util";
 
 // TODO: mock DB
-const app = initApp({ db: postgres });
+const server = initApp<AppDev>(AppDev, { db: postgres }).server();
 const apiPath = "/groups";
 const apiRegister = "/users/register";
 const apiLogin = "/users/login";
@@ -28,13 +29,13 @@ afterAll(() => {
 
 async function initDb() {
   await Promise.all([
-    request(app.server).post(apiRegister).send(credentialFoo).expect(201),
-    request(app.server).post(apiRegister).send(credentialBar).expect(201),
+    request(server).post(apiRegister).send(credentialFoo).expect(201),
+    request(server).post(apiRegister).send(credentialBar).expect(201),
   ]);
 
   const users = await Promise.all([
-    request(app.server).post(apiLogin).send(credentialFoo).expect(200),
-    request(app.server).post(apiLogin).send(credentialBar).expect(200),
+    request(server).post(apiLogin).send(credentialFoo).expect(200),
+    request(server).post(apiLogin).send(credentialBar).expect(200),
   ]);
 
   tokenFoo = `Bearer ${users[0].body.data.token}`;
@@ -46,11 +47,11 @@ describe("Create group", () => {
   const payloadOk = { name: "fooGroup" };
 
   test("unauthorized request should return 401", async () => {
-    await request(app.server).post(apiPath).send(payloadOk).expect(401);
+    await request(server).post(apiPath).send(payloadOk).expect(401);
   });
 
   test("bad request should return 400", async () => {
-    await request(app.server)
+    await request(server)
       .post(apiPath)
       .set({ Authorization: tokenFoo })
       .send(payloadBad)
@@ -58,7 +59,7 @@ describe("Create group", () => {
   });
 
   test("good request should return 201", async () => {
-    await request(app.server)
+    await request(server)
       .post(apiPath)
       .set({ Authorization: tokenFoo })
       .send(payloadOk)
@@ -66,13 +67,13 @@ describe("Create group", () => {
   });
 
   test("duplicate group name should return 500", async () => {
-    await request(app.server)
+    await request(server)
       .post(apiPath)
       .set({ Authorization: tokenFoo })
       .send(payloadOk)
       .expect(201);
 
-    await request(app.server)
+    await request(server)
       .post(apiPath)
       .set({ Authorization: tokenBar })
       .send(payloadOk)
@@ -80,7 +81,7 @@ describe("Create group", () => {
   });
 
   test("create group with non-existent member should return 201", async () => {
-    const groupResp = await request(app.server)
+    const groupResp = await request(server)
       .post(apiPath)
       .set({ Authorization: tokenFoo })
       .send({ ...payloadOk, memberEmails: ["badEmail"] })
@@ -92,7 +93,7 @@ describe("Create group", () => {
   test("create group with existing member should return 201 with member", async () => {
     const {
       body: { resource: group },
-    } = await request(app.server)
+    } = await request(server)
       .post(apiPath)
       .set({ Authorization: tokenBar })
       .send({ ...payloadOk, memberEmails: [credentialFoo.email] })

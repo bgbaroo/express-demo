@@ -9,7 +9,7 @@ export interface IUser {
   groups(): IGroup[];
 }
 
-export interface IUserArg {
+export interface ArgCreateUser {
   email: string;
   id?: string;
   groups?: IGroup[];
@@ -25,7 +25,7 @@ export class User implements IUser {
 
   // Creates a new User. If id is undefined,
   // UUID will be auto-generated for the user
-  constructor(arg: IUserArg) {
+  constructor(arg: ArgCreateUser) {
     this.id = arg.id || uuid();
     this.email = arg.email;
     this._groups = new Set(arg.groups);

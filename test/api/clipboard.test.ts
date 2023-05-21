@@ -1,11 +1,12 @@
 import request from "supertest";
 
+import { AppDev } from "../../src/api/app";
 import initApp from "../../src/init-app";
 import postgres from "../../src/data/sources/postgres";
 import { clearDb } from "../util";
 
 // TODO: mock DB
-const app = initApp({ db: postgres });
+const server = initApp<AppDev>(AppDev, { db: postgres }).server();
 
 const apiPath = "/clipboards";
 const userCredential = { email: "foo", password: "bar" };
@@ -26,9 +27,9 @@ afterAll(() => {
 });
 
 async function initDb() {
-  await request(app.server).post("/users/register").send(userCredential);
+  await request(server).post("/users/register").send(userCredential);
 
-  const res = await request(app.server)
+  const res = await request(server)
     .post("/users/login")
     .send(userCredential)
     .expect(200);
@@ -38,14 +39,11 @@ async function initDb() {
 
 describe("Create clipboard", () => {
   test("Missing token should return 401", async () => {
-    return await request(app.server)
-      .post(apiPath)
-      .send(defaultClip)
-      .expect(401);
+    return await request(server).post(apiPath).send(defaultClip).expect(401);
   });
 
   test("should return 201", async () => {
-    return await request(app.server)
+    return await request(server)
       .post(apiPath)
       .set({ Authorization: token })
       .send(defaultClip)
@@ -55,13 +53,13 @@ describe("Create clipboard", () => {
 
 describe("Get clipboard", () => {
   test("Bad ID should return 404", async () => {
-    await request(app.server)
+    await request(server)
       .post(apiPath)
       .set({ Authorization: token })
       .send(defaultClip)
       .expect(201);
 
-    await request(app.server)
+    await request(server)
       .get(`${apiPath}/some_bad_id`)
       .set({ Authorization: token })
       .send(defaultClip)
@@ -69,13 +67,13 @@ describe("Get clipboard", () => {
   });
 
   test("Should found some", async () => {
-    await request(app.server)
+    await request(server)
       .post(apiPath)
       .set({ Authorization: token })
       .send(defaultClip)
       .expect(201);
 
-    await request(app.server)
+    await request(server)
       .get(`${apiPath}`)
       .set({ Authorization: token })
       .send(defaultClip)
@@ -83,14 +81,14 @@ describe("Get clipboard", () => {
   });
 
   test("Should found exact", async () => {
-    const res = await request(app.server)
+    const res = await request(server)
       .post(apiPath)
       .set({ Authorization: token })
       .send(defaultClip)
       .expect(201);
 
     const id = res.body.resource.id;
-    await request(app.server)
+    await request(server)
       .get(`${apiPath}/${id}`)
       .set({ Authorization: token })
       .send(defaultClip)

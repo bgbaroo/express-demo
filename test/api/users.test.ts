@@ -1,12 +1,13 @@
 import request from "supertest";
 import dotenv from "dotenv";
 
+import { AppDev } from "../../src/api/app";
 import initApp from "../../src/init-app";
 import postgres from "../../src/data/sources/postgres";
 import { clearDb } from "../util";
 
 // TODO: mock DB
-const app = initApp({ db: postgres });
+const server = initApp<AppDev>(AppDev, { db: postgres }).server();
 
 beforeEach(() => {
   return clearDb(postgres);
@@ -23,17 +24,17 @@ describe("Register API", () => {
 
   test("Missing email should return 400", async () => {
     const payload = { password: "foo" };
-    return await request(app.server).post(apiPath).send(payload).expect(400);
+    return await request(server).post(apiPath).send(payload).expect(400);
   });
 
   test("Missing password should return 400", async () => {
     const payload = { email: "foo" };
-    return await request(app.server).post(apiPath).send(payload).expect(400);
+    return await request(server).post(apiPath).send(payload).expect(400);
   });
 
   test("Should return 201", async () => {
     const payload = { email: "foo", password: "foobar" };
-    return await request(app.server).post(apiPath).send(payload).expect(201);
+    return await request(server).post(apiPath).send(payload).expect(201);
   });
 });
 
@@ -45,12 +46,9 @@ describe("Login API", () => {
   const loginPath = "/users/login";
 
   test("Invalid credentials should not authenticate", async () => {
-    await request(app.server)
-      .post(registerPath)
-      .send(userCredential)
-      .expect(201);
+    await request(server).post(registerPath).send(userCredential).expect(201);
 
-    const res = await request(app.server)
+    const res = await request(server)
       .post(loginPath)
       .send(invalidUserCredentials)
       .expect(401);
@@ -59,12 +57,9 @@ describe("Login API", () => {
   });
 
   test("Should authenticate login", async () => {
-    await request(app.server)
-      .post(registerPath)
-      .send(userCredential)
-      .expect(201);
+    await request(server).post(registerPath).send(userCredential).expect(201);
 
-    const res = await request(app.server)
+    const res = await request(server)
       .post(loginPath)
       .send(userCredential)
       .expect(200);
@@ -73,19 +68,16 @@ describe("Login API", () => {
   });
 
   test("JWT should authenticate", async () => {
-    await request(app.server)
-      .post(registerPath)
-      .send(userCredential)
-      .expect(201);
+    await request(server).post(registerPath).send(userCredential).expect(201);
 
-    const loginRes = await request(app.server)
+    const loginRes = await request(server)
       .post(loginPath)
       .send(userCredential)
       .expect(200);
 
     const token = loginRes.body.data.token;
 
-    const res = await request(app.server)
+    const res = await request(server)
       .get("/clipboards")
       .set({ Authorization: `Bearer ${token}` });
 
