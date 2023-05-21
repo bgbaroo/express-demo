@@ -14,13 +14,17 @@ export class RepositoryUser implements IRepositoryUser {
     return await this.link.createUser(user, password);
   }
 
-  async getUser(where: IWhereUser): Promise<IUserData> {
+  async getUserNotNullable(where: IWhereUser): Promise<IUserData> {
     const user = await this.link.getUser(where);
     if (!user) {
       return Promise.reject(`null user: ${where}`);
     }
 
     return Promise.resolve(user);
+  }
+
+  async getUser(where: IWhereUser): Promise<IUserData | null> {
+    return await this.link.getUser(where);
   }
 
   async getUsers(): Promise<IUserData[]> {

@@ -12,7 +12,7 @@ export class UseCaseUserLogin implements IUseCaseUserRegister {
   }
 
   async execute(user: IUser, password: string): Promise<IUser> {
-    const _user = await this.repo.getUser({ email: user.email });
+    const _user = await this.repo.getUserNotNullable({ email: user.email });
     if (!_user) {
       return Promise.reject(`no such user: ${user.email}`);
     }

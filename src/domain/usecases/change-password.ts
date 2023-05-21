@@ -11,7 +11,7 @@ export class UseCaseUserChangePassword implements IUseCaseUserChangePassword {
   }
 
   async execute(user: IUser, newPassword: string): Promise<IUser> {
-    const _user = await this.repo.getUser({ email: user.email });
+    const _user = await this.repo.getUserNotNullable({ email: user.email });
     if (!_user) {
       return Promise.reject(`no such user: ${user.email}`);
     }
