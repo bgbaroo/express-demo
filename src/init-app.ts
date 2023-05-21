@@ -28,7 +28,6 @@ import { HandlerUsers } from "./api/handlers/users";
 import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboards";
 import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboards";
 import { App } from "./api/app";
-import { UseCaseGetUserByEmail } from "./domain/usecases/get-user-by-email";
 
 function initApp(arg: { db: DbDriver }): App {
   const dataLinkUser = new DataLinkUser(arg.db);
@@ -43,10 +42,9 @@ function initApp(arg: { db: DbDriver }): App {
   const dataLinkGroup = new DataLinkGroup(arg.db);
   const repoGroup = new RepositoryGroup(dataLinkGroup);
   const handlerGroups = new HandlerGroups({
-    createGroup: new UseCaseCreateGroup(repoGroup),
+    createGroup: new UseCaseCreateGroup({ repoGroup, repoUser }),
     deleteGroup: new UseCaseDeleteGroup(repoGroup),
     deleteGroups: new UseCaseDeleteUserGroups(repoGroup),
-    getUserByEmail: new UseCaseGetUserByEmail(repoUser),
   });
 
   const dataLinkClipboard = new DataLinkClipboard(arg.db);

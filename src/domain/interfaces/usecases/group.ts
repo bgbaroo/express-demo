@@ -1,7 +1,14 @@
 import { IGroup } from "../../entities/group";
 
+export interface CreateGroupArg {
+  name: string;
+  ownerId: string;
+  ownerEmail: string;
+  memberEmails: string[] | undefined;
+}
+
 export interface IUseCaseCreateGroup {
-  execute(group: IGroup): Promise<IGroup>;
+  execute(arg: CreateGroupArg): Promise<IGroup>;
 }
 
 export interface IUseCaseGetGroup {
