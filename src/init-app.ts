@@ -4,8 +4,8 @@ import { DataLinkGroup } from "./data/sources/postgres/data-links/group";
 import { DataLinkClipboard } from "./data/sources/postgres/data-links/clipboard";
 
 import { RepositoryUser } from "./domain/repositories/user";
-import { RepositoryClipboard } from "./domain/repositories/clipboard";
 import { RepositoryGroup } from "./domain/repositories/group";
+import { RepositoryClipboard } from "./domain/repositories/clipboard";
 
 import { UseCaseUserRegister } from "./domain/usecases/register";
 import { UseCaseUserLogin } from "./domain/usecases/login";
@@ -17,16 +17,16 @@ import { UseCaseDeleteGroup } from "./domain/usecases/delete-group";
 import { UseCaseDeleteUserGroups } from "./domain/usecases/delete-user-groups";
 
 import { UseCaseCreateClipboard } from "./domain/usecases/create-clipboard";
-import { UseCaseDeleteUserClipboard } from "./domain/usecases/delete-user-clipboard";
 import { UseCaseGetUserClipboard } from "./domain/usecases/get-user-clipboard";
-import { UseCaseDeleteUserClipboards } from "./domain/usecases/delete-user-clipboards";
 import { UseCaseGetUserClipboards } from "./domain/usecases/get-user-clipboards";
-
-import { HandlerClipboards } from "./api/handlers/clipboards";
-import { HandlerGroups } from "./api/handlers/groups";
-import { HandlerUsers } from "./api/handlers/users";
 import { UseCaseGetGroupClipboards } from "./domain/usecases/get-group-clipboards";
 import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboards";
+import { UseCaseDeleteUserClipboard } from "./domain/usecases/delete-user-clipboard";
+import { UseCaseDeleteUserClipboards } from "./domain/usecases/delete-user-clipboards";
+
+import { HandlerUsers } from "./api/handlers/users";
+import { HandlerGroups } from "./api/handlers/groups";
+import { HandlerClipboards } from "./api/handlers/clipboards";
 import { App, ArgCreateApp } from "./api/app";
 
 function initApp<T extends App>(
