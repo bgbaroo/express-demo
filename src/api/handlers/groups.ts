@@ -56,6 +56,34 @@ export class HandlerGroups implements IHandlerGroups {
     this.usecaseGetUserByEmail = arg.getUserByEmail;
   }
 
+  private async getUsersByEmail(
+    emails: string[] | undefined,
+  ): Promise<IUser[] | undefined> {
+    if (!emails) {
+      return undefined;
+    }
+
+    // Match return signature with use case types
+    const members: IUser[] | undefined = [];
+    const _members = await Promise.all(
+      emails.map(async (email): Promise<IUser | null> => {
+        return this.usecaseGetUserByEmail.execute(email);
+      }),
+    ).catch((err) => {
+      console.error(`error getting user by email: ${err}`);
+
+      return undefined;
+    });
+
+    if (_members) {
+      _members.forEach((member) => {
+        if (member) members.push(member);
+      });
+    }
+
+    return members;
+  }
+
   async createGroup(
     req: AuthRequest<any, ResponseGroup, CreateGroupBody, any>,
     res: Response,
@@ -70,32 +98,12 @@ export class HandlerGroups implements IHandlerGroups {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
-    let members: IUser[] | undefined = undefined;
-    if (emails) {
-      const _members = await Promise.all(
-        emails.map(async (email): Promise<IUser | null> => {
-          return this.usecaseGetUserByEmail.execute(email);
-        }),
-      ).catch((err) => {
-        console.error(`error getting user by email: ${err}`);
-
-        return undefined;
-      });
-
-      members = [];
-      if (_members) {
-        _members.forEach((member) => {
-          if (member) members?.push(member);
-        });
-      }
-    }
-
     return this.usecaseCreateGroup
       .execute(
         new Group({
           name,
           owner: new GroupOwner({ id: userId, email }),
-          users: members,
+          users: await this.getUsersByEmail(emails),
         }),
       )
       .then((group) => resp.Created(res, groupToResp(group)))
