@@ -6,17 +6,34 @@ import { IHandlerGroups } from "../routes/groups";
 import { AuthRequest } from "../auth/jwt";
 import { AppErrors } from "../../domain/errors";
 import { GroupOwner } from "../../domain/entities/group-owner";
-import { Group } from "../../domain/entities/group";
-import { User } from "../../domain/entities/user";
+import { IGroup, Group } from "../../domain/entities/group";
+import { IUser } from "../../domain/entities/user";
 import {
   IUseCaseCreateGroup,
   IUseCaseDeleteGroup,
   IUseCaseDeleteUserGroups,
 } from "../../domain/interfaces/usecases/group";
+import { IUseCaseGetUserByEmail } from "../../domain/interfaces/usecases/user";
 
 interface CreateGroupBody {
   name: string;
   memberEmails?: string[];
+}
+
+interface ResponseGroup {
+  id: string;
+  name: string;
+  ownerId: string;
+  members: string[];
+}
+
+function groupToResp(group: IGroup): ResponseGroup {
+  return {
+    id: group.id,
+    name: group.name,
+    ownerId: group.getOwnerId(),
+    members: group.getMembers().map((member) => member.email),
+  };
 }
 
 export class HandlerGroups implements IHandlerGroups {
@@ -24,21 +41,26 @@ export class HandlerGroups implements IHandlerGroups {
   private readonly usecaseDeleteGroup: IUseCaseDeleteGroup;
   private readonly usecaseDeleteGroups: IUseCaseDeleteUserGroups;
 
+  // TODO: get multiple users by emails instead
+  private readonly usecaseGetUserByEmail: IUseCaseGetUserByEmail;
+
   constructor(arg: {
     createGroup: IUseCaseCreateGroup;
     deleteGroup: IUseCaseDeleteGroup;
     deleteGroups: IUseCaseDeleteUserGroups;
+    getUserByEmail: IUseCaseGetUserByEmail;
   }) {
     this.usecaseCreateGroup = arg.createGroup;
     this.usecaseDeleteGroup = arg.deleteGroup;
     this.usecaseDeleteGroups = arg.deleteGroups;
+    this.usecaseGetUserByEmail = arg.getUserByEmail;
   }
 
   async createGroup(
-    req: AuthRequest<any, any, CreateGroupBody, any>,
+    req: AuthRequest<any, ResponseGroup, CreateGroupBody, any>,
     res: Response,
   ): Promise<Response> {
-    const { name, memberEmails } = req.body;
+    const { name, memberEmails: emails } = req.body;
     if (!name) {
       return resp.MissingField(res, "name");
     }
@@ -48,18 +70,38 @@ export class HandlerGroups implements IHandlerGroups {
       return resp.InternalServerError(res, AppErrors.MissingJWTPayload);
     }
 
+    let members: IUser[] | undefined = undefined;
+    if (emails) {
+      const _members = await Promise.all(
+        emails.map(async (email): Promise<IUser | null> => {
+          return this.usecaseGetUserByEmail.execute(email);
+        }),
+      ).catch((err) => {
+        console.error(`error getting user by email: ${err}`);
+
+        return undefined;
+      });
+
+      members = [];
+      if (_members) {
+        _members.forEach((member) => {
+          if (member) members?.push(member);
+        });
+      }
+    }
+
     return this.usecaseCreateGroup
       .execute(
         new Group({
           name,
           owner: new GroupOwner({ id: userId, email }),
-          users: memberEmails?.map((member) => new User({ email: member })),
+          users: members,
         }),
       )
-      .then((group) => resp.Created(res, group))
+      .then((group) => resp.Created(res, groupToResp(group)))
       .catch((err) => {
         console.error(
-          `failed to create group ${name} by owner ${email} with members ${memberEmails}: ${err}`,
+          `failed to create group ${name} by owner ${email} with members ${emails}: ${err}`,
         );
         return resp.InternalServerError(res, `failed to create group ${name}`);
       });

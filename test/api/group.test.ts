@@ -17,7 +17,8 @@ let tokenBar: string;
 
 beforeEach(async () => {
   await clearDb(postgres);
-  return initDb();
+
+  return await initDb();
 });
 
 afterAll(() => {
@@ -62,6 +63,44 @@ describe("Create group", () => {
       .set({ Authorization: tokenFoo })
       .send(payloadOk)
       .expect(201);
+  });
+
+  test("duplicate group name should return 500", async () => {
+    await request(app.server)
+      .post(apiPath)
+      .set({ Authorization: tokenFoo })
+      .send(payloadOk)
+      .expect(201);
+
+    await request(app.server)
+      .post(apiPath)
+      .set({ Authorization: tokenBar })
+      .send(payloadOk)
+      .expect(500);
+  });
+
+  test("create group with non-existent member should return 201", async () => {
+    const groupResp = await request(app.server)
+      .post(apiPath)
+      .set({ Authorization: tokenFoo })
+      .send({ ...payloadOk, memberEmails: ["badEmail"] })
+      .expect(201);
+
+    expect(groupResp.body.resource.members.length).toEqual(1);
+  });
+
+  test("create group with existing member should return 201 with member", async () => {
+    const {
+      body: { resource: group },
+    } = await request(app.server)
+      .post(apiPath)
+      .set({ Authorization: tokenBar })
+      .send({ ...payloadOk, memberEmails: [credentialFoo.email] })
+      .expect(201);
+
+    expect(group.members.length).toEqual(2);
+    expect(group.members.includes(credentialFoo.email)).toEqual(true);
+    expect(group.members.includes(credentialBar.email)).toEqual(true);
   });
 });
 

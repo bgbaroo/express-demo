@@ -16,7 +16,7 @@ interface Arg {
 }
 
 describe("users and groups datalink", () => {
-  it("group with user relations", async () => {
+  test("group with user relations", async () => {
     const pg = new PrismaClient();
     const userDb = new DataLinkUser(pg);
     const groupDb = new DataLinkGroup(pg);

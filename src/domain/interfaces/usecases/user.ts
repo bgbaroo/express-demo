@@ -21,5 +21,9 @@ export interface IUseCaseUserDeleteUser {
 }
 
 export interface IUseCaseUserGetUser {
-  execute(userId: string): Promise<IUser>;
+  execute(userId: string): Promise<IUser | null>;
+}
+
+export interface IUseCaseGetUserByEmail {
+  execute(email: string): Promise<IUser | null>;
 }

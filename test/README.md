@@ -124,7 +124,7 @@ import { mul, periodReturn, fromPercent, compound } from "./bank_return";
 
 // describe defines a test suite
 describe("mul", () => {
-  // it defines sub-test within a describe test suite
+  // Keyword `test` and `it` define a test for Jest
   it("multiply with 0 should give 0", () => {
     expect(mul(0, 0)).toEqual(0);
     expect(mul(0, 1)).toEqual(0);

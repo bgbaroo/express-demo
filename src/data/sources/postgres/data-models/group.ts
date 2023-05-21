@@ -42,16 +42,17 @@ function includeOwnerAndUsers(): IIncludeOwnerAndUsers {
 
 // Converts data from database into IGroup
 function toGroupWithMembers(data: AppDataModelGroupWithMembers): IGroup {
-  // We did not get owner's groups (not owned groups) information
-  // to save costs.
   const owner = new GroupOwner({
     id: data.owner.id,
     email: data.owner.email,
   });
 
-  data.owner.groups.forEach((groupData) => {
-    owner.ownNewGroup(new Group({ ...groupData, owner }));
-  });
+  data.owner.groups
+    // Avoid adding this group again (new Group constructor also adds group)
+    .filter((group) => group.id != data.id)
+    .forEach((groupData) => {
+      owner.ownNewGroup(new Group({ ...groupData, owner }));
+    });
 
   return new Group({
     id: data.id,

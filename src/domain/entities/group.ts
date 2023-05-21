@@ -28,20 +28,20 @@ export class Group implements IGroup {
   private _members: Map<string, IUser>;
 
   // For when constructing from database values, with known ID
-  constructor(args: {
+  constructor(arg: {
     id?: string;
     name: string;
     owner: IGroupOwner;
     users?: IUser[];
   }) {
-    this.id = args.id || uuid();
-    this.name = args.name;
-    this.ownerId = args.owner.id;
+    this.id = arg.id || uuid();
+    this.name = arg.name;
+    this.ownerId = arg.owner.id;
     this._members = new Map();
-    this.setOwner(args.owner);
+    this.setOwner(arg.owner);
 
-    if (args.users !== undefined) {
-      this.addMembers(args.owner, args.users);
+    if (arg.users) {
+      this.addMembers(arg.owner, arg.users);
     }
   }
 
@@ -67,7 +67,9 @@ export class Group implements IGroup {
 
     owner.ownNewGroup(this);
     this.ownerId = owner.id;
-    this._addMember(owner, owner);
+    if (!this._addMember(owner, owner)) {
+      throw new Error("failed to add owner as user");
+    }
   }
 
   getOwnerId(): string {

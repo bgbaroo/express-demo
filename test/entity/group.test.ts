@@ -25,22 +25,22 @@ function testGroupOwner(owner: IGroupOwner, _gids: Set<string>) {
       const gid = gids[i];
       const group = new Group({ id: gid, name: `group_${gid}`, owner });
 
-      it("empty group.size() != 1", () => {
+      test("empty group.size() != 1", () => {
         // Owner is also a member,
         // and Groups will always have 1 owner
         expect(group.size()).toEqual(1);
       });
 
-      it("group has invalid owner", () => {
+      test("group has invalid owner", () => {
         expect(group.getOwnerId()).toEqual(owner.id);
       });
 
-      it("owner forgot some groups", () => {
+      test("owner forgot some groups", () => {
         expect(ownerForgot(owner, gids)).toBeUndefined();
       });
 
       const len = owner.groupsOwned().length;
-      it("owner groups length mismatch", () => {
+      test("owner groups length mismatch", () => {
         expect(len).toEqual(i + 1);
       });
     }
@@ -69,41 +69,41 @@ describe("no duplicate emails", () => {
   const group = new Group({ id: "gid", name: "gname", owner, users });
   const target = group.getMember(id);
 
-  it("unexpected Group.ownerId()", () => {
+  test("unexpected Group.ownerId()", () => {
     expect(group.getOwnerId()).toEqual(owner.id);
   });
 
-  it("unexpected Group.size()", () => {
+  test("unexpected Group.size()", () => {
     expect(group.size()).toEqual(4); // Plus the owner
   });
 
-  it("User undefined", () => {
+  test("User undefined", () => {
     expect(target).toBeDefined();
   });
 
-  it("User.id undefined", () => {
+  test("User.id undefined", () => {
     expect(target?.id).toBeDefined();
   });
 
-  it("User.id unexpected", () => {
+  test("User.id unexpected", () => {
     expect(target?.id).toEqual(id);
   });
 
-  it("User.email undefined", () => {
+  test("User.email undefined", () => {
     expect(target?.email).toBeDefined();
   });
 
-  it("User.email unexpected", () => {
+  test("User.email unexpected", () => {
     expect(target?.email).toEqual(myUser.email);
   });
 
-  it("duplicate User.id was added", () => {
+  test("duplicate User.id was added", () => {
     expect(group.addMember(owner, new User({ email: fooAtBar, id }))).toEqual(
       false,
     );
   });
 
-  it("new User was not added", () => {
+  test("new User was not added", () => {
     expect(
       group.addMember(owner, new User({ email: "new email", id: "new id" })),
     ).toEqual(true);

@@ -46,7 +46,7 @@ describe("groups and clipboards", () => {
     dataLinkClipboard: new DataLinkClipboard(postgres),
   };
 
-  it("membership visibility", async () => {
+  test("membership visibility", async () => {
     try {
       await clearDb(arg.dbDriver);
       await testGroupClipboards(arg);
