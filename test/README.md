@@ -125,34 +125,34 @@ import { mul, periodReturn, fromPercent, compound } from "./bank_return";
 // describe defines a test suite
 describe("mul", () => {
   // Keyword `test` and `it` define a test for Jest
-  it("multiply with 0 should give 0", () => {
+  test("multiply with 0 should give 0", () => {
     expect(mul(0, 0)).toEqual(0);
     expect(mul(0, 1)).toEqual(0);
     expect(mul(2, 0)).toEqual(0);
   });
 
-  it("multiply x with 1 should give x", () => {
+  test("multiply x with 1 should give x", () => {
     expect(mul(1, 7)).toEqual(7);
     expect(mul(7, 1)).toEqual(7);
     expect(mul(2, 1)).toEqual(2);
   });
 
-  it("basic multiplication", () => {
+  test("basic multiplication", () => {
     expect(mul(2, 2)).toEqual(4);
     expect(mul(5, 10)).toEqual(50);
   });
 });
 
 describe("fromPercent", () => {
-  it("100% is whole 1", () => {
+  test("100% is whole 1", () => {
     expect(fromPercent(100)).toEqual(1);
   });
 
-  it("0% is 0", () => {
+  test("0% is 0", () => {
     expect(fromPercent(0)).toEqual(0);
   });
 
-  it("unexpected fromPercent value", () => {
+  test("unexpected fromPercent value", () => {
     expect(fromPercent(2)).toEqual(0.02);
     expect(fromPercent(5)).toEqual(0.02);
     expect(fromPercent(10)).toEqual(0.1);
@@ -160,22 +160,22 @@ describe("fromPercent", () => {
 });
 
 describe("compound", () => {
-  it("0 interest => unchanged amount", () => {
+  test("0 interest => unchanged amount", () => {
     expect(periodReturn(100, 0, 1)).toEqual(100);
     expect(periodReturn(69, 0, 1)).toEqual(69);
   });
 
-  it("unexpected periodReturn value", () => {
+  test("unexpected periodReturn value", () => {
     expect(periodReturn(100, 10)).toEqual(110); // 100 x 1.1
     expect(periodReturn(100, 20)).toEqual(120); // 100 x 1.2
   });
 });
 
 describe("compound", () => {
-  it("0 interest => unchanged amount", () => {
+  test("0 interest => unchanged amount", () => {
     expect(periodReturn(100, 10, 0)).toEqual(100); // 100 x 1.1
   });
-  it("unexpected compound value", () => {
+  test("unexpected compound value", () => {
     expect(periodReturn(100, 10, 1)).toEqual(110); // 100 x 1.1
     expect(periodReturn(100, 10, 2)).toEqual(121); // (100 x 1.1) x 1.1
   });
