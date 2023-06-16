@@ -5,10 +5,11 @@ import modelUser, { IUserData } from "../data-models/user";
 import { IWhereUser } from "../../../../domain/interfaces/repositories/user";
 import { IUser } from "../../../../domain/entities/user";
 
-export class DataLinkUser
-  extends BasePrismaSchemaDataLink
-  implements IDataLinkUser
-{
+export function newDataLinkUser(db: DbDriver): IDataLinkUser {
+  return new DataLinkUser(db);
+}
+
+class DataLinkUser extends BasePrismaSchemaDataLink implements IDataLinkUser {
   constructor(db: DbDriver) {
     super(db);
   }

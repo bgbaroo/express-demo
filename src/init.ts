@@ -1,7 +1,9 @@
-import { DbDriver } from "./data/sources/postgres";
-import { DataLinkUser } from "./data/sources/postgres/data-links/user";
-import { DataLinkGroup } from "./data/sources/postgres/data-links/group";
-import { DataLinkClipboard } from "./data/sources/postgres/data-links/clipboard";
+import {
+  DbDriver,
+  newDataLinkUser,
+  newDataLinkGroup,
+  newDataLinkClipboard,
+} from "./data/sources/postgres";
 
 import { RepositoryUser } from "./domain/repositories/user";
 import { RepositoryGroup } from "./domain/repositories/group";
@@ -33,7 +35,7 @@ function init<T extends App>(
   t: { new (arg: ArgCreateApp): T },
   arg: { db: DbDriver },
 ): T {
-  const dataLinkUser = new DataLinkUser(arg.db);
+  const dataLinkUser = newDataLinkUser(arg.db);
   const repoUser = new RepositoryUser(dataLinkUser);
   const handlerUsers = handlers.newHandlerUsers({
     register: new UseCaseUserRegister(repoUser),
@@ -42,7 +44,7 @@ function init<T extends App>(
     deleteUser: new UseCaseUserDeleteUser(repoUser),
   });
 
-  const dataLinkGroup = new DataLinkGroup(arg.db);
+  const dataLinkGroup = newDataLinkGroup(arg.db);
   const repoGroup = new RepositoryGroup(dataLinkGroup);
   const handlerGroups = handlers.newHandlerGroups({
     createGroup: new UseCaseCreateGroup({ repoGroup, repoUser }),
@@ -50,7 +52,7 @@ function init<T extends App>(
     deleteGroups: new UseCaseDeleteUserGroups(repoGroup),
   });
 
-  const dataLinkClipboard = new DataLinkClipboard(arg.db);
+  const dataLinkClipboard = newDataLinkClipboard(arg.db);
   const repoClipboard = new RepositoryClipboard(dataLinkClipboard);
   const handlerClipboards = handlers.newHandlerClipboards({
     createClipboard: new UseCaseCreateClipboard(repoClipboard),

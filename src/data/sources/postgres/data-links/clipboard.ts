@@ -6,7 +6,11 @@ import { IWhereClipboard } from "../../../../domain/interfaces/repositories/clip
 import { IClipboard } from "../../../../domain/entities/clipboard";
 import { IDataLinkClipboard } from "../../../interfaces/data-links";
 
-export class DataLinkClipboard
+export function newDataLinkClipboard(db: DbDriver): IDataLinkClipboard {
+  return new DataLinkClipboard(db);
+}
+
+class DataLinkClipboard
   extends BasePrismaSchemaDataLink
   implements IDataLinkClipboard
 {

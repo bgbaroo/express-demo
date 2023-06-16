@@ -6,10 +6,11 @@ import { IGroup } from "../../../../domain/entities/group";
 import { IWhereGroup } from "../../../../domain/interfaces/repositories/group";
 import { IDataLinkGroup } from "../../../interfaces/data-links";
 
-export class DataLinkGroup
-  extends BasePrismaSchemaDataLink
-  implements IDataLinkGroup
-{
+export function newDataLinkGroup(db: DbDriver): IDataLinkGroup {
+  return new DataLinkGroup(db);
+}
+
+class DataLinkGroup extends BasePrismaSchemaDataLink implements IDataLinkGroup {
   constructor(db: DbDriver) {
     super(db);
   }

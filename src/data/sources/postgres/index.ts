@@ -1,4 +1,11 @@
 import { PrismaClient as DbDriver } from "@prisma/client";
+import { newDataLinkUser } from "./data-links/user";
+import { newDataLinkGroup } from "./data-links/group";
+import { newDataLinkClipboard } from "./data-links/clipboard";
+
+export default new DbDriver();
+
+export { newDataLinkUser, newDataLinkGroup, newDataLinkClipboard };
 
 // Client for file schema.prisma
 class BasePrismaSchemaDataLink {
@@ -10,5 +17,3 @@ class BasePrismaSchemaDataLink {
 }
 
 export { DbDriver, BasePrismaSchemaDataLink };
-
-export default new DbDriver();
