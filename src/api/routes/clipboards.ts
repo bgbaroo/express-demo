@@ -1,18 +1,12 @@
-import { HandlerFuncAuth } from "../app";
 import { authenticateJwt } from "../auth/jwt";
+import { IHandlerClipboards } from "../handlers";
 import { Router } from "./router";
 
-export interface IHandlerClipboards {
-  createClipboard: HandlerFuncAuth;
-  getClipboard: HandlerFuncAuth;
-  getClipboards: HandlerFuncAuth;
-  getGroupClipboards: HandlerFuncAuth;
-  getGroupsClipboards: HandlerFuncAuth;
-  deleteClipboard: HandlerFuncAuth;
-  deleteClipboards: HandlerFuncAuth;
+export function newRouterClipboard(handler: IHandlerClipboards): Router {
+  return new RouterClipboard(handler);
 }
 
-export class RouterClipboard extends Router {
+class RouterClipboard extends Router {
   constructor(handler: IHandlerClipboards) {
     super();
 

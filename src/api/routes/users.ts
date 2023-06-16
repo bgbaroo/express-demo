@@ -1,17 +1,12 @@
-import { HandlerFunc, HandlerFuncAuth } from "../app";
 import { authenticateJwt } from "../auth/jwt";
+import { IHandlerUsers } from "../handlers";
 import { Router } from "./router";
 
-export interface IHandlerUsers {
-  register: HandlerFunc;
-  login: HandlerFunc;
-  // Require auth
-  logout: HandlerFuncAuth;
-  changePassword: HandlerFuncAuth;
-  deleteUser: HandlerFuncAuth;
+export function newRouterUsers(handler: IHandlerUsers): Router {
+  return new RouterUsers(handler);
 }
 
-export class RouterUsers extends Router {
+class RouterUsers extends Router {
   constructor(handler: IHandlerUsers) {
     super();
 

@@ -1,14 +1,12 @@
-import { HandlerFuncAuth } from "../app";
 import { authenticateJwt } from "../auth/jwt";
+import { IHandlerGroups } from "../handlers";
 import { Router } from "./router";
 
-export interface IHandlerGroups {
-  createGroup: HandlerFuncAuth;
-  deleteGroup: HandlerFuncAuth;
-  deleteGroups: HandlerFuncAuth;
+export function newRouterGroups(handler: IHandlerGroups): Router {
+  return new RouterGroups(handler);
 }
 
-export class RouterGroups extends Router {
+class RouterGroups extends Router {
   constructor(handler: IHandlerGroups) {
     super();
 

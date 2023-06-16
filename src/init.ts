@@ -24,9 +24,7 @@ import { UseCaseGetGroupsClipboards } from "./domain/usecases/get-groups-clipboa
 import { UseCaseDeleteUserClipboard } from "./domain/usecases/delete-user-clipboard";
 import { UseCaseDeleteUserClipboards } from "./domain/usecases/delete-user-clipboards";
 
-import { HandlerUsers } from "./api/handlers/users";
-import { HandlerGroups } from "./api/handlers/groups";
-import { HandlerClipboards } from "./api/handlers/clipboards";
+import handlers from "./api/handlers";
 import { App, ArgCreateApp } from "./api/app";
 
 function init<T extends App>(
@@ -37,7 +35,7 @@ function init<T extends App>(
 ): T {
   const dataLinkUser = new DataLinkUser(arg.db);
   const repoUser = new RepositoryUser(dataLinkUser);
-  const handlerUsers = new HandlerUsers({
+  const handlerUsers = handlers.newHandlerUsers({
     register: new UseCaseUserRegister(repoUser),
     login: new UseCaseUserLogin(repoUser),
     changePassword: new UseCaseUserChangePassword(repoUser),
@@ -46,7 +44,7 @@ function init<T extends App>(
 
   const dataLinkGroup = new DataLinkGroup(arg.db);
   const repoGroup = new RepositoryGroup(dataLinkGroup);
-  const handlerGroups = new HandlerGroups({
+  const handlerGroups = handlers.newHandlerGroups({
     createGroup: new UseCaseCreateGroup({ repoGroup, repoUser }),
     deleteGroup: new UseCaseDeleteGroup(repoGroup),
     deleteGroups: new UseCaseDeleteUserGroups(repoGroup),
@@ -54,7 +52,7 @@ function init<T extends App>(
 
   const dataLinkClipboard = new DataLinkClipboard(arg.db);
   const repoClipboard = new RepositoryClipboard(dataLinkClipboard);
-  const handlerClipboards = new HandlerClipboards({
+  const handlerClipboards = handlers.newHandlerClipboards({
     createClipboard: new UseCaseCreateClipboard(repoClipboard),
     getClipboard: new UseCaseGetUserClipboard(repoClipboard),
     getClipboards: new UseCaseGetUserClipboards(repoClipboard),

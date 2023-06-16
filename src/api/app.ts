@@ -2,10 +2,9 @@ import http from "http";
 import express, { Request, Response } from "express";
 
 import resp from "./response";
-import { IHandlerClipboards, RouterClipboard } from "./routes/clipboards";
-import { IHandlerUsers, RouterUsers } from "./routes/users";
-import { IHandlerGroups, RouterGroups } from "./routes/groups";
+import routes from "./routes";
 import { AuthRequest } from "./auth/jwt";
+import { IHandlerClipboards, IHandlerGroups, IHandlerUsers } from "./handlers";
 
 // Handlers that do not require authentication middleware
 export type HandlerFunc = (Request, Response) => Promise<Response>;
@@ -13,9 +12,9 @@ export type HandlerFunc = (Request, Response) => Promise<Response>;
 export type HandlerFuncAuth = (AuthRequest, Response) => Promise<Response>;
 
 export interface ArgCreateApp {
-  clipboard: IHandlerClipboards;
   user: IHandlerUsers;
   group: IHandlerGroups;
+  clipboard: IHandlerClipboards;
 }
 
 export class App {
@@ -33,10 +32,10 @@ export class App {
     // Register routers
     this._server.use(
       "/clipboards",
-      new RouterClipboard(arg.clipboard).router(),
+      routes.newRouterClipboard(arg.clipboard).router(),
     );
-    this._server.use("/users", new RouterUsers(arg.user).router());
-    this._server.use("/groups", new RouterGroups(arg.group).router());
+    this._server.use("/users", routes.newRouterUsers(arg.user).router());
+    this._server.use("/groups", routes.newRouterGroups(arg.group).router());
   }
 
   async listenAndServe(port: number | string): Promise<void> {

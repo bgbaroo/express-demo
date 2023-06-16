@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import resp from "../response";
 import { JwtTokenPayload, generateJwt } from "../auth/jwt";
-import { IHandlerUsers } from "../routes/users";
+import { IHandlerUsers } from ".";
 import {
   IUseCaseUserRegister,
   IUseCaseUserLogin,
@@ -15,20 +15,26 @@ import { AppErrors } from "../../domain/errors";
 import { User } from "../../domain/entities/user";
 import { GenericAuthRequest } from "../request";
 
-export class HandlerUsers implements IHandlerUsers {
+interface ArgNewHandlerUsers {
+  register: IUseCaseUserRegister;
+  login: IUseCaseUserLogin;
+  logout?: IUseCaseUserLogout;
+  changePassword: IUseCaseUserChangePassword;
+  deleteUser: IUseCaseUserDeleteUser;
+}
+
+export function newHandlerUsers(arg: ArgNewHandlerUsers): IHandlerUsers {
+  return new HandlerUsers(arg);
+}
+
+class HandlerUsers implements IHandlerUsers {
   private readonly usecaseRegister: IUseCaseUserRegister;
   private readonly usecaseLogin: IUseCaseUserLogin;
   private readonly usecaseLogout?: IUseCaseUserLogout;
   private readonly usecaseChangePassword: IUseCaseUserChangePassword;
   private readonly usecaseDeleteUser: IUseCaseUserDeleteUser;
 
-  constructor(arg: {
-    register: IUseCaseUserRegister;
-    login: IUseCaseUserLogin;
-    logout?: IUseCaseUserLogout;
-    changePassword: IUseCaseUserChangePassword;
-    deleteUser: IUseCaseUserDeleteUser;
-  }) {
+  constructor(arg: ArgNewHandlerUsers) {
     this.usecaseRegister = arg.register;
     this.usecaseLogin = arg.login;
     this.usecaseLogout = arg.logout;

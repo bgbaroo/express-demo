@@ -3,8 +3,8 @@ import { Response } from "express";
 import resp from "../response";
 import { GenericAuthRequest } from "../request";
 import { AuthRequest } from "../auth/jwt";
+import { IHandlerClipboards } from ".";
 import { AppErrors } from "../../domain/errors";
-import { IHandlerClipboards } from "../routes/clipboards";
 import {
   IUseCaseCreateClipboard,
   IUseCaseDeleteUserClipboard,
@@ -25,7 +25,23 @@ interface CreateClipboardBody {
   expiration?: Date;
 }
 
-export class HandlerClipboards implements IHandlerClipboards {
+interface ArgNewHandlerClipboards {
+  createClipboard: IUseCaseCreateClipboard;
+  getClipboard: IUseCaseGetUserClipboard;
+  getClipboards: IUseCaseGetUserClipboards;
+  getGroupClipboards: IUseCaseGetGroupClipboards;
+  getGroupsClipboards: IUseCaseGetGroupsClipboards;
+  deleteClipboard: IUseCaseDeleteUserClipboard;
+  deleteClipboards: IUseCaseDeleteUserClipboards;
+}
+
+export function newHandlerClipboards(
+  arg: ArgNewHandlerClipboards,
+): IHandlerClipboards {
+  return new HandlerClipboards(arg);
+}
+
+class HandlerClipboards implements IHandlerClipboards {
   private readonly usecaseCreateClipboard: IUseCaseCreateClipboard;
   private readonly usecaseGetUserClipboard: IUseCaseGetUserClipboard;
   private readonly usecaseGetUserClipboards: IUseCaseGetUserClipboards;
@@ -34,15 +50,7 @@ export class HandlerClipboards implements IHandlerClipboards {
   private readonly usecaseDeleteUserClipboard: IUseCaseDeleteUserClipboard;
   private readonly usecaseDeleteUserClipboards: IUseCaseDeleteUserClipboards;
 
-  constructor(arg: {
-    createClipboard: IUseCaseCreateClipboard;
-    getClipboard: IUseCaseGetUserClipboard;
-    getClipboards: IUseCaseGetUserClipboards;
-    getGroupClipboards: IUseCaseGetGroupClipboards;
-    getGroupsClipboards: IUseCaseGetGroupsClipboards;
-    deleteClipboard: IUseCaseDeleteUserClipboard;
-    deleteClipboards: IUseCaseDeleteUserClipboards;
-  }) {
+  constructor(arg: ArgNewHandlerClipboards) {
     this.usecaseCreateClipboard = arg.createClipboard;
     this.usecaseGetUserClipboard = arg.getClipboard;
     this.usecaseGetUserClipboards = arg.getClipboards;

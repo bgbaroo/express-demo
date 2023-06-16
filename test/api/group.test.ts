@@ -104,20 +104,3 @@ describe("Create group", () => {
     expect(group.members.includes(credentialBar.email)).toEqual(true);
   });
 });
-
-// describe("Shared clipboard", async () => {
-//   const payloadCreateGroup = { name: "fooGroup" };
-//   const payloadCreateClipboardShared = { content: "fooShared", shared: true };
-//   const payloadCreateClipboardPrivate = {
-//     content: "fooPrivate",
-//     shared: false,
-//   };
-
-//   test("Non-member should not see group clipboard", async () => {
-//     // User foo reates group
-//     const groupCreated = request(app.server)
-//       .post(apiPath)
-//       .set({ Authrorization: tokenFoo })
-//       .send(payloadCreateGroup);
-//   });
-// });

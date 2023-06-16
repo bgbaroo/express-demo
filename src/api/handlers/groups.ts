@@ -1,9 +1,9 @@
 import { Response } from "express";
 
-import resp from "../response";
 import { GenericAuthRequest } from "../request";
-import { IHandlerGroups } from "../routes/groups";
+import resp from "../response";
 import { AuthRequest } from "../auth/jwt";
+import { IHandlerGroups } from ".";
 import { AppErrors } from "../../domain/errors";
 import { IGroup } from "../../domain/entities/group";
 import {
@@ -33,16 +33,22 @@ function groupToResp(group: IGroup): ResponseGroup {
   };
 }
 
-export class HandlerGroups implements IHandlerGroups {
+interface ArgNewHandlerGroups {
+  createGroup: IUseCaseCreateGroup;
+  deleteGroup: IUseCaseDeleteGroup;
+  deleteGroups: IUseCaseDeleteUserGroups;
+}
+
+export function newHandlerGroups(arg: ArgNewHandlerGroups): IHandlerGroups {
+  return new HandlerGroups(arg);
+}
+
+class HandlerGroups implements IHandlerGroups {
   private readonly usecaseCreateGroup: IUseCaseCreateGroup;
   private readonly usecaseDeleteGroup: IUseCaseDeleteGroup;
   private readonly usecaseDeleteGroups: IUseCaseDeleteUserGroups;
 
-  constructor(arg: {
-    createGroup: IUseCaseCreateGroup;
-    deleteGroup: IUseCaseDeleteGroup;
-    deleteGroups: IUseCaseDeleteUserGroups;
-  }) {
+  constructor(arg: ArgNewHandlerGroups) {
     this.usecaseCreateGroup = arg.createGroup;
     this.usecaseDeleteGroup = arg.deleteGroup;
     this.usecaseDeleteGroups = arg.deleteGroups;
