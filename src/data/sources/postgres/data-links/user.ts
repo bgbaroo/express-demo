@@ -1,5 +1,5 @@
 import { BasePrismaSchemaDataLink, DbDriver } from "../";
-import { IDataLinkUser } from "../../../interfaces/data-links";
+import { IDataLinkUser } from ".";
 import modelUser, { IUserData } from "../data-models/user";
 
 import { IWhereUser } from "../../../../domain/interfaces/repositories/user";

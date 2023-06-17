@@ -1,11 +1,10 @@
 import { PrismaClient as DbDriver } from "@prisma/client";
-import { newDataLinkUser } from "./data-links/user";
-import { newDataLinkGroup } from "./data-links/group";
-import { newDataLinkClipboard } from "./data-links/clipboard";
 
+// This Prisma connection will be cached,
+// all files importing this module will have exactly
+// the same object. See Node.js reference here.
+// https://nodejs.org/api/modules.html#caching
 export default new DbDriver();
-
-export { newDataLinkUser, newDataLinkGroup, newDataLinkClipboard };
 
 // Client for file schema.prisma
 class BasePrismaSchemaDataLink {

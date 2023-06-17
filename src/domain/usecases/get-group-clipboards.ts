@@ -11,6 +11,6 @@ export class UseCaseGetGroupClipboards implements IUseCaseGetGroupClipboards {
   }
 
   async execute(userId: string, groupId: string): Promise<IClipboard[] | null> {
-    return await this.repo.getGroupClipboards(userId, groupId);
+    return await this.repo.getUserGroupClipboards(userId, groupId);
   }
 }

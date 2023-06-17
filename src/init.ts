@@ -1,13 +1,6 @@
-import {
-  DbDriver,
-  newDataLinkUser,
-  newDataLinkGroup,
-  newDataLinkClipboard,
-} from "./data/sources/postgres";
-
-import { RepositoryUser } from "./domain/repositories/user";
-import { RepositoryGroup } from "./domain/repositories/group";
-import { RepositoryClipboard } from "./domain/repositories/clipboard";
+import { DbDriver } from "./data/sources/postgres";
+import links from "./data/sources/postgres/data-links";
+import repos from "./domain/repositories";
 
 import { UseCaseUserRegister } from "./domain/usecases/register";
 import { UseCaseUserLogin } from "./domain/usecases/login";
@@ -35,8 +28,8 @@ function init<T extends App>(
   t: { new (arg: ArgCreateApp): T },
   arg: { db: DbDriver },
 ): T {
-  const dataLinkUser = newDataLinkUser(arg.db);
-  const repoUser = new RepositoryUser(dataLinkUser);
+  const dataLinkUser = links.newDataLinkUser(arg.db);
+  const repoUser = repos.newRepositoryUser(dataLinkUser);
   const handlerUsers = handlers.newHandlerUsers({
     register: new UseCaseUserRegister(repoUser),
     login: new UseCaseUserLogin(repoUser),
@@ -44,16 +37,16 @@ function init<T extends App>(
     deleteUser: new UseCaseUserDeleteUser(repoUser),
   });
 
-  const dataLinkGroup = newDataLinkGroup(arg.db);
-  const repoGroup = new RepositoryGroup(dataLinkGroup);
+  const dataLinkGroup = links.newDataLinkGroup(arg.db);
+  const repoGroup = repos.newRepositoryGroup(dataLinkGroup);
   const handlerGroups = handlers.newHandlerGroups({
     createGroup: new UseCaseCreateGroup({ repoGroup, repoUser }),
     deleteGroup: new UseCaseDeleteGroup(repoGroup),
     deleteGroups: new UseCaseDeleteUserGroups(repoGroup),
   });
 
-  const dataLinkClipboard = newDataLinkClipboard(arg.db);
-  const repoClipboard = new RepositoryClipboard(dataLinkClipboard);
+  const dataLinkClipboard = links.newDataLinkClipboard(arg.db);
+  const repoClipboard = repos.newRepositoryClipboard(dataLinkClipboard);
   const handlerClipboards = handlers.newHandlerClipboards({
     createClipboard: new UseCaseCreateClipboard(repoClipboard),
     getClipboard: new UseCaseGetUserClipboard(repoClipboard),

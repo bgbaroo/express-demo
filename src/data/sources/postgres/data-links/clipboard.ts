@@ -4,7 +4,7 @@ import userModel from "../data-models/user";
 
 import { IWhereClipboard } from "../../../../domain/interfaces/repositories/clipboard";
 import { IClipboard } from "../../../../domain/entities/clipboard";
-import { IDataLinkClipboard } from "../../../interfaces/data-links";
+import { IDataLinkClipboard } from ".";
 
 export function newDataLinkClipboard(db: DbDriver): IDataLinkClipboard {
   return new DataLinkClipboard(db);

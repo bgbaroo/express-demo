@@ -1,11 +1,17 @@
-import { IUserData } from "../sources/postgres/data-models/user";
-import { IWhereUser } from "../../domain/interfaces/repositories/user";
-import { IWhereGroup } from "../../domain/interfaces/repositories/group";
-import { IWhereClipboard } from "../../domain/interfaces/repositories/clipboard";
+import { newDataLinkUser } from "./user";
+import { newDataLinkGroup } from "./group";
+import { newDataLinkClipboard } from "./clipboard";
 
-import { IUser } from "../../domain/entities/user";
-import { IGroup } from "../../domain/entities/group";
-import { IClipboard } from "../../domain/entities/clipboard";
+import { IUserData } from "../data-models/user";
+import { IWhereUser } from "../../../../domain/interfaces/repositories/user";
+import { IWhereGroup } from "../../../../domain/interfaces/repositories/group";
+import { IWhereClipboard } from "../../../../domain/interfaces/repositories/clipboard";
+
+import { IUser } from "../../../../domain/entities/user";
+import { IGroup } from "../../../../domain/entities/group";
+import { IClipboard } from "../../../../domain/entities/clipboard";
+
+export default { newDataLinkUser, newDataLinkGroup, newDataLinkClipboard };
 
 export interface IDataLinkUser {
   createUser(user: IUser, password: string): Promise<IUserData>;

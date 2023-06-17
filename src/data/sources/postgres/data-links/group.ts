@@ -4,7 +4,7 @@ import modelUser from "../data-models/user";
 
 import { IGroup } from "../../../../domain/entities/group";
 import { IWhereGroup } from "../../../../domain/interfaces/repositories/group";
-import { IDataLinkGroup } from "../../../interfaces/data-links";
+import { IDataLinkGroup } from ".";
 
 export function newDataLinkGroup(db: DbDriver): IDataLinkGroup {
   return new DataLinkGroup(db);

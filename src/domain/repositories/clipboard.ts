@@ -1,11 +1,17 @@
-import { IDataLinkClipboard } from "../../data/interfaces/data-links";
+import { IDataLinkClipboard } from "../../data/sources/postgres/data-links";
 import { IClipboard } from "../entities/clipboard";
 import {
   IRepositoryClipboard,
   whereClipboard,
 } from "../interfaces/repositories/clipboard";
 
-export class RepositoryClipboard implements IRepositoryClipboard {
+export function newRepositoryClipboard(
+  link: IDataLinkClipboard,
+): IRepositoryClipboard {
+  return new RepositoryClipboard(link);
+}
+
+class RepositoryClipboard implements IRepositoryClipboard {
   private readonly link: IDataLinkClipboard;
 
   constructor(link: IDataLinkClipboard) {
@@ -29,15 +35,24 @@ export class RepositoryClipboard implements IRepositoryClipboard {
     return await this.link.getClipboards({ userId });
   }
 
-  async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
+  async getUserGroupsClipboards(userId: string): Promise<IClipboard[] | null> {
     return await this.link.getClipboards(
-      whereClipboard({ shared: true, groupId }),
+      whereClipboard({ shared: true, allGroups: true, userId }),
     );
   }
 
-  async getGroupsClipboards(userId: string): Promise<IClipboard[] | null> {
+  async getUserGroupClipboards(
+    userId: string,
+    groupId: string,
+  ): Promise<IClipboard[] | null> {
     return await this.link.getClipboards(
-      whereClipboard({ shared: true, allGroups: true, userId }),
+      whereClipboard({ shared: true, allGroups: true, userId, groupId }),
+    );
+  }
+
+  async getGroupClipboards(groupId: string): Promise<IClipboard[] | null> {
+    return await this.link.getClipboards(
+      whereClipboard({ shared: true, groupId }),
     );
   }
 

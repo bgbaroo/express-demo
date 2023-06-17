@@ -1,30 +1,29 @@
-import postgres from "../../src/data/sources/postgres";
+import postgres, { DbDriver } from "../../src/data/sources/postgres";
+import links, {
+  IDataLinkClipboard,
+  IDataLinkGroup,
+  IDataLinkUser,
+} from "../../src/data/sources/postgres/data-links";
 
-import { clearDb } from "../util";
-
-import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
-import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
-import { DataLinkClipboard } from "../../src/data/sources/postgres/data-links/clipboard";
-import { DbDriver } from "../../src/data/sources/postgres";
+import repo from "../../src/domain/repositories";
 
 import { IRepositoryClipboard } from "../../src/domain/interfaces/repositories/clipboard";
-import { RepositoryUser } from "../../src/domain/repositories/user";
-import { RepositoryGroup } from "../../src/domain/repositories/group";
-import { RepositoryClipboard } from "../../src/domain/repositories/clipboard";
 
 import { GroupOwner } from "../../src/domain/entities/group-owner";
 import { Group } from "../../src/domain/entities/group";
 import { User } from "../../src/domain/entities/user";
 import { IClipboard, Clipboard } from "../../src/domain/entities/clipboard";
 
+import { clearDb } from "../util";
+
 interface Arg {
   owner: string;
   members: string[];
   nonMembers: string[];
   dbDriver: DbDriver;
-  dataLinkUser: DataLinkUser;
-  dataLinkGroup: DataLinkGroup;
-  dataLinkClipboard: DataLinkClipboard;
+  dataLinkUser: IDataLinkUser;
+  dataLinkGroup: IDataLinkGroup;
+  dataLinkClipboard: IDataLinkClipboard;
 }
 
 describe("groups and clipboards", () => {
@@ -41,9 +40,9 @@ describe("groups and clipboards", () => {
       "clipboard.test-user3",
     ],
     dbDriver: postgres,
-    dataLinkUser: new DataLinkUser(postgres),
-    dataLinkGroup: new DataLinkGroup(postgres),
-    dataLinkClipboard: new DataLinkClipboard(postgres),
+    dataLinkUser: links.newDataLinkUser(postgres),
+    dataLinkGroup: links.newDataLinkGroup(postgres),
+    dataLinkClipboard: links.newDataLinkClipboard(postgres),
   };
 
   test("membership visibility", async () => {
@@ -62,9 +61,9 @@ describe("groups and clipboards", () => {
 });
 
 async function testGroupClipboards(arg: Arg): Promise<void> {
-  const repoUser = new RepositoryUser(arg.dataLinkUser);
-  const repoGroup = new RepositoryGroup(arg.dataLinkGroup);
-  const repoClipboard = new RepositoryClipboard(arg.dataLinkClipboard);
+  const repoUser = repo.newRepositoryUser(arg.dataLinkUser);
+  const repoGroup = repo.newRepositoryGroup(arg.dataLinkGroup);
+  const repoClipboard = repo.newRepositoryClipboard(arg.dataLinkClipboard);
 
   console.log("Creating group owner user");
   const ownerUser = await repoUser.createUser(
@@ -102,7 +101,9 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
   ]);
 
   members.forEach(async (member) => {
-    const ownerGroupClips = await repoClipboard.getGroupsClipboards(member.id);
+    const ownerGroupClips = await repoClipboard.getUserGroupsClipboards(
+      member.id,
+    );
     if (!ownerGroupClips) {
       return Promise.reject("null groupClips");
     }
@@ -156,9 +157,35 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
     );
   });
 
+  // We only have 1 group, so getUserGroupClipboards should return
+  // the same number of clipboards as groupClipboards
+  await Promise.all(
+    members.map(
+      async (member): Promise<[string, Promise<IClipboard[] | null>]> => {
+        return [
+          member.id,
+          repoClipboard.getUserGroupClipboards(member.id, group.id),
+        ];
+      },
+    ),
+  ).then((membersResults) => {
+    membersResults.forEach(async (memberResult) => {
+      const clipboards = await memberResult[1];
+      if (!clipboards) {
+        return Promise.reject(
+          `null groupClipboards for member ${memberResult[0]}`,
+        );
+      }
+
+      expect(clipboards.length).toEqual(groupClipboards.length);
+    });
+  });
+
   // Members should not see non-members' clips
   members.forEach(async (member) => {
-    const groupsClipboards = await repoClipboard.getGroupsClipboards(member.id);
+    const groupsClipboards = await repoClipboard.getUserGroupsClipboards(
+      member.id,
+    );
     if (!groupsClipboards) {
       return Promise.reject("null groupClips");
     }
@@ -188,7 +215,9 @@ async function testGroupClipboards(arg: Arg): Promise<void> {
 
   // Members should only see shared clips
   members.forEach(async (member) => {
-    const groupsClipboards = await repoClipboard.getGroupsClipboards(member.id);
+    const groupsClipboards = await repoClipboard.getUserGroupsClipboards(
+      member.id,
+    );
     if (!groupsClipboards) {
       return Promise.reject("null groupClips");
     }

@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { DataLinkUser } from "../../src/data/sources/postgres/data-links/user";
-import { DataLinkGroup } from "../../src/data/sources/postgres/data-links/group";
+import links, {
+  IDataLinkUser,
+  IDataLinkGroup,
+} from "../../src/data/sources/postgres/data-links";
 
 import { GroupOwner } from "../../src/domain/entities/group-owner";
 import { Group } from "../../src/domain/entities/group";
@@ -18,8 +20,8 @@ interface Arg {
 describe("users and groups datalink", () => {
   test("group with user relations", async () => {
     const pg = new PrismaClient();
-    const userDb = new DataLinkUser(pg);
-    const groupDb = new DataLinkGroup(pg);
+    const userDb = links.newDataLinkUser(pg);
+    const groupDb = links.newDataLinkGroup(pg);
 
     const arg = {
       gName: "groupName",
@@ -35,8 +37,8 @@ describe("users and groups datalink", () => {
 });
 
 async function testUserAndGroupWrites(
-  userDb: DataLinkUser,
-  groupDb: DataLinkGroup,
+  userDb: IDataLinkUser,
+  groupDb: IDataLinkGroup,
   arg: Arg,
 ): Promise<void> {
   try {

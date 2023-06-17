@@ -12,12 +12,15 @@ export interface IRepositoryClipboard {
   }): Promise<IClipboard | null>;
 
   // Get shared clipboards from user's groups
-  getGroupsClipboards(userId: string): Promise<IClipboard[] | null>;
+  getUserGroupsClipboards(userId: string): Promise<IClipboard[] | null>;
   // Get shared clipboards from a user's group
-  getGroupClipboards(
+  getUserGroupClipboards(
     userId: string,
     groupId: string,
   ): Promise<IClipboard[] | null>;
+
+  // Get shared clipboards from a user's group
+  getGroupClipboards(groupId: string): Promise<IClipboard[] | null>;
 
   deleteUserClipboard(arg: { userId: string; id: string }): Promise<IClipboard>;
   deleteUserClipboards(userId: string): Promise<number>;
