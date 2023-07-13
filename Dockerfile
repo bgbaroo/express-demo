@@ -7,8 +7,14 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install && \ 
-  pnpm prisma && \
+RUN npm install -g pnpm && \
+  pnpm install
+
+COPY . .
+
+RUN pnpm prisma && \
   pnpm build 
 
 CMD ["pnpm", "start"]
+
+EXPOSE 8000
